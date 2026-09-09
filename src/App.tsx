@@ -2,7 +2,31 @@ import { useMemo, useState, type ChangeEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { generateGuidelinePages } from './guideline-system/generatePages';
+import { postProcessGuidelinePages } from './guideline-system/postProcess';
 import type { BrandProject } from './types/guideline';
+
+const FONT_OPTIONS = [
+  'Pretendard',
+  'Noto Sans KR',
+  'SUIT',
+  'Wanted Sans',
+  'Spoqa Han Sans Neo',
+  'Apple SD Gothic Neo',
+  'Nanum Gothic',
+  'NanumSquare Neo',
+  'Gmarket Sans',
+  'IBM Plex Sans KR',
+  'Inter',
+  'Roboto',
+  'Open Sans',
+  'Montserrat',
+  'Poppins',
+  'Lato',
+  'Helvetica Neue',
+  'Arial',
+  'Noto Serif KR',
+  'Georgia',
+];
 
 const initialProject: BrandProject = {
   name: '',
@@ -37,7 +61,7 @@ export default function App() {
   const [currentId, setCurrentId] = useState('01-cover');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
-  const pages = useMemo(() => generateGuidelinePages(project), [project]);
+  const pages = useMemo(() => postProcessGuidelinePages(generateGuidelinePages(project), project), [project]);
   const currentPage = pages.find((page) => page.id === currentId) ?? pages[0];
   const enabledPages = pages.filter((page) => enabled[page.id] !== false);
 
@@ -73,6 +97,10 @@ export default function App() {
       setError('브랜드명을 입력해주세요.');
       return;
     }
+    if (!project.englishName.trim()) {
+      setError('영문 브랜드명을 입력해주세요. 가이드 내지 헤더에 필수로 사용됩니다.');
+      return;
+    }
     if (!project.logo) {
       setError('Primary Logo SVG를 업로드해주세요.');
       return;
@@ -103,7 +131,7 @@ export default function App() {
           <section className="form-section">
             <div className="section-heading">
               <h2>Brand</h2>
-              <p>가이드 문서에 사용할 기본 정보를 입력합니다.</p>
+              <p>가이드 문서에 사용할 기본 정보를 입력합니다. 영문 브랜드명은 모든 내지 헤더에 사용됩니다.</p>
             </div>
             <div className="field-grid two-column">
               <label className="field">
@@ -111,8 +139,8 @@ export default function App() {
                 <input value={project.name} onChange={(e) => updateProject('name', e.target.value)} placeholder="브랜드명" />
               </label>
               <label className="field">
-                <span>영문 브랜드명</span>
-                <input value={project.englishName} onChange={(e) => updateProject('englishName', e.target.value)} placeholder="Brand name" />
+                <span>영문 브랜드명 *</span>
+                <input value={project.englishName} onChange={(e) => updateProject('englishName', e.target.value)} placeholder="Brand name" required />
               </label>
             </div>
             <label className="field">
@@ -191,16 +219,20 @@ export default function App() {
           <section className="form-section">
             <div className="section-heading">
               <h2>Typography</h2>
-              <p>미입력 시 Pretendard를 기본값으로 사용합니다.</p>
+              <p>실무에서 자주 사용하는 서체를 선택할 수 있습니다. 기본값은 Pretendard입니다.</p>
             </div>
             <div className="field-grid two-column">
               <label className="field">
                 <span>Title Typeface</span>
-                <input value={project.typography.title} onChange={(e) => setProject((previous) => ({ ...previous, typography: { ...previous.typography, title: e.target.value } }))} />
+                <select value={project.typography.title} onChange={(e) => setProject((previous) => ({ ...previous, typography: { ...previous.typography, title: e.target.value } }))}>
+                  {FONT_OPTIONS.map((font) => <option key={font} value={font}>{font}</option>)}
+                </select>
               </label>
               <label className="field">
                 <span>Body Typeface</span>
-                <input value={project.typography.body} onChange={(e) => setProject((previous) => ({ ...previous, typography: { ...previous.typography, body: e.target.value } }))} />
+                <select value={project.typography.body} onChange={(e) => setProject((previous) => ({ ...previous, typography: { ...previous.typography, body: e.target.value } }))}>
+                  {FONT_OPTIONS.map((font) => <option key={font} value={font}>{font}</option>)}
+                </select>
               </label>
             </div>
           </section>
@@ -221,20 +253,20 @@ export default function App() {
         <div className="topbar-inner editor-header-inner">
           <div>
             <strong className="brand-title">BrandCreator</strong>
-            <span className="project-name">{project.name}</span>
+            <span className="project-name">{project.englishName}</span>
           </div>
           <div className="header-actions">
             <button className="button ghost" onClick={() => setMode('setup')}>프로젝트 정보</button>
-            <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.name)}>전체 SVG</button>
+            <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
             <button className="button primary" onClick={() => window.print()}>PDF로 내보내기</button>
           </div>
         </div>
       </header>
 
       <main className="editor-layout">
-        <aside className="page-sidebar" aria-label="가이드라인 페이지">
+        <aside className="page-sidebar" aria-label="가이드라인 목차">
           <div className="sidebar-heading">
-            <strong>PAGES</strong>
+            <strong>CONTENTS</strong>
             <span>{enabledPages.length}/{pages.length}</span>
           </div>
           <div className="page-list">
@@ -261,7 +293,7 @@ export default function App() {
               <span className="metadata-label">{currentPage.title}</span>
               <strong>{currentPage.subtitle || currentPage.id}</strong>
             </div>
-            <button className="button tertiary small" onClick={() => downloadSvg(currentPage, project.name)}>현재 페이지 SVG</button>
+            <button className="button tertiary small" onClick={() => downloadSvg(currentPage, project.englishName || project.name)}>현재 페이지 SVG</button>
           </div>
           <div className="page-stage">
             <div className="svg-page" dangerouslySetInnerHTML={{ __html: currentPage.svg }} />
@@ -303,6 +335,7 @@ export default function App() {
             <h3>Document</h3>
             <div className="spec-row"><span>Artboard</span><strong>A4 Landscape</strong></div>
             <div className="spec-row"><span>Size</span><strong>297 × 210 mm</strong></div>
+            <div className="spec-row"><span>Tracking</span><strong>-3%</strong></div>
             <div className="spec-row"><span>Rendering</span><strong>SVG Vector</strong></div>
           </div>
         </aside>
