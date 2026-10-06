@@ -148,12 +148,6 @@ export default function App() {
 
         <main className="setup-workspace">
           <section className="setup-main">
-            <div className="setup-hero">
-              <p className="eyebrow">BRAND SYSTEM GENERATOR · V1</p>
-              <h1>브랜드 가이드라인을<br />하나의 시스템으로 설계합니다.</h1>
-              <p>로고와 핵심 브랜드 정보만 입력하면 로고 규정, 컬러, 타이포그래피까지 일관된 A4 가이드라인으로 자동 구성합니다.</p>
-            </div>
-
             <div className="setup-module-stack">
               <section className="setup-module">
                 <div className="module-index">01</div>
