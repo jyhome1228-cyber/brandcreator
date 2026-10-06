@@ -381,6 +381,25 @@ export default function App() {
                 <div className="progress-track"><i style={{ width: `${setupProgress}%` }} /></div>
                 <p>필수 정보와 로고를 입력하면 바로 브랜드 가이드라인을 생성할 수 있습니다.</p>
               </div>
+
+              <div className="page-structure-card">
+                <div className="page-structure-heading">
+                  <div>
+                    <span className="metadata-label">PAGE STRUCTURE</span>
+                    <strong>가이드라인 구성</strong>
+                  </div>
+                  <span>{pages.length}P</span>
+                </div>
+                <div className="page-structure-list">
+                  {pages.map((page, index) => (
+                    <div className="structure-row" key={page.id}>
+                      <span className="structure-number">{String(index + 1).padStart(2, '0')}</span>
+                      <span className="structure-title">{page.subtitle || page.title}</span>
+                      <span className="structure-section">{sectionLabels[page.section]}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
             </div>
           </aside>
         </main>
