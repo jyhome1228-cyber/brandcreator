@@ -188,88 +188,443 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
   const secondary = safeHex(project.colors.secondary, '#EAEAEA');
   const accent = safeHex(project.colors.accent, '#777777');
   const coverFg = contrast(primary);
+  const brandName = project.name || project.englishName || 'Brand';
+  const englishName = project.englishName || brandName;
   const ratio = project.logo?.aspectRatio && project.logo.aspectRatio > 0 ? project.logo.aspectRatio : 1;
   const ratioText = ratio.toFixed(2);
   const clear = Math.max(0.1, Math.min(2, project.rules.clearSpace || 0.25));
-  const brandName = project.name || project.englishName || 'Brand';
-  const logoCopy = `시그니처 로고는 ${brandName}를 대표하는 핵심 시각 자산입니다. 모든 공식 커뮤니케이션에서는 기본형을 우선 사용하며, 형태와 비율을 임의로 변경하지 않고 일관성을 유지합니다.`;
-  const gridCopy = '그리드 시스템은 로고의 균형과 안정적인 비례를 유지하기 위한 기준입니다. 제작 및 재현 과정에서 원본 비율이 왜곡되지 않도록 하며, 다양한 크기와 매체에서도 동일한 시각적 무게감을 유지합니다.';
-  const clearCopy = '로고 주변에는 일정한 보호 공간(Clear Space)을 확보해야 합니다. 텍스트, 이미지 및 기타 그래픽 요소와의 시각적 간섭을 방지하고 로고의 명확한 인지성을 유지하기 위한 기준입니다.';
-  const minCopy = '로고는 사용 환경에 관계없이 충분한 가독성과 식별성을 유지해야 합니다. 지정된 최소 사용 크기 이하에서는 로고를 사용하지 않는 것을 원칙으로 합니다.';
-  const monoCopy = '단색 로고는 컬러 사용이 제한되는 환경에서도 브랜드의 형태와 인지성을 일관되게 유지하기 위한 규정입니다. 흑백 인쇄 및 단색 디지털 환경에서는 지정된 Black 또는 White 버전을 사용합니다.';
-  const colorCopy = project.description ? `브랜드 컬러는 ${brandName}의 성격과 인상을 시각적으로 전달하는 핵심 요소입니다. ${project.description} 지정된 컬러값을 기준으로 사용하여 다양한 매체에서 동일한 브랜드 이미지를 유지합니다.` : `브랜드 컬러는 ${brandName}의 성격과 톤앤매너를 시각적으로 전달하는 핵심 요소입니다. 지정된 컬러값을 기준으로 사용하여 인쇄와 디지털 환경에서 일관된 브랜드 이미지를 유지합니다.`;
-  const combinationCopy = '컬러 조합은 브랜드 컬러와 로고의 관계를 명확하게 정의합니다. 배경과 로고 사이에 충분한 대비를 확보하고, 지정된 조합을 우선 사용하여 브랜드의 시각적 일관성을 유지합니다.';
-  const usageCopy = '배경 컬러에 따라 로고의 가독성이 달라질 수 있으므로 지정된 사용 기준을 따릅니다. 식별성이 떨어지는 조합은 사용을 피하고 충분한 대비가 확보되는 컬러 조합을 우선 적용합니다.';
-  const titleCopy = `제목용 서체는 브랜드의 첫인상과 정보 위계를 형성하는 주요 요소입니다. ${project.typography.title || 'Pretendard'}를 제목 서체로 사용하며, 주요 타이틀과 강조 정보에 일관되게 적용합니다.`;
-  const bodyCopy = `본문용 서체는 다양한 정보가 명확하고 편안하게 전달될 수 있도록 높은 가독성을 기준으로 사용합니다. ${project.typography.body || 'Pretendard'}를 기본 본문 서체로 사용하여 인쇄와 디지털 환경에서 동일한 정보 체계를 유지합니다.`;
 
   const pages: GuidelinePage[] = [];
   const add = (page: GuidelinePage) => pages.push(page);
 
-  add({ id: '01-cover', section: 'intro', title: 'Cover', subtitle: '', svg: `${openSvg(project, primary)}<text x="105" y="285" fill="${coverFg}" font-size="330" font-weight="700">Brand Guidelines</text>${logo(project.logo, 105, 1450, 650, 210, coverFg)}<text x="2240" y="1550" fill="${coverFg}" font-size="54" font-weight="700">${esc(project.year)}</text><text x="2240" y="1620" fill="${coverFg}" opacity=".74" font-size="28">${esc(brandName)}</text><text x="2240" y="1670" fill="${coverFg}" opacity=".74" font-size="24">${esc(project.slogan || 'Visual Identity Guidelines')}</text></svg>` });
+  const copy = {
+    primary: `Primary Logo는 ${brandName}의 가장 핵심적인 시각 자산입니다. 모든 공식 커뮤니케이션에서 기본형을 우선 사용하며, 비율과 형태를 임의로 변경하지 않습니다.`,
+    construction: '로고의 구조와 비례는 일관된 인상을 유지하기 위한 기준입니다. 원본 비율을 유지하고 기준선과 정렬축을 활용해 다양한 환경에서도 동일한 형태로 재현합니다.',
+    variations: '사용 환경에 따라 Primary, Monochrome, Reverse 버전을 선택합니다. 배경 대비와 가독성을 우선하며 지정된 조합 외 임의의 컬러 변형은 지양합니다.',
+    clear: `로고 주변에는 최소 ${clear}X의 보호 공간을 확보합니다. X는 로고 높이를 기준으로 하며, 보호 공간 안에는 텍스트·이미지·그래픽 요소가 침범하지 않도록 합니다.`,
+    incorrect: '로고의 일관성을 위해 형태 왜곡, 임의 회전, 효과 적용, 비지정 컬러 사용을 금지합니다. 모든 사용 환경에서 원본 로고의 비례와 명료성을 유지합니다.',
+    minimum: '작은 크기에서도 브랜드 인지가 유지되도록 최소 사용 크기를 준수합니다. 인쇄물과 디지털 환경에 각각 지정된 최소 기준 이하에서는 사용하지 않습니다.',
+    color: `Brand Color는 ${brandName}의 인상을 형성하는 핵심 요소입니다. 지정된 HEX·RGB·CMYK 값을 기준으로 디지털과 인쇄 환경에서 동일한 컬러 경험을 유지합니다.`,
+    colorSystem: 'Primary Color를 중심으로 Secondary와 Accent Color를 보조적으로 사용합니다. 넓은 면적은 Primary 중심, 정보 구분과 강조에는 보조 컬러를 제한적으로 적용합니다.',
+    combination: '로고와 배경 컬러의 조합은 가독성과 브랜드 인지도를 기준으로 선택합니다. 충분한 명도 대비가 확보되는 조합을 우선 사용합니다.',
+    usage: '컬러 사용 비율과 대비 규칙을 함께 적용해 화면과 인쇄물에서 안정적인 시각 위계를 유지합니다. 동일 화면에서 과도한 컬러 경쟁이 발생하지 않도록 합니다.',
+    title: `Title Typeface는 ${project.typography.title || 'Pretendard'}를 사용합니다. 짧고 강한 메시지와 주요 헤드라인에 적용하며 일관된 크기·행간·자간 기준을 유지합니다.`,
+    body: `Body Typeface는 ${project.typography.body || 'Pretendard'}를 사용합니다. 정보 전달과 장문 가독성을 우선하며 제목과 본문 사이에 명확한 위계를 형성합니다.`,
+  };
 
-  const indexFg = contrast(primary);
-  add({ id: '02-index', section: 'intro', title: 'INDEX', subtitle: '', svg: `${openSvg(project, primary)}<text x="105" y="255" fill="${indexFg}" font-size="225" font-weight="700">INDEX</text><g fill="${indexFg}"><text x="1930" y="365" font-size="48" font-weight="700">LOGO</text><text x="2280" y="365" font-size="46">Signature logo</text><text x="2280" y="430" font-size="46">Grid system 1</text><text x="2280" y="495" font-size="46">Grid system 2</text><text x="2280" y="560" font-size="46">Clear space 1</text><text x="2280" y="625" font-size="46">Clear space 2</text><text x="2280" y="690" font-size="46">Minimum size</text><line x1="1930" y1="760" x2="2865" y2="760" stroke="${indexFg}" opacity=".55"/><text x="1930" y="865" font-size="48" font-weight="700">COLOR</text><text x="2280" y="865" font-size="46">Monochromatic</text><text x="2280" y="930" font-size="46">Brand color</text><text x="2280" y="995" font-size="46">Combinations</text><text x="2280" y="1060" font-size="46">Usage</text><line x1="1930" y1="1130" x2="2865" y2="1130" stroke="${indexFg}" opacity=".55"/><text x="1930" y="1235" font-size="48" font-weight="700">TYPOGRAPHY</text><text x="2280" y="1235" font-size="46">Title text</text><text x="2280" y="1300" font-size="46">Body text</text></g>${footer(project, 'Index', true)}</svg>` });
+  const leftMeta = (items: Array<[string, string]>) => items.map(([k, v], index) =>
+    `<g transform="translate(105 ${1050 + index * 112})"><text x="0" y="0" fill="${MUTED}" font-size="24" font-weight="500">${esc(k.toUpperCase())}</text><text x="0" y="46" fill="${BLACK}" font-size="30" font-weight="600">${esc(v)}</text><line x1="0" y1="76" x2="720" y2="76" stroke="${LINE}" stroke-width="2"/></g>`
+  ).join('');
 
-  add({ id: '03-logo-section', section: 'logo', title: 'LOGO', subtitle: '', svg: sectionCover(project, 'LOGO', '01', ['Signature logo', 'Grid system 1', 'Grid system 2', 'Clear space 1', 'Clear space 2', 'Minimum size']) });
+  const panel = (x: number, y: number, w: number, h: number, fill = SOFT, stroke = 'none') =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="4" fill="${fill}" stroke="${stroke}" stroke-width="2"/>`;
 
-  const signatureTop = { x: 1035, y: 460, w: 1830, h: 620 };
-  const signatureBottomY = 1114;
-  add({ id: '04-signature-logo', section: 'logo', title: 'LOGO', subtitle: 'Signature logo', svg: commonPage(project, 'LOGO', 'Signature logo', logoCopy, `<rect x="${signatureTop.x}" y="${signatureTop.y}" width="${signatureTop.w}" height="${signatureTop.h}" fill="${SOFT}"/>${label('PRIMARY', 1075, 520)}${logo(project.logo, 1350, 650, 1200, 330)}<rect x="1035" y="${signatureBottomY}" width="898" height="520" fill="${SOFT}"/>${label('MONOCHROME', 1075, signatureBottomY + 60)}${logo(project.logo, 1210, signatureBottomY + 145, 550, 230, BLACK)}<rect x="1967" y="${signatureBottomY}" width="898" height="520" fill="${primary}"/>${label('REVERSE', 2007, signatureBottomY + 60, contrast(primary))}${logo(project.logo, 2142, signatureBottomY + 145, 550, 230, contrast(primary))}`) });
+  const cross = (x: number, y: number, w: number, h: number) =>
+    `<line x1="${x + 18}" y1="${y + 18}" x2="${x + w - 18}" y2="${y + h - 18}" stroke="${ERROR}" stroke-width="6"/><line x1="${x + w - 18}" y1="${y + 18}" x2="${x + 18}" y2="${y + h - 18}" stroke="${ERROR}" stroke-width="6"/>`;
 
-  const gridBox = { x: 1125, y: 610, w: 1650, h: 760 };
+  const colorSpec = (hexValue: string, x: number, y: number, w: number, h: number, name: string) => {
+    const hex = safeHex(hexValue);
+    const [r, g, b] = hexRgb(hex);
+    const [c, m, yy, k] = rgbToCmyk(hex);
+    const fg = contrast(hex);
+    return `${panel(x, y, w, h, hex)}<text x="${x + 28}" y="${y + 48}" fill="${fg}" font-size="24" font-weight="700">${esc(name)}</text><text x="${x + 28}" y="${y + h - 128}" fill="${fg}" font-size="26" font-weight="600">${hex}</text><text x="${x + 28}" y="${y + h - 82}" fill="${fg}" opacity=".82" font-size="21">RGB ${r} · ${g} · ${b}</text><text x="${x + 28}" y="${y + h - 42}" fill="${fg}" opacity=".82" font-size="21">CMYK ${c} · ${m} · ${yy} · ${k}</text>`;
+  };
+
+  const sectionIntro = (section: string, number: string, items: string[]) => {
+    const itemMarkup = items.map((item, index) =>
+      `<text x="2110" y="${390 + index * 72}" fill="${BLACK}" font-size="34" font-weight="500">${esc(String(index + 1).padStart(2, '0'))}</text><text x="2240" y="${390 + index * 72}" fill="${BLACK}" font-size="34">${esc(item)}</text>`
+    ).join('');
+    return `${openSvg(project, '#F1F1F3')}<text x="105" y="210" fill="${MUTED}" font-size="26" font-weight="600">${number} · BRAND IDENTITY SYSTEM</text><text x="105" y="1750" fill="${BLACK}" font-size="250" font-weight="700">${esc(section)}</text><line x1="2040" y1="300" x2="2865" y2="300" stroke="${BLACK}" stroke-width="3"/>${itemMarkup}${footer(project, section)}</svg>`;
+  };
+
+  // 01 Cover
+  add({
+    id: '01-cover',
+    section: 'intro',
+    title: 'Cover',
+    subtitle: '',
+    svg: `${openSvg(project, primary)}
+      <text x="105" y="170" fill="${coverFg}" opacity=".74" font-size="24" font-weight="600">${esc(project.year)} · BRAND IDENTITY GUIDELINES</text>
+      <text x="105" y="520" fill="${coverFg}" font-size="260" font-weight="700">Brand</text>
+      <text x="105" y="760" fill="${coverFg}" font-size="260" font-weight="700">Guidelines</text>
+      <line x1="105" y1="930" x2="2865" y2="930" stroke="${coverFg}" opacity=".28" stroke-width="2"/>
+      ${logo(project.logo, 105, 1420, 620, 190, coverFg)}
+      <text x="2200" y="1460" fill="${coverFg}" font-size="30" font-weight="600">${esc(englishName)}</text>
+      <text x="2200" y="1520" fill="${coverFg}" opacity=".74" font-size="23">${esc(project.slogan || 'Visual Identity System')}</text>
+      <text x="2200" y="1600" fill="${coverFg}" opacity=".55" font-size="20">VERSION 1.0 · ${esc(project.year)}</text>
+    </svg>`
+  });
+
+  // 02 Index
+  add({
+    id: '02-index',
+    section: 'intro',
+    title: 'INDEX',
+    subtitle: '',
+    svg: `${openSvg(project)}
+      <text x="105" y="245" fill="${BLACK}" font-size="190" font-weight="700">INDEX</text>
+      <text x="105" y="355" fill="${MUTED}" font-size="28">Brand Identity Guidelines · ${esc(englishName)}</text>
+      <line x1="105" y1="430" x2="2865" y2="430" stroke="${BLACK}" stroke-width="3"/>
+
+      <text x="105" y="590" fill="${MUTED}" font-size="24" font-weight="700">01</text>
+      <text x="190" y="590" fill="${BLACK}" font-size="48" font-weight="700">LOGO</text>
+      <text x="190" y="675" fill="${BLACK}" font-size="30">04  Primary logo</text>
+      <text x="190" y="730" fill="${BLACK}" font-size="30">05  Construction grid</text>
+      <text x="190" y="785" fill="${BLACK}" font-size="30">06  Logo variations</text>
+      <text x="190" y="840" fill="${BLACK}" font-size="30">07  Clear space</text>
+      <text x="190" y="895" fill="${BLACK}" font-size="30">08  Incorrect usage</text>
+      <text x="190" y="950" fill="${BLACK}" font-size="30">09  Minimum size</text>
+
+      <text x="1050" y="590" fill="${MUTED}" font-size="24" font-weight="700">02</text>
+      <text x="1135" y="590" fill="${BLACK}" font-size="48" font-weight="700">COLOR</text>
+      <text x="1135" y="675" fill="${BLACK}" font-size="30">11  Brand color</text>
+      <text x="1135" y="730" fill="${BLACK}" font-size="30">12  Color system</text>
+      <text x="1135" y="785" fill="${BLACK}" font-size="30">13  Combinations</text>
+      <text x="1135" y="840" fill="${BLACK}" font-size="30">14  Usage guide</text>
+
+      <text x="2010" y="590" fill="${MUTED}" font-size="24" font-weight="700">03</text>
+      <text x="2095" y="590" fill="${BLACK}" font-size="48" font-weight="700">TYPOGRAPHY</text>
+      <text x="2095" y="675" fill="${BLACK}" font-size="30">16  Title text</text>
+      <text x="2095" y="730" fill="${BLACK}" font-size="30">17  Body text</text>
+
+      <rect x="105" y="1250" width="2760" height="460" fill="${SOFT}"/>
+      <text x="145" y="1320" fill="${MUTED}" font-size="23" font-weight="700">DOCUMENT SYSTEM</text>
+      <text x="145" y="1430" fill="${BLACK}" font-size="46" font-weight="700">A4 Landscape</text>
+      <text x="1040" y="1430" fill="${BLACK}" font-size="46" font-weight="700">Vector SVG</text>
+      <text x="1935" y="1430" fill="${BLACK}" font-size="46" font-weight="700">PDF Export</text>
+      <text x="145" y="1510" fill="${MUTED}" font-size="25">297 × 210 mm</text>
+      <text x="1040" y="1510" fill="${MUTED}" font-size="25">Editable artwork</text>
+      <text x="1935" y="1510" fill="${MUTED}" font-size="25">Ready for delivery</text>
+      ${footer(project, 'Index')}
+    </svg>`
+  });
+
+  // 03 Logo section
+  add({ id: '03-logo-section', section: 'logo', title: 'LOGO', subtitle: '', svg: sectionIntro('LOGO', '01', ['Primary logo', 'Construction grid', 'Logo variations', 'Clear space', 'Incorrect usage', 'Minimum size']) });
+
+  // 04 Primary logo
+  add({
+    id: '04-signature-logo',
+    section: 'logo',
+    title: 'LOGO',
+    subtitle: 'Primary logo',
+    svg: commonPage(project, 'LOGO', 'Primary logo', copy.primary,
+      `${leftMeta([['Role', 'Core brand asset'], ['Priority', 'Primary version first'], ['Rule', 'Do not redraw']])}
+      ${panel(1035, 460, 1830, 720, WHITE, LINE)}
+      ${label('PRIMARY LOGO', 1080, 520)}
+      ${logo(project.logo, 1390, 660, 1120, 310)}
+      ${panel(1035, 1215, 885, 330, primary)}
+      ${label('REVERSE', 1075, 1270, contrast(primary))}
+      ${logo(project.logo, 1240, 1330, 480, 140, contrast(primary))}
+      ${panel(1955, 1215, 910, 330, '#F2F2F2')}
+      ${label('MONOCHROME', 1995, 1270)}
+      ${logo(project.logo, 2165, 1330, 480, 140, BLACK)}
+      <text x="1035" y="1625" fill="${MUTED}" font-size="22">The primary logo should always be reproduced from approved master artwork.</text>`
+    )
+  });
+
+  // 05 Construction grid
+  const gridBox = { x: 1140, y: 610, w: 1600, h: 650 };
   const gridLogo = fitLogo(project.logo, gridBox.x + 180, gridBox.y + 150, gridBox.w - 360, gridBox.h - 300);
-  add({ id: '05-grid-system-1', section: 'logo', title: 'LOGO', subtitle: 'Grid system 1', svg: commonPage(project, 'LOGO', 'Grid system 1', gridCopy, `<rect x="1035" y="460" width="1830" height="1110" fill="${SOFT}"/>${logo(project.logo, gridLogo.x, gridLogo.y, gridLogo.width, gridLogo.height)}<line x1="1035" y1="${gridLogo.y}" x2="2865" y2="${gridLogo.y}" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="10 9"/><line x1="1035" y1="${gridLogo.y + gridLogo.height}" x2="2865" y2="${gridLogo.y + gridLogo.height}" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="10 9"/><line x1="${gridLogo.x}" y1="540" x2="${gridLogo.x}" y2="1470" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="10 9"/><line x1="${gridLogo.x + gridLogo.width}" y1="540" x2="${gridLogo.x + gridLogo.width}" y2="1470" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="10 9"/>${measurementLine(gridLogo.x, 1430, gridLogo.x + gridLogo.width, 1430, `${ratioText}X`, gridLogo.x + gridLogo.width / 2, 1490)}${measurementLine(2770, gridLogo.y, 2770, gridLogo.y + gridLogo.height, '1X', 2812, gridLogo.y + gridLogo.height / 2 + 8)}`) });
+  add({
+    id: '05-grid-system-1',
+    section: 'logo',
+    title: 'LOGO',
+    subtitle: 'Construction grid',
+    svg: commonPage(project, 'LOGO', 'Construction grid', copy.construction,
+      `${leftMeta([['Base unit', 'X = Logo height'], ['Ratio', `${ratioText} : 1`], ['Alignment', 'Optical center']])}
+      ${panel(1035, 460, 1830, 1040, '#FAFAFA', LINE)}
+      <g opacity=".58">
+        <line x1="1170" y1="540" x2="1170" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="1370" y1="540" x2="1370" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="1570" y1="540" x2="1570" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="1770" y1="540" x2="1770" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="1970" y1="540" x2="1970" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="2170" y1="540" x2="2170" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="2370" y1="540" x2="2370" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="2570" y1="540" x2="2570" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="1080" y1="700" x2="2800" y2="700" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="1080" y1="900" x2="2800" y2="900" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="1080" y1="1100" x2="2800" y2="1100" stroke="${GUIDE}" stroke-width="2"/>
+        <line x1="1080" y1="1300" x2="2800" y2="1300" stroke="${GUIDE}" stroke-width="2"/>
+      </g>
+      ${logo(project.logo, gridLogo.x, gridLogo.y, gridLogo.width, gridLogo.height)}
+      ${measurementLine(gridLogo.x, 1360, gridLogo.x + gridLogo.width, 1360, `${ratioText}X`, gridLogo.x + gridLogo.width / 2, 1420)}
+      ${measurementLine(2740, gridLogo.y, 2740, gridLogo.y + gridLogo.height, '1X', 2780, gridLogo.y + gridLogo.height / 2)}
+      <rect x="1035" y="1535" width="565" height="120" fill="${SOFT}"/>
+      <rect x="1632" y="1535" width="565" height="120" fill="${SOFT}"/>
+      <rect x="2229" y="1535" width="636" height="120" fill="${SOFT}"/>
+      <text x="1065" y="1580" fill="${MUTED}" font-size="20">BASE UNIT</text><text x="1065" y="1625" fill="${BLACK}" font-size="28" font-weight="700">1X = Logo height</text>
+      <text x="1662" y="1580" fill="${MUTED}" font-size="20">PROPORTION</text><text x="1662" y="1625" fill="${BLACK}" font-size="28" font-weight="700">${ratioText} : 1</text>
+      <text x="2259" y="1580" fill="${MUTED}" font-size="20">REPRODUCTION</text><text x="2259" y="1625" fill="${BLACK}" font-size="28" font-weight="700">Scale proportionally</text>`
+    )
+  });
 
-  const smallGrid = fitLogo(project.logo, 1320, 640, 1280, 400, 30);
-  const miniGrid = fitLogo(project.logo, 1480, 1190, 960, 260, 20);
-  add({ id: '06-grid-system-2', section: 'logo', title: 'LOGO', subtitle: 'Grid system 2', svg: commonPage(project, 'LOGO', 'Grid system 2', gridCopy, `<rect x="1035" y="460" width="1830" height="520" fill="${SOFT}"/>${logo(project.logo, smallGrid.x, smallGrid.y, smallGrid.width, smallGrid.height)}<line x1="1035" y1="${smallGrid.y}" x2="2865" y2="${smallGrid.y}" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="10 9"/><line x1="1035" y1="${smallGrid.y + smallGrid.height}" x2="2865" y2="${smallGrid.y + smallGrid.height}" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="10 9"/>${measurementLine(smallGrid.x, 930, smallGrid.x + smallGrid.width, 930, `${ratioText}X`, smallGrid.x + smallGrid.width / 2, 970)}<rect x="1035" y="1014" width="1830" height="520" fill="${SOFT}"/>${logo(project.logo, miniGrid.x, miniGrid.y, miniGrid.width, miniGrid.height)}<line x1="1035" y1="${miniGrid.y}" x2="2865" y2="${miniGrid.y}" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="10 9"/><line x1="1035" y1="${miniGrid.y + miniGrid.height}" x2="2865" y2="${miniGrid.y + miniGrid.height}" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="10 9"/>`) });
+  // 06 Logo variations
+  add({
+    id: '06-grid-system-2',
+    section: 'logo',
+    title: 'LOGO',
+    subtitle: 'Logo variations',
+    svg: commonPage(project, 'LOGO', 'Logo variations', copy.variations,
+      `${leftMeta([['Primary', 'Brand color'], ['Mono', 'Black / White'], ['Reverse', 'High contrast']])}
+      ${panel(1035, 460, 885, 500, WHITE, LINE)}
+      ${label('01 · PRIMARY', 1075, 520)}
+      ${logo(project.logo, 1220, 650, 520, 170, primary)}
+      ${panel(1955, 460, 910, 500, primary)}
+      ${label('02 · REVERSE', 1995, 520, contrast(primary))}
+      ${logo(project.logo, 2150, 650, 520, 170, contrast(primary))}
+      ${panel(1035, 995, 885, 500, '#F2F2F2')}
+      ${label('03 · BLACK', 1075, 1055)}
+      ${logo(project.logo, 1220, 1185, 520, 170, BLACK)}
+      ${panel(1955, 995, 910, 500, BLACK)}
+      ${label('04 · WHITE', 1995, 1055, WHITE)}
+      ${logo(project.logo, 2150, 1185, 520, 170, WHITE)}
+      <text x="1035" y="1605" fill="${MUTED}" font-size="22">Choose the version with the clearest contrast for each background.</text>`
+    )
+  });
 
-  const clearLogo = fitLogo(project.logo, 1430, 795, 1040, 360, 20);
-  const clearSpacePx = Math.max(55, clearLogo.height * clear);
-  const outerX = clearLogo.x - clearSpacePx;
-  const outerY = clearLogo.y - clearSpacePx;
-  const outerW = clearLogo.width + clearSpacePx * 2;
-  const outerH = clearLogo.height + clearSpacePx * 2;
-  add({ id: '07-clear-space-1', section: 'logo', title: 'LOGO', subtitle: 'Clear space 1', svg: commonPage(project, 'LOGO', 'Clear space 1', clearCopy, `<rect x="1035" y="460" width="1830" height="1110" fill="${SOFT}"/><rect x="${outerX}" y="${outerY}" width="${outerW}" height="${outerH}" fill="none" stroke="${LINE}" stroke-width="2"/><rect x="${outerX}" y="${outerY}" width="${outerW}" height="${clearSpacePx}" fill="#E7E7E7"/><rect x="${outerX}" y="${outerY + outerH - clearSpacePx}" width="${outerW}" height="${clearSpacePx}" fill="#E7E7E7"/><rect x="${outerX}" y="${outerY + clearSpacePx}" width="${clearSpacePx}" height="${outerH - clearSpacePx * 2}" fill="#E7E7E7"/><rect x="${outerX + outerW - clearSpacePx}" y="${outerY + clearSpacePx}" width="${clearSpacePx}" height="${outerH - clearSpacePx * 2}" fill="#E7E7E7"/>${logo(project.logo, clearLogo.x, clearLogo.y, clearLogo.width, clearLogo.height)}${measurementLine(outerX, outerY - 38, clearLogo.x, outerY - 38, `${clear}X`, outerX + clearSpacePx / 2, outerY - 55)}${measurementLine(clearLogo.x + clearLogo.width, outerY - 38, outerX + outerW, outerY - 38, `${clear}X`, clearLogo.x + clearLogo.width + clearSpacePx / 2, outerY - 55)}`) });
+  // 07 Clear space
+  const clearLogo = fitLogo(project.logo, 1450, 760, 980, 330, 20);
+  const clearPx = Math.max(62, clearLogo.height * clear);
+  add({
+    id: '07-clear-space-1',
+    section: 'logo',
+    title: 'LOGO',
+    subtitle: 'Clear space',
+    svg: commonPage(project, 'LOGO', 'Clear space', copy.clear,
+      `${leftMeta([['Unit', 'X = Logo height'], ['Minimum', `${clear}X`], ['Applies to', 'All media']])}
+      ${panel(1035, 460, 1830, 1010, '#FAFAFA', LINE)}
+      <rect x="${clearLogo.x - clearPx}" y="${clearLogo.y - clearPx}" width="${clearLogo.width + clearPx * 2}" height="${clearLogo.height + clearPx * 2}" fill="#EFEFEF" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="12 9"/>
+      <rect x="${clearLogo.x}" y="${clearLogo.y}" width="${clearLogo.width}" height="${clearLogo.height}" fill="#FFFFFF"/>
+      ${logo(project.logo, clearLogo.x, clearLogo.y, clearLogo.width, clearLogo.height)}
+      ${measurementLine(clearLogo.x - clearPx, clearLogo.y - clearPx - 38, clearLogo.x, clearLogo.y - clearPx - 38, `${clear}X`, clearLogo.x - clearPx / 2, clearLogo.y - clearPx - 55)}
+      ${measurementLine(clearLogo.x + clearLogo.width, clearLogo.y - clearPx - 38, clearLogo.x + clearLogo.width + clearPx, clearLogo.y - clearPx - 38, `${clear}X`, clearLogo.x + clearLogo.width + clearPx / 2, clearLogo.y - clearPx - 55)}
+      <text x="1070" y="1535" fill="${MUTED}" font-size="22">SAFE AREA</text>
+      <text x="1070" y="1585" fill="${BLACK}" font-size="30" font-weight="700">No text, image, icon or edge may enter the protected area.</text>`
+    )
+  });
 
-  const clearSmall = fitLogo(project.logo, 1510, 640, 900, 280, 20);
-  const clearMini = fitLogo(project.logo, 1650, 1190, 620, 190, 15);
-  add({ id: '08-clear-space-2', section: 'logo', title: 'LOGO', subtitle: 'Clear space 2', svg: commonPage(project, 'LOGO', 'Clear space 2', clearCopy, `<rect x="1035" y="460" width="1830" height="520" fill="${SOFT}"/><rect x="${clearSmall.x - clearSmall.height * clear}" y="${clearSmall.y - clearSmall.height * clear}" width="${clearSmall.width + clearSmall.height * clear * 2}" height="${clearSmall.height + clearSmall.height * clear * 2}" fill="none" stroke="${LINE}" stroke-width="2"/>${logo(project.logo, clearSmall.x, clearSmall.y, clearSmall.width, clearSmall.height)}${label(`${clear}X`, clearSmall.x + clearSmall.width + 35, clearSmall.y + 25, GUIDE)}<rect x="1035" y="1014" width="1830" height="520" fill="${SOFT}"/><rect x="${clearMini.x - clearMini.height * clear}" y="${clearMini.y - clearMini.height * clear}" width="${clearMini.width + clearMini.height * clear * 2}" height="${clearMini.height + clearMini.height * clear * 2}" fill="none" stroke="${LINE}" stroke-width="2"/>${logo(project.logo, clearMini.x, clearMini.y, clearMini.width, clearMini.height)}${label(`${clear}X`, clearMini.x + clearMini.width + 35, clearMini.y + 25, GUIDE)}`) });
+  // 08 Incorrect usage
+  const badCells = [
+    ['Do not stretch', 1035, 500],
+    ['Do not rotate', 1645, 500],
+    ['Do not add effects', 2255, 500],
+    ['Do not recolor', 1035, 1040],
+    ['Do not outline', 1645, 1040],
+    ['Do not reduce contrast', 2255, 1040],
+  ] as const;
+  const badMarkup = badCells.map(([title, x, y], index) => {
+    const bg = index === 5 ? '#EAEAEA' : '#FAFAFA';
+    const logoColor = index === 3 ? ERROR : index === 5 ? '#D0D0D0' : BLACK;
+    return `${panel(x, y, 575, 460, bg, LINE)}<text x="${x + 24}" y="${y + 44}" fill="${MUTED}" font-size="20" font-weight="600">${esc(title.toUpperCase())}</text>${logo(project.logo, x + 110, y + 145, 355, 120, logoColor)}${cross(x + 20, y + 72, 535, 330)}`;
+  }).join('');
+  add({
+    id: '08-clear-space-2',
+    section: 'logo',
+    title: 'LOGO',
+    subtitle: 'Incorrect usage',
+    svg: commonPage(project, 'LOGO', 'Incorrect usage', copy.incorrect,
+      `${leftMeta([['Shape', 'No distortion'], ['Color', 'Approved only'], ['Effect', 'None']])}${badMarkup}`
+    )
+  });
 
-  add({ id: '09-minimum-size', section: 'logo', title: 'LOGO', subtitle: 'Minimum size', svg: commonPage(project, 'LOGO', 'Minimum size', minCopy, `<rect x="1035" y="460" width="1830" height="520" fill="${SOFT}"/>${label('PRIMARY LOGO', 1075, 520)}${logo(project.logo, 1635, 620, 630, 190)}<text x="2300" y="775" fill="${BLACK}" font-size="28">${project.rules.minimumPrintMm}mm / ${project.rules.minimumDigitalPx}px</text><rect x="1035" y="1014" width="898" height="520" fill="${SOFT}"/>${label('PRINT', 1075, 1074)}${logo(project.logo, 1300, 1175, 370, 130)}<text x="1484" y="1410" fill="${BLACK}" font-size="28" text-anchor="middle">${project.rules.minimumPrintMm} mm</text><rect x="1967" y="1014" width="898" height="520" fill="${SOFT}"/>${label('DIGITAL', 2007, 1074)}${logo(project.logo, 2232, 1175, 370, 130)}<text x="2416" y="1410" fill="${BLACK}" font-size="28" text-anchor="middle">${project.rules.minimumDigitalPx} px</text>`) });
+  // 09 Minimum size
+  add({
+    id: '09-minimum-size',
+    section: 'logo',
+    title: 'LOGO',
+    subtitle: 'Minimum size',
+    svg: commonPage(project, 'LOGO', 'Minimum size', copy.minimum,
+      `${leftMeta([['Print', `${project.rules.minimumPrintMm} mm`], ['Digital', `${project.rules.minimumDigitalPx} px`], ['Priority', 'Legibility first']])}
+      ${panel(1035, 460, 885, 900, '#FAFAFA', LINE)}
+      ${label('PRINT', 1080, 520)}
+      <text x="1080" y="620" fill="${BLACK}" font-size="88" font-weight="700">${project.rules.minimumPrintMm} mm</text>
+      <text x="1080" y="675" fill="${MUTED}" font-size="23">Minimum width for printed material</text>
+      ${logo(project.logo, 1195, 900, 565, 180)}
+      <line x1="1195" y1="1135" x2="1760" y2="1135" stroke="${BLACK}" stroke-width="2"/>
+      <text x="1478" y="1185" fill="${MUTED}" font-size="22" text-anchor="middle">${project.rules.minimumPrintMm} mm</text>
 
-  add({ id: '10-color-section', section: 'color', title: 'COLOR', subtitle: '', svg: sectionCover(project, 'COLOR', '02', ['Monochromatic', 'Brand color', 'Combinations', 'Usage']) });
+      ${panel(1955, 460, 910, 900, '#FAFAFA', LINE)}
+      ${label('DIGITAL', 2000, 520)}
+      <text x="2000" y="620" fill="${BLACK}" font-size="88" font-weight="700">${project.rules.minimumDigitalPx} px</text>
+      <text x="2000" y="675" fill="${MUTED}" font-size="23">Minimum width for digital interface</text>
+      ${logo(project.logo, 2120, 900, 580, 180)}
+      <line x1="2120" y1="1135" x2="2700" y2="1135" stroke="${BLACK}" stroke-width="2"/>
+      <text x="2410" y="1185" fill="${MUTED}" font-size="22" text-anchor="middle">${project.rules.minimumDigitalPx} px</text>
 
-  add({ id: '11-monochromatic', section: 'color', title: 'COLOR', subtitle: 'Monochromatic', svg: commonPage(project, 'COLOR', 'Monochromatic', monoCopy, `<rect x="1035" y="460" width="898" height="1110" fill="${WHITE}" stroke="${LINE}" stroke-width="2"/>${label('BLACK', 1075, 520)}${logo(project.logo, 1205, 835, 560, 280, BLACK)}<rect x="1967" y="460" width="898" height="1110" fill="#242021"/>${label('WHITE', 2007, 520, WHITE)}${logo(project.logo, 2137, 835, 560, 280, WHITE)}`) });
+      <rect x="1035" y="1400" width="1830" height="150" fill="${SOFT}"/>
+      <text x="1075" y="1455" fill="${MUTED}" font-size="21">CHECK</text>
+      <text x="1075" y="1505" fill="${BLACK}" font-size="28" font-weight="600">If fine details disappear, use a larger size rather than simplifying or redrawing the logo.</text>`
+    )
+  });
 
-  add({ id: '12-brand-color', section: 'color', title: 'COLOR', subtitle: 'Brand color', svg: commonPage(project, 'COLOR', 'Brand color', colorCopy, `${swatch(project, primary, 1035, 'PRIMARY')}${swatch(project, secondary, 1630, 'SECONDARY')}${swatch(project, accent, 2225, 'ACCENT')}`) });
+  // 10 Color section
+  add({ id: '10-color-section', section: 'color', title: 'COLOR', subtitle: '', svg: sectionIntro('COLOR', '02', ['Brand color', 'Color system', 'Combinations', 'Usage guide']) });
 
-  add({ id: '13-color-combination', section: 'color', title: 'COLOR', subtitle: 'Combinations', svg: commonPage(project, 'COLOR', 'Combinations', combinationCopy, `${colorCell(project, primary, contrast(primary), 1035, 460, 898, 350, 'PRIMARY')}${colorCell(project, WHITE, primary, 1967, 460, 898, 350, 'WHITE')}${colorCell(project, '#242021', WHITE, 1035, 844, 898, 350, 'BLACK')}${colorCell(project, WHITE, BLACK, 1967, 844, 898, 350, 'MONO')}${colorCell(project, secondary, accent, 1035, 1228, 898, 350, 'SECONDARY')}${colorCell(project, accent, primary, 1967, 1228, 898, 350, 'ACCENT')}`) });
+  // 11 Brand color
+  add({
+    id: '11-monochromatic',
+    section: 'color',
+    title: 'COLOR',
+    subtitle: 'Brand color',
+    svg: commonPage(project, 'COLOR', 'Brand color', copy.color,
+      `${leftMeta([['Primary', primary], ['Secondary', secondary], ['Accent', accent]])}
+      ${colorSpec(primary, 1035, 460, 570, 1090, 'PRIMARY')}
+      ${colorSpec(secondary, 1630, 460, 570, 1090, 'SECONDARY')}
+      ${colorSpec(accent, 2225, 460, 640, 1090, 'ACCENT')}`
+    )
+  });
 
-  const backgrounds = [WHITE, primary, secondary, accent, '#242021'];
-  const logoColors = [primary, WHITE, BLACK, accent];
-  const cellW = 366;
-  const cellH = 210;
-  const gridX = 1035;
-  const gridY = 520;
-  let usageGrid = '';
-  backgrounds.forEach((bg, row) => {
-    logoColors.forEach((logoColor, col) => {
-      usageGrid += usageCell(project, bg, logoColor, gridX + col * cellW, gridY + row * cellH, cellW, cellH);
+  // 12 Color system
+  add({
+    id: '12-brand-color',
+    section: 'color',
+    title: 'COLOR',
+    subtitle: 'Color system',
+    svg: commonPage(project, 'COLOR', 'Color system', copy.colorSystem,
+      `${leftMeta([['Primary', '60%'], ['Secondary', '30%'], ['Accent', '10%']])}
+      <text x="1035" y="520" fill="${MUTED}" font-size="22" font-weight="700">RECOMMENDED COLOR RATIO</text>
+      <rect x="1035" y="570" width="1098" height="360" fill="${primary}"/>
+      <rect x="2133" y="570" width="549" height="360" fill="${secondary}"/>
+      <rect x="2682" y="570" width="183" height="360" fill="${accent}"/>
+      <text x="1070" y="885" fill="${contrast(primary)}" font-size="28" font-weight="700">60%</text>
+      <text x="2168" y="885" fill="${contrast(secondary)}" font-size="28" font-weight="700">30%</text>
+      <text x="2710" y="885" fill="${contrast(accent)}" font-size="28" font-weight="700">10%</text>
+
+      <text x="1035" y="1040" fill="${MUTED}" font-size="22" font-weight="700">PRIMARY TINT SCALE</text>
+      <rect x="1035" y="1090" width="366" height="340" fill="${primary}" opacity=".15"/>
+      <rect x="1401" y="1090" width="366" height="340" fill="${primary}" opacity=".35"/>
+      <rect x="1767" y="1090" width="366" height="340" fill="${primary}" opacity=".55"/>
+      <rect x="2133" y="1090" width="366" height="340" fill="${primary}" opacity=".75"/>
+      <rect x="2499" y="1090" width="366" height="340" fill="${primary}"/>
+      <text x="1065" y="1485" fill="${MUTED}" font-size="20">15</text>
+      <text x="1431" y="1485" fill="${MUTED}" font-size="20">35</text>
+      <text x="1797" y="1485" fill="${MUTED}" font-size="20">55</text>
+      <text x="2163" y="1485" fill="${MUTED}" font-size="20">75</text>
+      <text x="2529" y="1485" fill="${MUTED}" font-size="20">100</text>`
+    )
+  });
+
+  // 13 Combinations
+  add({
+    id: '13-color-combination',
+    section: 'color',
+    title: 'COLOR',
+    subtitle: 'Combinations',
+    svg: commonPage(project, 'COLOR', 'Combinations', copy.combination,
+      `${leftMeta([['Rule', 'Contrast first'], ['Preferred', 'Primary / White'], ['Avoid', 'Low contrast']])}
+      ${colorCell(project, primary, contrast(primary), 1035, 460, 885, 330, 'PRIMARY')}
+      ${colorCell(project, WHITE, primary, 1955, 460, 910, 330, 'WHITE')}
+      ${colorCell(project, BLACK, WHITE, 1035, 825, 885, 330, 'BLACK')}
+      ${colorCell(project, secondary, contrast(secondary), 1955, 825, 910, 330, 'SECONDARY')}
+      ${colorCell(project, accent, contrast(accent), 1035, 1190, 885, 330, 'ACCENT')}
+      ${colorCell(project, WHITE, BLACK, 1955, 1190, 910, 330, 'MONOCHROME')}`
+    )
+  });
+
+  // 14 Usage guide
+  const usageBackgrounds = [WHITE, primary, secondary, accent, BLACK];
+  const usageLogoColors = [primary, WHITE, BLACK];
+  let usageMatrix = '';
+  usageBackgrounds.forEach((bg, row) => {
+    usageLogoColors.forEach((lc, col) => {
+      usageMatrix += usageCell(project, bg, lc, 1035 + col * 570, 565 + row * 190, 570, 190);
     });
   });
-  add({ id: '14-color-usage', section: 'color', title: 'COLOR', subtitle: 'Usage', svg: commonPage(project, 'COLOR', 'Usage', usageCopy, `${label('LOGO COLOR →', 1035, 475)}${label('PRIMARY', 1080, 505)}${label('WHITE', 1446, 505)}${label('BLACK', 1812, 505)}${label('ACCENT', 2178, 505)}${usageGrid}`) });
+  add({
+    id: '14-color-usage',
+    section: 'color',
+    title: 'COLOR',
+    subtitle: 'Usage guide',
+    svg: commonPage(project, 'COLOR', 'Usage guide', copy.usage,
+      `${leftMeta([['Best', 'High contrast'], ['Ratio', '60 / 30 / 10'], ['Consistency', 'Use master values']])}
+      <text x="1035" y="505" fill="${MUTED}" font-size="22" font-weight="700">BACKGROUND × LOGO COLOR MATRIX</text>
+      ${usageMatrix}
+      <text x="1035" y="1585" fill="${MUTED}" font-size="21">Red cross = insufficient contrast or non-recommended combination.</text>`
+    )
+  });
 
-  add({ id: '15-typography-section', section: 'typography', title: 'TYPOGRAPHY', subtitle: '', svg: sectionCover(project, 'TYPOGRAPHY', '03', ['Title text', 'Body text']) });
+  // 15 Typography section
+  add({ id: '15-typography-section', section: 'typography', title: 'TYPOGRAPHY', subtitle: '', svg: sectionIntro('TYPOGRAPHY', '03', ['Title text', 'Body text']) });
 
+  // 16 Title text
   const titleFont = project.typography.title || 'Pretendard';
-  add({ id: '16-title-typeface', section: 'typography', title: 'TYPOGRAPHY', subtitle: 'Title text', svg: commonPage(project, 'TYPOGRAPHY', 'Title text', titleCopy, `<rect x="1035" y="460" width="1830" height="1110" fill="${SOFT}"/>${typographySample(project, titleFont, 1180, 760, true)}`) });
+  add({
+    id: '16-title-typeface',
+    section: 'typography',
+    title: 'TYPOGRAPHY',
+    subtitle: 'Title text',
+    svg: commonPage(project, 'TYPOGRAPHY', 'Title text', copy.title,
+      `${leftMeta([['Typeface', titleFont], ['Weight', 'Bold / SemiBold'], ['Tracking', '-3%']])}
+      ${panel(1035, 460, 1830, 740, WHITE, LINE)}
+      <g style="font-family:${fontStack(titleFont)}">
+        <text x="1090" y="655" fill="${BLACK}" font-size="182" font-weight="700">Aa</text>
+        <text x="1420" y="650" fill="${BLACK}" font-size="88" font-weight="700">Brand Headline</text>
+        <text x="1420" y="735" fill="${MUTED}" font-size="34" font-weight="500">브랜드의 핵심 메시지를 명확하게 전달합니다.</text>
+        <text x="1090" y="930" fill="${BLACK}" font-size="50" font-weight="700">ABCDEFGHIJKLMNOPQRSTUVWXYZ</text>
+        <text x="1090" y="1005" fill="${BLACK}" font-size="50" font-weight="700">abcdefghijklmnopqrstuvwxyz · 0123456789</text>
+      </g>
+      <rect x="1035" y="1240" width="430" height="300" fill="${SOFT}"/>
+      <rect x="1490" y="1240" width="430" height="300" fill="${SOFT}"/>
+      <rect x="1945" y="1240" width="430" height="300" fill="${SOFT}"/>
+      <rect x="2400" y="1240" width="465" height="300" fill="${SOFT}"/>
+      <text x="1070" y="1300" fill="${MUTED}" font-size="20">DISPLAY</text><text x="1070" y="1380" fill="${BLACK}" font-size="50" font-weight="700">56 / 64</text><text x="1070" y="1460" fill="${MUTED}" font-size="22">Bold</text>
+      <text x="1525" y="1300" fill="${MUTED}" font-size="20">H1</text><text x="1525" y="1380" fill="${BLACK}" font-size="50" font-weight="700">40 / 48</text><text x="1525" y="1460" fill="${MUTED}" font-size="22">Bold</text>
+      <text x="1980" y="1300" fill="${MUTED}" font-size="20">H2</text><text x="1980" y="1380" fill="${BLACK}" font-size="50" font-weight="700">28 / 38</text><text x="1980" y="1460" fill="${MUTED}" font-size="22">SemiBold</text>
+      <text x="2435" y="1300" fill="${MUTED}" font-size="20">TRACKING</text><text x="2435" y="1380" fill="${BLACK}" font-size="50" font-weight="700">-3%</text><text x="2435" y="1460" fill="${MUTED}" font-size="22">Recommended</text>`
+    )
+  });
 
+  // 17 Body text
   const bodyFont = project.typography.body || 'Pretendard';
-  add({ id: '17-body-typeface', section: 'typography', title: 'TYPOGRAPHY', subtitle: 'Body text', svg: commonPage(project, 'TYPOGRAPHY', 'Body text', bodyCopy, `<rect x="1035" y="460" width="1830" height="1110" fill="${SOFT}"/>${typographySample(project, bodyFont, 1180, 710, false)}<g style="font-family:${fontStack(bodyFont)}"><text x="1180" y="1240" fill="${BLACK}" font-size="42" font-weight="700">국문</text><text x="1180" y="1325" fill="${BLACK}" font-size="42">가나다라마바사아자차카타파하</text><text x="1180" y="1390" fill="${BLACK}" font-size="42">가나다라마바사아자차카타파하</text><text x="2620" y="1210" fill="${BLACK}" font-size="34" text-anchor="end" font-weight="700">Black</text><text x="2620" y="1262" fill="${BLACK}" font-size="34" text-anchor="end" font-weight="700">Bold</text><text x="2620" y="1314" fill="${BLACK}" font-size="34" text-anchor="end" font-weight="600">SemiBold</text><text x="2620" y="1366" fill="${BLACK}" font-size="34" text-anchor="end" font-weight="500">Medium</text><text x="2620" y="1418" fill="${BLACK}" font-size="34" text-anchor="end" font-weight="400">Regular</text><text x="2620" y="1470" fill="${MUTED}" font-size="34" text-anchor="end" font-weight="300">Light</text></g>`) });
+  add({
+    id: '17-body-typeface',
+    section: 'typography',
+    title: 'TYPOGRAPHY',
+    subtitle: 'Body text',
+    svg: commonPage(project, 'TYPOGRAPHY', 'Body text', copy.body,
+      `${leftMeta([['Typeface', bodyFont], ['Body', '16 / 28'], ['Caption', '12 / 18']])}
+      ${panel(1035, 460, 1830, 1100, WHITE, LINE)}
+      <g style="font-family:${fontStack(bodyFont)}">
+        <text x="1090" y="565" fill="${MUTED}" font-size="20" font-weight="700">TYPE SCALE / HIERARCHY</text>
+        <text x="1090" y="700" fill="${BLACK}" font-size="72" font-weight="700">Heading 01</text>
+        <text x="1090" y="800" fill="${BLACK}" font-size="52" font-weight="600">Heading 02</text>
+        <text x="1090" y="905" fill="${BLACK}" font-size="34" font-weight="600">브랜드 메시지를 읽기 쉬운 구조로 정리합니다.</text>
+        <text x="1090" y="1000" fill="${BLACK}" font-size="29" font-weight="400">본문 텍스트는 충분한 행간과 안정적인 글자 크기를 사용해 정보를 명확하게 전달합니다.</text>
+        <text x="1090" y="1055" fill="${BLACK}" font-size="29" font-weight="400">인쇄물과 디지털 환경 모두에서 동일한 위계 체계를 유지하는 것을 권장합니다.</text>
+        <text x="1090" y="1165" fill="${MUTED}" font-size="22">Caption / Supporting information / Metadata</text>
 
-  add({ id: '18-back-cover', section: 'end', title: 'Back Cover', subtitle: '', svg: `${openSvg(project, primary)}${logo(project.logo, 1035, 780, 900, 540, coverFg)}<text x="1485" y="1450" fill="${coverFg}" opacity=".78" font-size="28" text-anchor="middle">${esc(project.slogan || brandName)}</text></svg>` });
+        <text x="2280" y="690" fill="${BLACK}" font-size="34" font-weight="800">ExtraBold</text>
+        <text x="2280" y="755" fill="${BLACK}" font-size="34" font-weight="700">Bold</text>
+        <text x="2280" y="820" fill="${BLACK}" font-size="34" font-weight="600">SemiBold</text>
+        <text x="2280" y="885" fill="${BLACK}" font-size="34" font-weight="500">Medium</text>
+        <text x="2280" y="950" fill="${BLACK}" font-size="34" font-weight="400">Regular</text>
+        <text x="2280" y="1015" fill="${MUTED}" font-size="34" font-weight="300">Light</text>
+
+        <line x1="1090" y1="1265" x2="2795" y2="1265" stroke="${LINE}" stroke-width="2"/>
+        <text x="1090" y="1345" fill="${MUTED}" font-size="20">BODY SAMPLE</text>
+        <text x="1090" y="1410" fill="${BLACK}" font-size="28">ABCDEFGHIJKLMNOPQRSTUVWXYZ · abcdefghijklmnopqrstuvwxyz · 0123456789</text>
+        <text x="1090" y="1470" fill="${BLACK}" font-size="28">가나다라마바사아자차카타파하 · 브랜드 아이덴티티 시스템</text>
+      </g>`
+    )
+  });
+
+  // 18 Back cover
+  add({
+    id: '18-back-cover',
+    section: 'end',
+    title: 'Back Cover',
+    subtitle: '',
+    svg: `${openSvg(project, primary)}
+      <text x="105" y="170" fill="${coverFg}" opacity=".7" font-size="23">${esc(project.year)} · BRAND IDENTITY GUIDELINES</text>
+      ${logo(project.logo, 105, 780, 820, 300, coverFg)}
+      <line x1="105" y1="1540" x2="2865" y2="1540" stroke="${coverFg}" opacity=".28" stroke-width="2"/>
+      <text x="105" y="1620" fill="${coverFg}" font-size="36" font-weight="700">${esc(englishName)}</text>
+      <text x="105" y="1680" fill="${coverFg}" opacity=".72" font-size="24">${esc(project.slogan || 'Visual Identity System')}</text>
+      <text x="2440" y="1680" fill="${coverFg}" opacity=".72" font-size="22">END · ${esc(project.year)}</text>
+    </svg>`
+  });
 
   return pages;
 }
