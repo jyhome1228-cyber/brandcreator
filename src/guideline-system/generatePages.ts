@@ -193,6 +193,8 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
   const ratio = project.logo?.aspectRatio && project.logo.aspectRatio > 0 ? project.logo.aspectRatio : 1;
   const ratioText = ratio.toFixed(2);
   const clear = Math.max(0.1, Math.min(2, project.rules.clearSpace || 0.25));
+  const brandDescription = project.description.trim() || `${brandName}는 일관된 시각 언어를 통해 브랜드의 태도와 가치를 명확하게 전달합니다. 본 가이드라인은 모든 접점에서 동일한 인상을 유지하기 위한 기본 원칙과 적용 기준을 정의합니다.`;
+  const brandSlogan = project.slogan.trim() || 'Consistent identity, clear experience.';
 
   const pages: GuidelinePage[] = [];
   const add = (page: GuidelinePage) => pages.push(page);
@@ -255,7 +257,95 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
     </svg>`
   });
 
-  // 02 Index
+  // 02 Brand overview
+  add({
+    id: '02-brand-overview',
+    section: 'intro',
+    title: 'INTRO',
+    subtitle: 'Brand overview',
+    svg: `${openSvg(project)}
+      ${pageHeader(project, 'INTRO', 'Brand overview')}
+      <text x="105" y="500" fill="${MUTED}" font-size="24" font-weight="700">BRAND STATEMENT</text>
+      ${textBlock(brandDescription, 105, 570, 31)}
+      <text x="105" y="955" fill="${MUTED}" font-size="24" font-weight="700">BRAND NAME</text>
+      <text x="105" y="1025" fill="${BLACK}" font-size="54" font-weight="700">${esc(englishName)}</text>
+      <text x="105" y="1135" fill="${MUTED}" font-size="24" font-weight="700">SLOGAN</text>
+      <text x="105" y="1205" fill="${BLACK}" font-size="38" font-weight="600">${esc(brandSlogan)}</text>
+
+      ${panel(1035, 460, 1830, 420, primary)}
+      <text x="1080" y="525" fill="${contrast(primary)}" opacity=".72" font-size="22" font-weight="700">CORE IDENTITY</text>
+      <text x="1080" y="675" fill="${contrast(primary)}" font-size="92" font-weight="700">${esc(englishName)}</text>
+      <text x="1080" y="760" fill="${contrast(primary)}" opacity=".78" font-size="30">${esc(brandSlogan)}</text>
+
+      ${panel(1035, 915, 570, 520, '#F7F7F7', LINE)}
+      ${panel(1630, 915, 570, 520, '#F7F7F7', LINE)}
+      ${panel(2225, 915, 640, 520, '#F7F7F7', LINE)}
+      <text x="1075" y="975" fill="${MUTED}" font-size="21" font-weight="700">01 · CONSISTENCY</text>
+      <text x="1075" y="1060" fill="${BLACK}" font-size="42" font-weight="700">일관성</text>
+      <text x="1075" y="1140" fill="${MUTED}" font-size="25">로고, 컬러, 서체의 사용 기준을</text>
+      <text x="1075" y="1188" fill="${MUTED}" font-size="25">모든 접점에서 동일하게 유지합니다.</text>
+
+      <text x="1670" y="975" fill="${MUTED}" font-size="21" font-weight="700">02 · CLARITY</text>
+      <text x="1670" y="1060" fill="${BLACK}" font-size="42" font-weight="700">명확성</text>
+      <text x="1670" y="1140" fill="${MUTED}" font-size="25">정보 위계와 충분한 여백으로</text>
+      <text x="1670" y="1188" fill="${MUTED}" font-size="25">브랜드 메시지를 분명하게 전달합니다.</text>
+
+      <text x="2265" y="975" fill="${MUTED}" font-size="21" font-weight="700">03 · FLEXIBILITY</text>
+      <text x="2265" y="1060" fill="${BLACK}" font-size="42" font-weight="700">확장성</text>
+      <text x="2265" y="1140" fill="${MUTED}" font-size="25">인쇄와 디지털 환경에서 유연하게</text>
+      <text x="2265" y="1188" fill="${MUTED}" font-size="25">확장 가능한 시스템을 지향합니다.</text>
+
+      <line x1="1035" y1="1500" x2="2865" y2="1500" stroke="${LINE}" stroke-width="2"/>
+      <text x="1035" y="1565" fill="${MUTED}" font-size="21" font-weight="700">GUIDELINE PURPOSE</text>
+      <text x="1035" y="1635" fill="${BLACK}" font-size="31" font-weight="600">브랜드를 사용하는 모든 사람이 같은 기준으로 판단하고 제작할 수 있도록 합니다.</text>
+      ${footer(project, 'Brand overview')}
+    </svg>`
+  });
+
+  // 03 Brand asset notice
+  add({
+    id: '03-brand-asset-notice',
+    section: 'intro',
+    title: 'INTRO',
+    subtitle: 'Brand asset notice',
+    svg: `${openSvg(project)}
+      ${pageHeader(project, 'INTRO', 'Brand asset notice')}
+      <text x="105" y="500" fill="${BLACK}" font-size="48" font-weight="700">브랜드 자산 사용 전 반드시 확인해주세요.</text>
+      <text x="105" y="585" fill="${MUTED}" font-size="29">본 문서는 ${esc(brandName)}의 시각적 일관성을 유지하기 위한 최소 기준을 정의합니다.</text>
+      <text x="105" y="635" fill="${MUTED}" font-size="29">모든 제작물은 원본 자산과 본 가이드의 규정을 기준으로 검토한 뒤 사용합니다.</text>
+
+      ${panel(105, 790, 820, 630, '#F7F7F7', LINE)}
+      ${panel(955, 790, 820, 630, '#F7F7F7', LINE)}
+      ${panel(1805, 790, 1060, 630, '#F7F7F7', LINE)}
+      <text x="155" y="855" fill="${MUTED}" font-size="22" font-weight="700">01 · MASTER ASSET</text>
+      <text x="155" y="950" fill="${BLACK}" font-size="44" font-weight="700">원본 사용</text>
+      <text x="155" y="1040" fill="${MUTED}" font-size="26">제공된 SVG 원본을 우선 사용하고</text>
+      <text x="155" y="1092" fill="${MUTED}" font-size="26">로고를 새로 그리거나 재조합하지 않습니다.</text>
+      <text x="155" y="1200" fill="${BLACK}" font-size="24" font-weight="600">CHECK</text>
+      <text x="155" y="1255" fill="${MUTED}" font-size="24">형태 · 비율 · 색상 · 여백</text>
+
+      <text x="1005" y="855" fill="${MUTED}" font-size="22" font-weight="700">02 · APPROVED VALUES</text>
+      <text x="1005" y="950" fill="${BLACK}" font-size="44" font-weight="700">지정값 준수</text>
+      <text x="1005" y="1040" fill="${MUTED}" font-size="26">컬러와 최소 크기 등 수치 정보는</text>
+      <text x="1005" y="1092" fill="${MUTED}" font-size="26">문서에 표기된 값을 그대로 적용합니다.</text>
+      <text x="1005" y="1200" fill="${BLACK}" font-size="24" font-weight="600">CHECK</text>
+      <text x="1005" y="1255" fill="${MUTED}" font-size="24">HEX · RGB · CMYK · X</text>
+
+      <text x="1855" y="855" fill="${MUTED}" font-size="22" font-weight="700">03 · FINAL REVIEW</text>
+      <text x="1855" y="950" fill="${BLACK}" font-size="44" font-weight="700">적용 전 검수</text>
+      <text x="1855" y="1040" fill="${MUTED}" font-size="26">최종 결과물에서 대비, 최소 크기,</text>
+      <text x="1855" y="1092" fill="${MUTED}" font-size="26">보호 공간과 타이포 위계를 확인합니다.</text>
+      <text x="1855" y="1200" fill="${BLACK}" font-size="24" font-weight="600">OUTPUT</text>
+      <text x="1855" y="1255" fill="${MUTED}" font-size="24">Print · Web · Social · Presentation</text>
+
+      <rect x="105" y="1490" width="2760" height="190" fill="${primary}"/>
+      <text x="155" y="1555" fill="${contrast(primary)}" opacity=".72" font-size="21" font-weight="700">CORE PRINCIPLE</text>
+      <text x="155" y="1625" fill="${contrast(primary)}" font-size="34" font-weight="700">Consistency before decoration.  규칙을 먼저 지키고, 표현은 그 안에서 확장합니다.</text>
+      ${footer(project, 'Brand asset notice')}
+    </svg>`
+  });
+
+  // 04 Index
   add({
     id: '02-index',
     section: 'intro',
@@ -265,27 +355,28 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       <text x="105" y="245" fill="${BLACK}" font-size="190" font-weight="700">INDEX</text>
       <text x="105" y="355" fill="${MUTED}" font-size="28">Brand Identity Guidelines · ${esc(englishName)}</text>
       <line x1="105" y1="430" x2="2865" y2="430" stroke="${BLACK}" stroke-width="3"/>
+      <text x="105" y="500" fill="${MUTED}" font-size="22">02  Brand overview · 03  Brand asset notice · 04  Index</text>
 
       <text x="105" y="590" fill="${MUTED}" font-size="24" font-weight="700">01</text>
       <text x="190" y="590" fill="${BLACK}" font-size="48" font-weight="700">LOGO</text>
-      <text x="190" y="675" fill="${BLACK}" font-size="30">04  Primary logo</text>
-      <text x="190" y="730" fill="${BLACK}" font-size="30">05  Construction grid</text>
-      <text x="190" y="785" fill="${BLACK}" font-size="30">06  Logo variations</text>
-      <text x="190" y="840" fill="${BLACK}" font-size="30">07  Clear space</text>
-      <text x="190" y="895" fill="${BLACK}" font-size="30">08  Incorrect usage</text>
-      <text x="190" y="950" fill="${BLACK}" font-size="30">09  Minimum size</text>
+      <text x="190" y="675" fill="${BLACK}" font-size="30">06  Primary logo</text>
+      <text x="190" y="730" fill="${BLACK}" font-size="30">07  Construction grid</text>
+      <text x="190" y="785" fill="${BLACK}" font-size="30">08  Logo variations</text>
+      <text x="190" y="840" fill="${BLACK}" font-size="30">09  Clear space</text>
+      <text x="190" y="895" fill="${BLACK}" font-size="30">10  Incorrect usage</text>
+      <text x="190" y="950" fill="${BLACK}" font-size="30">11  Minimum size</text>
 
       <text x="1050" y="590" fill="${MUTED}" font-size="24" font-weight="700">02</text>
       <text x="1135" y="590" fill="${BLACK}" font-size="48" font-weight="700">COLOR</text>
-      <text x="1135" y="675" fill="${BLACK}" font-size="30">11  Brand color</text>
-      <text x="1135" y="730" fill="${BLACK}" font-size="30">12  Color system</text>
-      <text x="1135" y="785" fill="${BLACK}" font-size="30">13  Combinations</text>
-      <text x="1135" y="840" fill="${BLACK}" font-size="30">14  Usage guide</text>
+      <text x="1135" y="675" fill="${BLACK}" font-size="30">13  Brand color</text>
+      <text x="1135" y="730" fill="${BLACK}" font-size="30">14  Color system</text>
+      <text x="1135" y="785" fill="${BLACK}" font-size="30">15  Combinations</text>
+      <text x="1135" y="840" fill="${BLACK}" font-size="30">16  Usage guide</text>
 
       <text x="2010" y="590" fill="${MUTED}" font-size="24" font-weight="700">03</text>
       <text x="2095" y="590" fill="${BLACK}" font-size="48" font-weight="700">TYPOGRAPHY</text>
-      <text x="2095" y="675" fill="${BLACK}" font-size="30">16  Title text</text>
-      <text x="2095" y="730" fill="${BLACK}" font-size="30">17  Body text</text>
+      <text x="2095" y="675" fill="${BLACK}" font-size="30">18  Title text</text>
+      <text x="2095" y="730" fill="${BLACK}" font-size="30">19  Body text</text>
 
       <rect x="105" y="1250" width="2760" height="460" fill="${SOFT}"/>
       <text x="145" y="1320" fill="${MUTED}" font-size="23" font-weight="700">DOCUMENT SYSTEM</text>
@@ -319,7 +410,9 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       ${panel(1955, 1215, 910, 330, '#F2F2F2')}
       ${label('MONOCHROME', 1995, 1270)}
       ${logo(project.logo, 2165, 1330, 480, 140, BLACK)}
-      <text x="1035" y="1625" fill="${MUTED}" font-size="22">The primary logo should always be reproduced from approved master artwork.</text>`
+      <text x="1035" y="1600" fill="${MUTED}" font-size="20" font-weight="700">APPLICATION</text>
+      <text x="1035" y="1642" fill="${BLACK}" font-size="24" font-weight="600">Corporate · Website · Social · Presentation · Packaging</text>
+      <text x="1035" y="1690" fill="${MUTED}" font-size="21">Always reproduce the primary logo from approved master artwork. Never redraw or rebuild the mark.</text>`
     )
   });
 
@@ -380,7 +473,9 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       ${panel(1955, 995, 910, 500, BLACK)}
       ${label('04 · WHITE', 1995, 1055, WHITE)}
       ${logo(project.logo, 2150, 1185, 520, 170, WHITE)}
-      <text x="1035" y="1605" fill="${MUTED}" font-size="22">Choose the version with the clearest contrast for each background.</text>`
+      <text x="1035" y="1585" fill="${MUTED}" font-size="20" font-weight="700">SELECTION RULE</text>
+      <text x="1035" y="1632" fill="${BLACK}" font-size="26" font-weight="600">배경 대비가 가장 명확한 버전을 선택하고, 한 화면 안에서는 로고 표현 방식을 통일합니다.</text>
+      <text x="1035" y="1680" fill="${MUTED}" font-size="21">Primary → standard use · Reverse → dark/brand backgrounds · Mono → restricted color environments</text>`
     )
   });
 
@@ -455,7 +550,8 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
 
       <rect x="1035" y="1400" width="1830" height="150" fill="${SOFT}"/>
       <text x="1075" y="1455" fill="${MUTED}" font-size="21">CHECK</text>
-      <text x="1075" y="1505" fill="${BLACK}" font-size="28" font-weight="600">If fine details disappear, use a larger size rather than simplifying or redrawing the logo.</text>`
+      <text x="1075" y="1505" fill="${BLACK}" font-size="27" font-weight="600">세부 형태가 뭉개지거나 식별성이 떨어지면 로고를 단순화하지 말고 사용 크기를 확대합니다.</text>
+      <text x="1075" y="1545" fill="${MUTED}" font-size="20">Minimum size is a lower limit, not a recommended default size.</text>`
     )
   });
 
@@ -502,7 +598,9 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       <text x="1431" y="1485" fill="${MUTED}" font-size="20">35</text>
       <text x="1797" y="1485" fill="${MUTED}" font-size="20">55</text>
       <text x="2163" y="1485" fill="${MUTED}" font-size="20">75</text>
-      <text x="2529" y="1485" fill="${MUTED}" font-size="20">100</text>`
+      <text x="2529" y="1485" fill="${MUTED}" font-size="20">100</text>
+      <text x="1035" y="1570" fill="${MUTED}" font-size="20" font-weight="700">APPLICATION</text>
+      <text x="1035" y="1615" fill="${BLACK}" font-size="25" font-weight="600">Primary는 브랜드 인지, Secondary는 면적 보조, Accent는 CTA·강조 요소에 제한적으로 사용합니다.</text>`
     )
   });
 
@@ -572,7 +670,9 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       <text x="1070" y="1300" fill="${MUTED}" font-size="20">DISPLAY</text><text x="1070" y="1380" fill="${BLACK}" font-size="50" font-weight="700">56 / 64</text><text x="1070" y="1460" fill="${MUTED}" font-size="22">Bold</text>
       <text x="1525" y="1300" fill="${MUTED}" font-size="20">H1</text><text x="1525" y="1380" fill="${BLACK}" font-size="50" font-weight="700">40 / 48</text><text x="1525" y="1460" fill="${MUTED}" font-size="22">Bold</text>
       <text x="1980" y="1300" fill="${MUTED}" font-size="20">H2</text><text x="1980" y="1380" fill="${BLACK}" font-size="50" font-weight="700">28 / 38</text><text x="1980" y="1460" fill="${MUTED}" font-size="22">SemiBold</text>
-      <text x="2435" y="1300" fill="${MUTED}" font-size="20">TRACKING</text><text x="2435" y="1380" fill="${BLACK}" font-size="50" font-weight="700">-3%</text><text x="2435" y="1460" fill="${MUTED}" font-size="22">Recommended</text>`
+      <text x="2435" y="1300" fill="${MUTED}" font-size="20">TRACKING</text><text x="2435" y="1380" fill="${BLACK}" font-size="50" font-weight="700">-3%</text><text x="2435" y="1460" fill="${MUTED}" font-size="22">Recommended</text>
+      <text x="1035" y="1615" fill="${MUTED}" font-size="20" font-weight="700">USAGE</text>
+      <text x="1035" y="1660" fill="${BLACK}" font-size="25" font-weight="600">Display는 캠페인 핵심 메시지, H1·H2는 문서와 웹의 정보 구조를 구분하는 데 사용합니다.</text>`
     )
   });
 
