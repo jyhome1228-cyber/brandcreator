@@ -60,6 +60,32 @@ function contrast(hex: string): string {
   return contrastRatio(hex, BLACK) >= contrastRatio(hex, WHITE) ? BLACK : WHITE;
 }
 
+/**
+ * Brand guideline surfaces use a stricter editorial rule than the general
+ * contrast helper: saturated / dark brand colors should read as a color field
+ * with white typography, while only genuinely light surfaces use black.
+ */
+function surfaceInk(hex: string): string {
+  const [r, g, b] = hexRgb(hex);
+  const max = Math.max(r, g, b);
+  const min = Math.min(r, g, b);
+  const saturation = max === 0 ? 0 : (max - min) / max;
+  const luminance = relativeLuminance(hex);
+
+  const isNearWhite = luminance >= 0.72 && saturation <= 0.22;
+  const isVeryLightColor = luminance >= 0.82;
+
+  return isNearWhite || isVeryLightColor ? BLACK : WHITE;
+}
+
+function surfaceMutedInk(hex: string): string {
+  return surfaceInk(hex) === WHITE ? 'rgba(255,255,255,.72)' : MUTED;
+}
+
+function surfaceLine(hex: string): string {
+  return surfaceInk(hex) === WHITE ? 'rgba(255,255,255,.28)' : LINE;
+}
+
 function wrap(text: string, max = 34): string[] {
   const normalized = text.trim().replace(/\s+/g, ' ');
   if (!normalized) return [];
@@ -169,7 +195,7 @@ function swatch(project: BrandProject, color: string, x: number, labelText: stri
 function colorCell(project: BrandProject, bg: string, logoColor: string, x: number, y: number, w: number, h: number, title: string): string {
   const safeBg = safeHex(bg, WHITE);
   const safeLogo = safeHex(logoColor, BLACK);
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${safeBg}"/>${label(title, x + 26, y + 44, contrast(safeBg))}${logo(project.logo, x + 135, y + 78, w - 270, h - 130, safeLogo)}`;
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${safeBg}"/>${label(title, x + 26, y + 44, surfaceInk(safeBg))}${logo(project.logo, x + 135, y + 78, w - 270, h - 130, safeLogo)}`;
 }
 
 function usageCell(project: BrandProject, bg: string, logoColor: string, x: number, y: number, w: number, h: number): string {
@@ -187,7 +213,9 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
   const primary = safeHex(project.colors.primary);
   const secondary = safeHex(project.colors.secondary, '#EAEAEA');
   const accent = safeHex(project.colors.accent, '#777777');
-  const coverFg = contrast(primary);
+  const coverFg = surfaceInk(primary);
+  const coverMuted = surfaceMutedInk(primary);
+  const coverLine = surfaceLine(primary);
   const brandName = project.name || project.englishName || 'Brand';
   const englishName = project.englishName || brandName;
   const ratio = project.logo?.aspectRatio && project.logo.aspectRatio > 0 ? project.logo.aspectRatio : 1;
@@ -228,15 +256,20 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
     const hex = safeHex(hexValue);
     const [r, g, b] = hexRgb(hex);
     const [c, m, yy, k] = rgbToCmyk(hex);
-    const fg = contrast(hex);
-    return `${panel(x, y, w, h, hex)}<text x="${x + 28}" y="${y + 48}" fill="${fg}" font-size="24" font-weight="700">${esc(name)}</text><text x="${x + 28}" y="${y + h - 128}" fill="${fg}" font-size="26" font-weight="600">${hex}</text><text x="${x + 28}" y="${y + h - 82}" fill="${fg}" opacity=".82" font-size="21">RGB ${r} · ${g} · ${b}</text><text x="${x + 28}" y="${y + h - 42}" fill="${fg}" opacity=".82" font-size="21">CMYK ${c} · ${m} · ${yy} · ${k}</text>`;
+    const fg = surfaceInk(hex);
+    const muted = surfaceMutedInk(hex);
+    return `${panel(x, y, w, h, hex)}<text x="${x + 28}" y="${y + 48}" fill="${fg}" font-size="24" font-weight="700">${esc(name)}</text><text x="${x + 28}" y="${y + h - 128}" fill="${fg}" font-size="26" font-weight="600">${hex}</text><text x="${x + 28}" y="${y + h - 82}" fill="${muted}" font-size="21">RGB ${r} · ${g} · ${b}</text><text x="${x + 28}" y="${y + h - 42}" fill="${muted}" font-size="21">CMYK ${c} · ${m} · ${yy} · ${k}</text>`;
   };
 
   const sectionIntro = (section: string, number: string, items: string[]) => {
+    const sectionBg = primary;
+    const sectionFg = surfaceInk(sectionBg);
+    const sectionMuted = surfaceMutedInk(sectionBg);
+    const sectionRule = surfaceLine(sectionBg);
     const itemMarkup = items.map((item, index) =>
-      `<text x="2110" y="${390 + index * 72}" fill="${BLACK}" font-size="34" font-weight="500">${esc(String(index + 1).padStart(2, '0'))}</text><text x="2240" y="${390 + index * 72}" fill="${BLACK}" font-size="34">${esc(item)}</text>`
+      `<text x="2110" y="${390 + index * 72}" fill="${sectionMuted}" font-size="34" font-weight="500">${esc(String(index + 1).padStart(2, '0'))}</text><text x="2240" y="${390 + index * 72}" fill="${sectionFg}" font-size="34">${esc(item)}</text>`
     ).join('');
-    return `${openSvg(project, '#F1F1F3')}<text x="105" y="210" fill="${MUTED}" font-size="26" font-weight="600">${number} · BRAND IDENTITY SYSTEM</text><text x="105" y="1750" fill="${BLACK}" font-size="250" font-weight="700">${esc(section)}</text><line x1="2040" y1="300" x2="2865" y2="300" stroke="${BLACK}" stroke-width="3"/>${itemMarkup}${footer(project, section)}</svg>`;
+    return `${openSvg(project, sectionBg)}<text x="105" y="210" fill="${sectionMuted}" font-size="26" font-weight="600">${number} · BRAND IDENTITY SYSTEM</text><text x="105" y="1750" fill="${sectionFg}" font-size="250" font-weight="700">${esc(section)}</text><line x1="2040" y1="300" x2="2865" y2="300" stroke="${sectionRule}" stroke-width="3"/>${itemMarkup}${footer(project, section, true)}</svg>`;
   };
 
   // 01 Cover
@@ -246,14 +279,14 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
     title: 'Cover',
     subtitle: '',
     svg: `${openSvg(project, primary)}
-      <text x="105" y="170" fill="${coverFg}" opacity=".74" font-size="24" font-weight="600">${esc(project.year)} · BRAND IDENTITY GUIDELINES</text>
+      <text x="105" y="170" fill="${coverMuted}" font-size="24" font-weight="600">${esc(project.year)} · BRAND IDENTITY GUIDELINES</text>
       <text x="105" y="520" fill="${coverFg}" font-size="260" font-weight="700">Brand</text>
       <text x="105" y="760" fill="${coverFg}" font-size="260" font-weight="700">Guidelines</text>
-      <line x1="105" y1="930" x2="2865" y2="930" stroke="${coverFg}" opacity=".28" stroke-width="2"/>
+      <line x1="105" y1="930" x2="2865" y2="930" stroke="${coverLine}" stroke-width="2"/>
       ${logo(project.logo, 105, 1420, 620, 190, coverFg)}
       <text x="2200" y="1460" fill="${coverFg}" font-size="30" font-weight="600">${esc(englishName)}</text>
-      <text x="2200" y="1520" fill="${coverFg}" opacity=".74" font-size="23">${esc(project.slogan || 'Visual Identity System')}</text>
-      <text x="2200" y="1600" fill="${coverFg}" opacity=".55" font-size="20">VERSION 1.0 · ${esc(project.year)}</text>
+      <text x="2200" y="1520" fill="${coverMuted}" font-size="23">${esc(project.slogan || 'Visual Identity System')}</text>
+      <text x="2200" y="1600" fill="${coverMuted}" font-size="20">VERSION 1.0 · ${esc(project.year)}</text>
     </svg>`
   });
 
@@ -273,9 +306,9 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       <text x="105" y="1205" fill="${BLACK}" font-size="38" font-weight="600">${esc(brandSlogan)}</text>
 
       ${panel(1035, 460, 1830, 420, primary)}
-      <text x="1080" y="525" fill="${contrast(primary)}" opacity=".72" font-size="22" font-weight="700">CORE IDENTITY</text>
-      <text x="1080" y="675" fill="${contrast(primary)}" font-size="92" font-weight="700">${esc(englishName)}</text>
-      <text x="1080" y="760" fill="${contrast(primary)}" opacity=".78" font-size="30">${esc(brandSlogan)}</text>
+      <text x="1080" y="525" fill="${surfaceInk(primary)}" opacity=".72" font-size="22" font-weight="700">CORE IDENTITY</text>
+      <text x="1080" y="675" fill="${surfaceInk(primary)}" font-size="92" font-weight="700">${esc(englishName)}</text>
+      <text x="1080" y="760" fill="${surfaceInk(primary)}" opacity=".78" font-size="30">${esc(brandSlogan)}</text>
 
       ${panel(1035, 915, 570, 520, '#F7F7F7', LINE)}
       ${panel(1630, 915, 570, 520, '#F7F7F7', LINE)}
@@ -339,8 +372,8 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       <text x="1855" y="1255" fill="${MUTED}" font-size="24">Print · Web · Social · Presentation</text>
 
       <rect x="105" y="1490" width="2760" height="190" fill="${primary}"/>
-      <text x="155" y="1555" fill="${contrast(primary)}" opacity=".72" font-size="21" font-weight="700">CORE PRINCIPLE</text>
-      <text x="155" y="1625" fill="${contrast(primary)}" font-size="34" font-weight="700">Consistency before decoration.  규칙을 먼저 지키고, 표현은 그 안에서 확장합니다.</text>
+      <text x="155" y="1555" fill="${surfaceInk(primary)}" opacity=".72" font-size="21" font-weight="700">CORE PRINCIPLE</text>
+      <text x="155" y="1625" fill="${surfaceInk(primary)}" font-size="34" font-weight="700">Consistency before decoration.  규칙을 먼저 지키고, 표현은 그 안에서 확장합니다.</text>
       ${footer(project, 'Brand asset notice')}
     </svg>`
   });
@@ -584,9 +617,9 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       <rect x="1035" y="570" width="1098" height="360" fill="${primary}"/>
       <rect x="2133" y="570" width="549" height="360" fill="${secondary}"/>
       <rect x="2682" y="570" width="183" height="360" fill="${accent}"/>
-      <text x="1070" y="885" fill="${contrast(primary)}" font-size="28" font-weight="700">60%</text>
-      <text x="2168" y="885" fill="${contrast(secondary)}" font-size="28" font-weight="700">30%</text>
-      <text x="2710" y="885" fill="${contrast(accent)}" font-size="28" font-weight="700">10%</text>
+      <text x="1070" y="885" fill="${surfaceInk(primary)}" font-size="28" font-weight="700">60%</text>
+      <text x="2168" y="885" fill="${surfaceInk(secondary)}" font-size="28" font-weight="700">30%</text>
+      <text x="2710" y="885" fill="${surfaceInk(accent)}" font-size="28" font-weight="700">10%</text>
 
       <text x="1035" y="1040" fill="${MUTED}" font-size="22" font-weight="700">PRIMARY TINT SCALE</text>
       <rect x="1035" y="1090" width="366" height="340" fill="${primary}" opacity=".15"/>
@@ -717,12 +750,12 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
     title: 'Back Cover',
     subtitle: '',
     svg: `${openSvg(project, primary)}
-      <text x="105" y="170" fill="${coverFg}" opacity=".7" font-size="23">${esc(project.year)} · BRAND IDENTITY GUIDELINES</text>
+      <text x="105" y="170" fill="${coverMuted}" font-size="23">${esc(project.year)} · BRAND IDENTITY GUIDELINES</text>
       ${logo(project.logo, 105, 780, 820, 300, coverFg)}
-      <line x1="105" y1="1540" x2="2865" y2="1540" stroke="${coverFg}" opacity=".28" stroke-width="2"/>
+      <line x1="105" y1="1540" x2="2865" y2="1540" stroke="${coverLine}" stroke-width="2"/>
       <text x="105" y="1620" fill="${coverFg}" font-size="36" font-weight="700">${esc(englishName)}</text>
-      <text x="105" y="1680" fill="${coverFg}" opacity=".72" font-size="24">${esc(project.slogan || 'Visual Identity System')}</text>
-      <text x="2440" y="1680" fill="${coverFg}" opacity=".72" font-size="22">END · ${esc(project.year)}</text>
+      <text x="105" y="1680" fill="${coverMuted}" font-size="24">${esc(project.slogan || 'Visual Identity System')}</text>
+      <text x="2440" y="1680" fill="${coverMuted}" font-size="22">END · ${esc(project.year)}</text>
     </svg>`
   });
 
