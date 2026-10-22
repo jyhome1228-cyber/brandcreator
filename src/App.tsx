@@ -72,6 +72,12 @@ export default function App() {
     Boolean(project.typography.title && project.typography.body),
   ];
   const setupProgress = Math.round((setupChecks.filter(Boolean).length / setupChecks.length) * 100);
+  const recommendationsApplied = Boolean(
+    project.logo &&
+    project.rules.clearSpace === project.logo.analysis.recommendation.clearSpace &&
+    project.rules.minimumPrintMm === project.logo.analysis.recommendation.minimumPrintMm &&
+    project.rules.minimumDigitalPx === project.logo.analysis.recommendation.minimumDigitalPx
+  );
   const sectionLabels: Record<GuidelinePage['section'], string> = {
     intro: 'INTRO',
     logo: 'LOGO',
@@ -105,6 +111,20 @@ export default function App() {
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'SVG 파일을 불러오지 못했습니다.');
     }
+  };
+
+  const applyLogoRecommendations = () => {
+    if (!project.logo) return;
+    const recommendation = project.logo.analysis.recommendation;
+    setProject((previous) => ({
+      ...previous,
+      rules: {
+        ...previous.rules,
+        clearSpace: recommendation.clearSpace,
+        minimumPrintMm: recommendation.minimumPrintMm,
+        minimumDigitalPx: recommendation.minimumDigitalPx,
+      },
+    }));
   };
 
   const generate = () => {
@@ -203,10 +223,121 @@ export default function App() {
                     <span>{project.logo ? `Ratio ${project.logo.aspectRatio.toFixed(2)} : 1 · ${project.logo.colors.length} colors detected` : 'SVG 파일을 올리면 컬러와 비율을 자동 분석합니다.'}</span>
                     <em>{project.logo ? '파일 변경' : '파일 선택'}</em>
                   </label>
+                  {project.logo ? (
+                    <div className="svg-analysis">
+                      <div className="analysis-heading">
+                        <div>
+                          <span className="metadata-label">SVG ANALYSIS · V1</span>
+                          <strong>로고 구조 분석</strong>
+                        </div>
+                        <span className="analysis-confidence">
+                          {Math.round(project.logo.analysis.classification.confidence * 100)}% confidence
+                        </span>
+                      </div>
+
+                      <div className="analysis-summary-grid">
+                        <div className="analysis-primary-card">
+                          <span>DETECTED TYPE</span>
+                          <strong>{project.logo.analysis.classification.type.replace('-', ' ').toUpperCase()}</strong>
+                          <small>{project.logo.analysis.geometry.orientation.toUpperCase()}</small>
+                        </div>
+                        <div className="analysis-metric">
+                          <span>VISUAL RATIO</span>
+                          <strong>{project.logo.analysis.geometry.visualAspectRatio.toFixed(2)} : 1</strong>
+                          <small>{Math.round(project.logo.analysis.geometry.canvasOccupancy * 100)}% canvas occupancy</small>
+                        </div>
+                        <div className="analysis-metric">
+                          <span>COMPLEXITY</span>
+                          <strong>{project.logo.analysis.structure.complexity.replace('-', ' ').toUpperCase()}</strong>
+                          <small>{project.logo.analysis.structure.complexityScore} / 100</small>
+                        </div>
+                        <div className="analysis-metric">
+                          <span>STRUCTURE</span>
+                          <strong>{project.logo.analysis.structure.pathCount} paths</strong>
+                          <small>{project.logo.analysis.structure.elementCount} elements · {project.logo.analysis.structure.groupCount} groups</small>
+                        </div>
+                      </div>
+
+                      <div className="analysis-detail-row">
+                        <div>
+                          <span>Fine detail density</span>
+                          <strong>{Math.round(project.logo.analysis.structure.smallDetailRatio * 100)}%</strong>
+                        </div>
+                        <div>
+                          <span>Path commands</span>
+                          <strong>{project.logo.analysis.structure.commandCount}</strong>
+                        </div>
+                        <div>
+                          <span>Orientation</span>
+                          <strong>{project.logo.analysis.geometry.orientation}</strong>
+                        </div>
+                      </div>
+
+                      <div className="analysis-color-section">
+                        <div className="inline-label-row">
+                          <span className="metadata-label">COLOR ANALYSIS</span>
+                          <small>SVG 속성 사용 빈도를 기준으로 계산합니다.</small>
+                        </div>
+                        <div className="analysis-color-list">
+                          {project.logo.analysis.color.colors.length ? project.logo.analysis.color.colors.slice(0, 6).map((item, index) => (
+                            <button
+                              className="analysis-color-item"
+                              key={item.hex}
+                              type="button"
+                              onClick={() => setProject((previous) => ({ ...previous, colors: { ...previous.colors, primary: item.hex } }))}
+                            >
+                              <i style={{ background: item.hex }} />
+                              <span>
+                                <strong>{String(index + 1).padStart(2, '0')} · {item.hex}</strong>
+                                <small>{Math.round(item.usageRatio * 100)}% usage</small>
+                              </span>
+                            </button>
+                          )) : <p className="analysis-empty">명시적인 Fill / Stroke 컬러가 감지되지 않았습니다.</p>}
+                        </div>
+                      </div>
+
+                      <div className="analysis-recommendation">
+                        <div className="analysis-recommendation-head">
+                          <div>
+                            <span className="metadata-label">RECOMMENDED RULES</span>
+                            <strong>분석값 기반 자동 제안</strong>
+                          </div>
+                          <button
+                            className={`button small ${recommendationsApplied ? 'secondary' : 'primary'}`}
+                            type="button"
+                            onClick={applyLogoRecommendations}
+                          >
+                            {recommendationsApplied ? 'Applied' : 'Apply recommendations'}
+                          </button>
+                        </div>
+                        <div className="recommendation-grid">
+                          <div>
+                            <span>CLEAR SPACE</span>
+                            <strong>{project.logo.analysis.recommendation.clearSpace.toFixed(2)}X</strong>
+                            <small>Logo height basis</small>
+                          </div>
+                          <div>
+                            <span>PRINT MIN.</span>
+                            <strong>{project.logo.analysis.recommendation.minimumPrintMm} mm</strong>
+                            <small>Recommended lower limit</small>
+                          </div>
+                          <div>
+                            <span>DIGITAL MIN.</span>
+                            <strong>{project.logo.analysis.recommendation.minimumDigitalPx} px</strong>
+                            <small>Recommended lower limit</small>
+                          </div>
+                        </div>
+                        <div className="recommendation-reasons">
+                          {project.logo.analysis.recommendation.rationale.map((reason) => <span key={reason}>{reason}</span>)}
+                        </div>
+                      </div>
+                    </div>
+                  ) : null}
+
                   {project.logo?.colors.length ? (
-                    <div className="detected-colors" aria-label="SVG에서 감지된 컬러">
+                    <div className="detected-colors legacy-detected-colors" aria-label="SVG에서 감지된 컬러">
                       <div className="inline-label-row">
-                        <span className="metadata-label">DETECTED COLORS</span>
+                        <span className="metadata-label">QUICK COLOR APPLY</span>
                         <small>클릭하면 Primary Color로 적용됩니다.</small>
                       </div>
                       <div className="color-chip-row">
