@@ -2194,3 +2194,368 @@ body {
     font-size: 20px;
   }
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* Stepped application workspace                                               */
+/* -------------------------------------------------------------------------- */
+
+.setup-workspace {
+  width: min(1480px, calc(100% - 48px));
+  grid-template-columns: 190px minmax(0, 1fr) 390px;
+  gap: 24px;
+  align-items: start;
+  padding-top: 34px;
+}
+
+.setup-step-nav {
+  position: sticky;
+  top: 92px;
+  align-self: start;
+  padding: 18px 12px 14px;
+  border: 1px solid #e3e7ec;
+  border-radius: 12px;
+  background: rgba(255,255,255,.94);
+  box-shadow: 0 8px 24px rgba(15,18,24,.028);
+}
+
+.step-nav-head {
+  padding: 2px 8px 16px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.step-nav-head strong {
+  display: block;
+  margin-top: 6px;
+  color: #111318;
+  font-size: 13px;
+  font-weight: 720;
+  letter-spacing: -0.03em !important;
+}
+
+.step-nav-head p {
+  margin: 8px 0 0;
+  color: #89919b;
+  font-size: 9px;
+  line-height: 1.55;
+}
+
+.step-nav-list {
+  display: grid;
+  gap: 4px;
+  padding: 10px 0 12px;
+}
+
+.step-nav-item {
+  width: 100%;
+  min-height: 52px;
+  padding: 8px 8px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  display: grid;
+  grid-template-columns: 26px minmax(0, 1fr) 18px;
+  align-items: center;
+  gap: 8px;
+  text-align: left;
+  color: #58606a;
+  transition: background .15s, color .15s;
+}
+
+.step-nav-item:hover {
+  background: #f7f8fa;
+}
+
+.step-nav-item.active {
+  background: #111318;
+  color: #fff;
+}
+
+.step-nav-number {
+  color: #a4abb4;
+  font-size: 8px;
+  font-weight: 760;
+  font-variant-numeric: tabular-nums;
+}
+
+.step-nav-item.active .step-nav-number {
+  color: rgba(255,255,255,.48);
+}
+
+.step-nav-copy {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.step-nav-copy strong {
+  font-size: 10.5px;
+  font-weight: 680;
+  letter-spacing: -0.02em !important;
+}
+
+.step-nav-copy small {
+  color: #9aa1aa;
+  font-size: 8px;
+}
+
+.step-nav-item.active .step-nav-copy small {
+  color: rgba(255,255,255,.5);
+}
+
+.step-nav-item i {
+  width: 16px;
+  height: 16px;
+  border: 1px solid #dde1e6;
+  border-radius: 50%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: transparent;
+  font-size: 8px;
+  font-style: normal;
+}
+
+.step-nav-item i.complete {
+  border-color: #cbd1d7;
+  color: #69717b;
+  background: #fff;
+}
+
+.step-nav-item.active i.complete {
+  border-color: rgba(255,255,255,.22);
+  color: #fff;
+  background: rgba(255,255,255,.1);
+}
+
+.step-nav-progress {
+  padding: 12px 8px 4px;
+  border-top: 1px solid #edf0f3;
+}
+
+.step-nav-progress > div:first-child {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  color: #9299a3;
+  font-size: 8px;
+}
+
+.step-nav-progress strong {
+  color: #30363d;
+  font-size: 8px;
+  font-weight: 720;
+}
+
+.step-nav-progress .progress-track {
+  margin-top: 8px;
+}
+
+.setup-main {
+  min-width: 0;
+}
+
+.setup-module-stack {
+  display: block;
+}
+
+.setup-panel {
+  display: none;
+  min-height: 540px;
+}
+
+.setup-panel.active {
+  display: grid;
+}
+
+.setup-panel .module-content {
+  min-height: 540px;
+}
+
+.setup-panel .module-heading {
+  padding-bottom: 22px;
+  border-bottom: 1px solid #edf0f3;
+}
+
+.setup-panel .module-description {
+  max-width: 680px;
+}
+
+.step-actions {
+  min-height: 78px;
+  margin-top: 12px;
+  padding: 14px 18px;
+  border-radius: 11px;
+}
+
+.action-step {
+  color: #a0a7b0 !important;
+  font-size: 8px !important;
+  font-weight: 760;
+  letter-spacing: .07em !important;
+}
+
+.step-actions .action-copy strong {
+  margin-top: 1px;
+  font-size: 11px;
+  font-weight: 650;
+}
+
+.step-action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step-action-buttons .button {
+  height: 40px;
+  border-radius: 8px;
+  font-size: 10.5px;
+}
+
+.step-back {
+  min-width: 72px;
+}
+
+.step-action-buttons .creator-primary {
+  min-width: 128px;
+}
+
+.setup-preview-panel {
+  position: relative;
+}
+
+.preview-sticky {
+  top: 92px;
+}
+
+.preview-panel-heading {
+  padding: 2px 2px 0;
+}
+
+.creator-document-preview {
+  box-shadow:
+    0 1px 2px rgba(15,18,24,.05),
+    0 12px 32px rgba(15,18,24,.08);
+}
+
+.preview-system-grid,
+.preview-progress-card,
+.page-structure-card {
+  background: #fff;
+}
+
+.preview-system-grid {
+  padding: 0;
+}
+
+.page-structure-card {
+  box-shadow: 0 8px 24px rgba(15,18,24,.018);
+}
+
+@media (max-width: 1280px) {
+  .setup-workspace {
+    width: min(1120px, calc(100% - 40px));
+    grid-template-columns: 170px minmax(0, 1fr) 340px;
+    gap: 18px;
+  }
+}
+
+@media (max-width: 1080px) {
+  .setup-workspace {
+    grid-template-columns: 160px minmax(0, 1fr);
+  }
+
+  .setup-preview-panel {
+    grid-column: 1 / -1;
+  }
+
+  .preview-sticky {
+    position: static;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 320px;
+    gap: 10px;
+  }
+
+  .preview-panel-heading {
+    grid-column: 1 / -1;
+  }
+
+  .creator-document-preview {
+    grid-row: 2 / span 3;
+  }
+
+  .preview-system-grid,
+  .preview-progress-card,
+  .page-structure-card {
+    grid-column: 2;
+  }
+}
+
+@media (max-width: 767px) {
+  .setup-workspace {
+    display: block;
+    width: calc(100% - 24px);
+    padding-top: 20px;
+  }
+
+  .setup-step-nav {
+    position: static;
+    margin-bottom: 12px;
+    padding: 10px;
+  }
+
+  .step-nav-head,
+  .step-nav-progress {
+    display: none;
+  }
+
+  .step-nav-list {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    padding: 0;
+  }
+
+  .step-nav-item {
+    min-height: 58px;
+    grid-template-columns: 1fr;
+    gap: 3px;
+    justify-items: center;
+    text-align: center;
+  }
+
+  .step-nav-number {
+    font-size: 8px;
+  }
+
+  .step-nav-copy small,
+  .step-nav-item i {
+    display: none;
+  }
+
+  .setup-panel,
+  .setup-panel .module-content {
+    min-height: 0;
+  }
+
+  .step-actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .step-action-buttons {
+    width: 100%;
+  }
+
+  .step-action-buttons .button {
+    flex: 1;
+  }
+
+  .setup-preview-panel {
+    margin-top: 18px;
+  }
+
+  .preview-sticky {
+    display: block;
+  }
+}
