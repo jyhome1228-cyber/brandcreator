@@ -58,6 +58,7 @@ function isHex(value: string): boolean {
 export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
   const [mode, setMode] = useState<'setup' | 'editor'>('setup');
+  const [setupStep, setSetupStep] = useState<1 | 2 | 3 | 4>(1);
   const [currentId, setCurrentId] = useState('01-cover');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
@@ -72,6 +73,12 @@ export default function App() {
     Boolean(project.typography.title && project.typography.body),
   ];
   const setupProgress = Math.round((setupChecks.filter(Boolean).length / setupChecks.length) * 100);
+  const stepStatus = {
+    1: Boolean(project.name.trim() && project.englishName.trim()),
+    2: Boolean(project.logo),
+    3: Boolean(isHex(project.colors.primary) && project.typography.title && project.typography.body),
+    4: Boolean(project.rules.clearSpace > 0 && project.rules.minimumPrintMm > 0 && project.rules.minimumDigitalPx > 0),
+  } as const;
   const recommendationsApplied = Boolean(
     project.logo &&
     project.rules.clearSpace === project.logo.analysis.recommendation.clearSpace &&
@@ -167,9 +174,46 @@ export default function App() {
         </header>
 
         <main className="setup-workspace">
+          <nav className="setup-step-nav" aria-label="Project setup steps">
+            <div className="step-nav-head">
+              <span className="metadata-label">PROJECT SETUP</span>
+              <strong>브랜드 시스템 설정</strong>
+              <p>필수 정보를 순서대로 설정하면 가이드라인이 자동 구성됩니다.</p>
+            </div>
+            <div className="step-nav-list">
+              {([
+                [1, 'Brand', '기본 정보'],
+                [2, 'Logo', 'SVG 분석'],
+                [3, 'System', '컬러 · 서체'],
+                [4, 'Rules', '사용 규정'],
+              ] as const).map(([step, label, detail]) => (
+                <button
+                  key={step}
+                  type="button"
+                  className={`step-nav-item ${setupStep === step ? 'active' : ''}`}
+                  onClick={() => setSetupStep(step)}
+                >
+                  <span className="step-nav-number">{String(step).padStart(2, '0')}</span>
+                  <span className="step-nav-copy">
+                    <strong>{label}</strong>
+                    <small>{detail}</small>
+                  </span>
+                  <i className={stepStatus[step] ? 'complete' : ''}>{stepStatus[step] ? '✓' : ''}</i>
+                </button>
+              ))}
+            </div>
+            <div className="step-nav-progress">
+              <div>
+                <span>Readiness</span>
+                <strong>{setupProgress}%</strong>
+              </div>
+              <div className="progress-track"><i style={{ width: `${setupProgress}%` }} /></div>
+            </div>
+          </nav>
+
           <section className="setup-main">
             <div className="setup-module-stack">
-              <section className="setup-module">
+              <section className={`setup-module setup-panel ${setupStep === 1 ? 'active' : ''}`}>
                 <div className="module-index">01</div>
                 <div className="module-content">
                   <div className="module-heading">
@@ -207,7 +251,7 @@ export default function App() {
                 </div>
               </section>
 
-              <section className="setup-module">
+              <section className={`setup-module setup-panel ${setupStep === 2 ? 'active' : ''}`}>
                 <div className="module-index">02</div>
                 <div className="module-content">
                   <div className="module-heading">
@@ -360,7 +404,7 @@ export default function App() {
                 </div>
               </section>
 
-              <section className="setup-module">
+              <section className={`setup-module setup-panel ${setupStep === 3 ? 'active' : ''}`}>
                 <div className="module-index">03</div>
                 <div className="module-content">
                   <div className="module-heading">
@@ -428,7 +472,7 @@ export default function App() {
                 </div>
               </section>
 
-              <section className="setup-module">
+              <section className={`setup-module setup-panel ${setupStep === 4 ? 'active' : ''}`}>
                 <div className="module-index">04</div>
                 <div className="module-content">
                   <div className="module-heading">
@@ -459,15 +503,30 @@ export default function App() {
 
             {error ? <p className="error-message setup-error" role="alert">{error}</p> : null}
 
-            <div className="setup-actions creator-actions">
+            <div className="setup-actions creator-actions step-actions">
               <div className="action-copy">
-                <strong>{pages.length} pages</strong>
-                <span>A4 Landscape · Editable SVG · PDF Export</span>
+                <span className="action-step">STEP {String(setupStep).padStart(2, '0')} / 04</span>
+                <strong>{setupStep === 1 ? '브랜드 정보를 설정합니다.' : setupStep === 2 ? '로고를 분석하고 권장 규칙을 확인합니다.' : setupStep === 3 ? '컬러와 타이포그래피 시스템을 구성합니다.' : '최종 사용 규칙을 확인하고 문서를 생성합니다.'}</strong>
+                <span>{pages.length} pages · A4 Landscape · Editable SVG · PDF Export</span>
               </div>
-              <button className="button primary large creator-primary" type="button" onClick={generate}>
-                가이드라인 생성하기
-                <span aria-hidden="true">→</span>
-              </button>
+              <div className="step-action-buttons">
+                {setupStep > 1 ? (
+                  <button className="button secondary step-back" type="button" onClick={() => setSetupStep((setupStep - 1) as 1 | 2 | 3 | 4)}>
+                    이전
+                  </button>
+                ) : null}
+                {setupStep < 4 ? (
+                  <button className="button primary creator-primary" type="button" onClick={() => setSetupStep((setupStep + 1) as 1 | 2 | 3 | 4)}>
+                    다음 단계
+                    <span aria-hidden="true">→</span>
+                  </button>
+                ) : (
+                  <button className="button primary creator-primary" type="button" onClick={generate}>
+                    가이드라인 생성
+                    <span aria-hidden="true">→</span>
+                  </button>
+                )}
+              </div>
             </div>
           </section>
 
