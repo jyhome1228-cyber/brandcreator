@@ -176,6 +176,7 @@ export default function App() {
                     <div>
                       <span className="module-kicker">BRAND INFORMATION</span>
                       <h2>브랜드 기본 정보</h2>
+                      <p className="module-description">가이드라인 문서 전반에 사용되는 브랜드 기본 메타데이터를 설정합니다.</p>
                     </div>
                     <span className="module-state">{project.name && project.englishName ? 'Complete' : 'Required'}</span>
                   </div>
@@ -213,6 +214,7 @@ export default function App() {
                     <div>
                       <span className="module-kicker">PRIMARY ASSET</span>
                       <h2>로고 업로드</h2>
+                      <p className="module-description">Primary Logo SVG를 업로드하면 구조와 컬러를 분석해 사용 규칙을 제안합니다.</p>
                     </div>
                     <span className="module-state">{project.logo ? 'Detected' : 'Required'}</span>
                   </div>
@@ -365,13 +367,17 @@ export default function App() {
                     <div>
                       <span className="module-kicker">VISUAL SYSTEM</span>
                       <h2>컬러 & 타이포그래피</h2>
+                      <p className="module-description">브랜드 컬러와 서체 체계를 설정하여 문서 전반의 시각적 일관성을 구성합니다.</p>
                     </div>
                     <span className="module-state">System</span>
                   </div>
                   <div className="system-split">
                     <div className="system-block">
                       <div className="system-block-title">
-                        <strong>Color</strong>
+                        <div>
+                          <span className="system-index">01</span>
+                          <strong>Color System</strong>
+                        </div>
                         <span>HEX · RGB · CMYK 자동 변환</span>
                       </div>
                       <div className="field-grid three-column compact-color-grid">
@@ -397,7 +403,10 @@ export default function App() {
                     </div>
                     <div className="system-block">
                       <div className="system-block-title">
-                        <strong>Typography</strong>
+                        <div>
+                          <span className="system-index">02</span>
+                          <strong>Typography System</strong>
+                        </div>
                         <span>Title / Body typeface</span>
                       </div>
                       <div className="field-grid two-column">
@@ -426,6 +435,7 @@ export default function App() {
                     <div>
                       <span className="module-kicker">LOGO RULES</span>
                       <h2>기본 사용 규정</h2>
+                      <p className="module-description">로고 보호공간과 최소 사용 크기를 최종 규칙으로 설정합니다.</p>
                     </div>
                     <span className="module-state">Editable</span>
                   </div>
@@ -510,7 +520,7 @@ export default function App() {
                   <strong>{setupProgress}%</strong>
                 </div>
                 <div className="progress-track"><i style={{ width: `${setupProgress}%` }} /></div>
-                <p>필수 정보와 로고를 입력하면 바로 브랜드 가이드라인을 생성할 수 있습니다.</p>
+                <p>필수 설정이 완료되면 가이드라인 문서를 생성할 수 있습니다.</p>
               </div>
 
               <div className="page-structure-card">
