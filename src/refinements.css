@@ -1093,3 +1093,332 @@ body :not(svg):not(svg *) {
     max-height: 320px;
   }
 }
+
+
+/* SVG Analysis */
+.svg-analysis {
+  margin-top: 18px;
+  border: 1px solid #e0e3e7;
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.analysis-heading {
+  min-height: 72px;
+  padding: 17px 18px;
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 18px;
+  border-bottom: 1px solid #eceef1;
+}
+
+.analysis-heading strong,
+.analysis-recommendation-head strong {
+  display: block;
+  margin-top: 5px;
+  font-size: 13px;
+  letter-spacing: -0.03em !important;
+}
+
+.analysis-confidence {
+  height: 25px;
+  padding: 0 9px;
+  border: 1px solid #dfe3e7;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  color: #747a82;
+  background: #fafbfc;
+  font-size: 9px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.analysis-summary-grid {
+  display: grid;
+  grid-template-columns: 1.18fr repeat(3, 1fr);
+  border-bottom: 1px solid #eceef1;
+}
+
+.analysis-primary-card,
+.analysis-metric {
+  min-height: 118px;
+  padding: 17px 16px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #eceef1;
+}
+
+.analysis-summary-grid > :last-child {
+  border-right: 0;
+}
+
+.analysis-primary-card {
+  background: #111317;
+  color: #fff;
+}
+
+.analysis-primary-card > span,
+.analysis-metric > span {
+  color: #999fa7;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .07em !important;
+}
+
+.analysis-primary-card > span {
+  color: rgba(255,255,255,.55);
+}
+
+.analysis-primary-card strong,
+.analysis-metric strong {
+  margin-top: 14px;
+  font-size: 16px;
+  line-height: 1.15;
+  letter-spacing: -0.04em !important;
+}
+
+.analysis-primary-card small,
+.analysis-metric small {
+  margin-top: auto;
+  color: #989ea6;
+  font-size: 8px;
+  line-height: 1.45;
+}
+
+.analysis-primary-card small {
+  color: rgba(255,255,255,.58);
+}
+
+.analysis-detail-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  border-bottom: 1px solid #eceef1;
+  background: #fafbfc;
+}
+
+.analysis-detail-row > div {
+  min-height: 54px;
+  padding: 11px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-right: 1px solid #eceef1;
+}
+
+.analysis-detail-row > div:last-child {
+  border-right: 0;
+}
+
+.analysis-detail-row span {
+  color: #858b93;
+  font-size: 9px;
+}
+
+.analysis-detail-row strong {
+  color: #30343a;
+  font-size: 10px;
+  text-transform: capitalize;
+}
+
+.analysis-color-section {
+  padding: 18px;
+  border-bottom: 1px solid #eceef1;
+}
+
+.analysis-color-list {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.analysis-color-item {
+  min-width: 0;
+  height: 54px;
+  padding: 7px 10px;
+  border: 1px solid #e5e7ea;
+  border-radius: 9px;
+  background: #fafbfc;
+  display: grid;
+  grid-template-columns: 31px minmax(0, 1fr);
+  align-items: center;
+  gap: 10px;
+  color: #25292e;
+  text-align: left;
+  transition: border-color .15s, background .15s;
+}
+
+.analysis-color-item:hover {
+  border-color: #bfc4ca;
+  background: #fff;
+}
+
+.analysis-color-item > i {
+  width: 31px;
+  height: 31px;
+  border-radius: 7px;
+  border: 1px solid rgba(0,0,0,.08);
+}
+
+.analysis-color-item > span {
+  min-width: 0;
+  display: grid;
+  gap: 3px;
+}
+
+.analysis-color-item strong {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.analysis-color-item small {
+  color: #9ba0a7;
+  font-size: 8px;
+}
+
+.analysis-empty {
+  grid-column: 1 / -1;
+  margin: 0;
+  padding: 14px;
+  border-radius: 8px;
+  background: #f6f7f8;
+  color: #8e949b;
+  font-size: 10px;
+}
+
+.analysis-recommendation {
+  padding: 18px;
+  background: #f7f8f9;
+}
+
+.analysis-recommendation-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+}
+
+.analysis-recommendation-head .button {
+  flex: 0 0 auto;
+  height: 32px;
+  padding-inline: 12px;
+  font-size: 10px;
+}
+
+.recommendation-grid {
+  margin-top: 15px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  border: 1px solid #e1e4e8;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #fff;
+}
+
+.recommendation-grid > div {
+  min-height: 96px;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid #e7e9ec;
+}
+
+.recommendation-grid > div:last-child {
+  border-right: 0;
+}
+
+.recommendation-grid span {
+  color: #969ca3;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: .06em !important;
+}
+
+.recommendation-grid strong {
+  margin-top: 10px;
+  font-size: 20px;
+  letter-spacing: -0.04em !important;
+}
+
+.recommendation-grid small {
+  margin-top: auto;
+  color: #9da2a9;
+  font-size: 8px;
+}
+
+.recommendation-reasons {
+  margin-top: 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.recommendation-reasons span {
+  height: 24px;
+  padding: 0 9px;
+  border: 1px solid #dfe2e6;
+  border-radius: 999px;
+  display: inline-flex;
+  align-items: center;
+  background: #fff;
+  color: #7e848c;
+  font-size: 8px;
+}
+
+.legacy-detected-colors {
+  padding-top: 18px;
+  border-top: 1px solid #eceef1;
+}
+
+@media (max-width: 900px) {
+  .analysis-summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .analysis-summary-grid > :nth-child(2) {
+    border-right: 0;
+  }
+
+  .analysis-summary-grid > :nth-child(-n + 2) {
+    border-bottom: 1px solid #eceef1;
+  }
+}
+
+@media (max-width: 767px) {
+  .analysis-heading,
+  .analysis-recommendation-head {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .analysis-summary-grid,
+  .analysis-detail-row,
+  .recommendation-grid,
+  .analysis-color-list {
+    grid-template-columns: 1fr;
+  }
+
+  .analysis-primary-card,
+  .analysis-metric,
+  .analysis-detail-row > div,
+  .recommendation-grid > div {
+    border-right: 0;
+    border-bottom: 1px solid #eceef1;
+  }
+
+  .analysis-summary-grid > :last-child,
+  .analysis-detail-row > div:last-child,
+  .recommendation-grid > div:last-child {
+    border-bottom: 0;
+  }
+
+  .analysis-recommendation-head .button {
+    width: 100%;
+  }
+}
