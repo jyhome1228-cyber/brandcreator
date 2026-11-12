@@ -63,6 +63,7 @@ export interface LogoAsset {
 }
 
 export interface BrandProject {
+  extensionContent?: Partial<Record<'graphic' | 'photography' | 'verbal' | 'application', string[]>>;
   name: string;
   englishName: string;
   description: string;
@@ -87,7 +88,7 @@ export interface BrandProject {
 
 export interface GuidelinePage {
   id: string;
-  section: 'intro' | 'logo' | 'color' | 'typography' | 'end';
+  section: 'intro' | 'logo' | 'color' | 'typography' | 'graphic' | 'photography' | 'verbal' | 'application' | 'end';
   title: string;
   subtitle: string;
   svg: string;

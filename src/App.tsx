@@ -2,6 +2,8 @@ import { useMemo, useState, type ChangeEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { generateGuidelinePages } from './guideline-system/generatePages';
+import { generateExtensionPages } from './guideline-system/extensionPages';
+import { CATEGORIES, INDUSTRIES, getDefaultSelection, getRecommendations, type GuidelineCategory, type IndustryId } from './engines/industryRecommendations';
 import { postProcessGuidelinePages } from './guideline-system/postProcess';
 import type { BrandProject, GuidelinePage } from './types/guideline';
 
@@ -62,9 +64,34 @@ export default function App() {
   const [currentId, setCurrentId] = useState('01-cover');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
-  const pages = useMemo(() => postProcessGuidelinePages(generateGuidelinePages(project), project), [project]);
+  const [industry, setIndustry] = useState<IndustryId>('service');
+  const [selectedCategories, setSelectedCategories] = useState<GuidelineCategory[]>(getDefaultSelection('service'));
+  const recommendations = useMemo(() => getRecommendations(industry), [industry]);
+  const pages = useMemo(() => {
+    const originals = postProcessGuidelinePages(generateGuidelinePages(project), project);
+    const basics = originals.filter(page =>
+      page.section === 'end' ||
+      (page.section === 'intro' ? (selectedCategories.includes('overview') || page.id === '01-cover' || page.id === '02-index') :
+      selectedCategories.includes(page.section as GuidelineCategory))
+    );
+    const extensions = generateExtensionPages(project, selectedCategories);
+    const endPosition = basics.findIndex(page => page.section === 'end');
+    if (endPosition < 0) return [...basics, ...extensions];
+    return [...basics.slice(0, endPosition), ...extensions, ...basics.slice(endPosition)];
+  }, [project, selectedCategories]);
+  const changeIndustry = (value: IndustryId) => {
+    setIndustry(value);
+    setSelectedCategories(getDefaultSelection(value));
+  };
+  const toggleCategory = (value: GuidelineCategory) => {
+    setSelectedCategories(previous => previous.includes(value)
+      ? previous.filter(item => item !== value)
+      : CATEGORIES.filter(item => item.id === value || previous.includes(item.id)).map(item => item.id));
+  };
   const currentPage = pages.find((page) => page.id === currentId) ?? pages[0];
   const enabledPages = pages.filter((page) => enabled[page.id] !== false);
+  const industryLabel = INDUSTRIES.find(item => item.id === industry)?.label ?? '브랜드';
+  const selectedCount = selectedCategories.length;
   const setupChecks = [
     Boolean(project.name.trim()),
     Boolean(project.englishName.trim()),
@@ -90,6 +117,10 @@ export default function App() {
     logo: 'LOGO',
     color: 'COLOR',
     typography: 'TYPOGRAPHY',
+    graphic: 'GRAPHIC',
+    photography: 'PHOTOGRAPHY',
+    verbal: 'VERBAL',
+    application: 'APPLICATION',
     end: 'END',
   };
 
@@ -134,6 +165,58 @@ export default function App() {
     }));
   };
 
+  const saveProject = () => {
+    const snapshot = {
+      version: 1,
+      product: 'grible',
+      industry,
+      selectedCategories,
+      project,
+      enabled,
+    };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `grible-${(project.englishName || project.name || 'project').replace(/[^a-z0-9가-힣_-]/gi, '-')}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const restoreProject = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const data: unknown = JSON.parse(await file.text());
+      if (!data || typeof data !== 'object' || !('version' in data) || data.version !== 1 || !('project' in data) || !data.project || typeof data.project !== 'object') {
+        throw new Error('올바른 그리블 프로젝트 파일이 아닙니다.');
+      }
+      const snapshot = data as { project: BrandProject; industry?: IndustryId; selectedCategories?: GuidelineCategory[]; enabled?: Record<string, boolean> };
+      if (typeof snapshot.project.name !== 'string' || typeof snapshot.project.englishName !== 'string' || !snapshot.project.colors || !snapshot.project.typography || !snapshot.project.rules) {
+        throw new Error('프로젝트 파일에 필수 브랜드 정보가 없습니다.');
+      }
+      const restoredIndustry = INDUSTRIES.some(item => item.id === snapshot.industry) ? snapshot.industry! : 'service';
+      const restoredModules = Array.isArray(snapshot.selectedCategories)
+        ? CATEGORIES.filter(item => snapshot.selectedCategories!.includes(item.id)).map(item => item.id)
+        : getDefaultSelection(restoredIndustry);
+      const saved = snapshot.project;
+      const safeLogo = saved.logo && typeof saved.logo.raw === 'string' && typeof saved.logo.fileName === 'string'
+        ? parseLogoSvg(saved.logo.raw, saved.logo.fileName)
+        : null;
+      setIndustry(restoredIndustry);
+      setSelectedCategories(restoredModules);
+      setProject({ ...saved, logo: safeLogo });
+      setEnabled(snapshot.enabled || {});
+      setCurrentId('01-cover');
+      setSetupStep(1);
+      setMode('setup');
+      setError('');
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : '프로젝트 파일을 열지 못했습니다.');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
   const generate = () => {
     if (!project.name.trim()) {
       setError('브랜드명을 입력해주세요.');
@@ -145,6 +228,11 @@ export default function App() {
     }
     if (!project.logo) {
       setError('Primary Logo SVG를 업로드해주세요.');
+      return;
+    }
+    if (selectedCategories.length === 0) {
+      setError('가이드라인에 포함할 구성요소를 하나 이상 선택해주세요.');
+      setSetupStep(1);
       return;
     }
     setError('');
@@ -159,11 +247,15 @@ export default function App() {
         <header className="topbar product-topbar">
           <div className="topbar-inner product-topbar-inner">
             <div className="product-brand">
-              <span className="product-mark">BC</span>
+              <span className="product-mark">g.</span>
               <div>
-                <strong className="brand-title">BrandCreator</strong>
-                <span className="topbar-meta">Brand Guideline Generator</span>
+                <strong className="brand-title">grible</strong>
+                <span className="topbar-meta">Brand Identity Creator</span>
               </div>
+            </div>
+            <div className="grible-header-utilities">
+              <label className="grible-import-button">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={(event) => void restoreProject(event)} /></label>
+              <button className="grible-save-button" type="button" onClick={saveProject}>프로젝트 저장</button>
             </div>
             <div className="topbar-status">
               <span className="status-dot" />
@@ -178,7 +270,7 @@ export default function App() {
             <div className="step-nav-head">
               <span className="metadata-label">PROJECT SETUP</span>
               <strong>브랜드 시스템 설정</strong>
-              <p>필수 정보를 순서대로 설정하면 가이드라인이 자동 구성됩니다.</p>
+              <p>로고를 올리고, 필요한 브랜드 규칙을 직접 선택하세요. 그리블이 가이드라인의 기본 구조를 구성합니다.</p>
             </div>
             <div className="step-nav-list">
               {([
@@ -218,11 +310,31 @@ export default function App() {
                 <div className="module-content">
                   <div className="module-heading">
                     <div>
-                      <span className="module-kicker">BRAND INFORMATION</span>
-                      <h2>브랜드 기본 정보</h2>
-                      <p className="module-description">가이드라인 문서 전반에 사용되는 브랜드 기본 메타데이터를 설정합니다.</p>
+                      <span className="module-kicker">01 / BRAND FOUNDATION</span>
+                      <h2>어떤 브랜드를 만들고 있나요?</h2>
+                      <p className="module-description">브랜드의 정보를 입력하고 업종에 따라 필요한 가이드라인 항목을 선택하세요.</p>
                     </div>
                     <span className="module-state">{project.name && project.englishName ? 'Complete' : 'Required'}</span>
+                  </div>
+                  <div className="field grible-industry-picker">
+                    <span>업종에 맞는 가이드라인 추천</span>
+                    <select value={industry} onChange={(event) => changeIndustry(event.target.value as IndustryId)} aria-label="브랜드 업종 선택" style={{ width: '100%', marginTop: 10 }}>
+                      {INDUSTRIES.map(item => <option value={item.id} key={item.id}>{item.label}</option>)}
+                    </select>
+                    <p className="module-description grible-research-note">업종별 기본 추천안으로, 22개 사례 연구의 최종 검증 결과는 아닙니다. 추천 항목은 직접 추가하거나 제외할 수 있습니다.</p>
+                    <div className="grible-module-grid">
+                      {CATEGORIES.map(item => (
+                        <label key={item.id} className={`grible-module-card ${selectedCategories.includes(item.id) ? 'is-selected' : ''}`}>
+                          <span className="grible-module-card-top">
+                            <input type="checkbox" checked={selectedCategories.includes(item.id)} onChange={() => toggleCategory(item.id)} aria-label={item.label + ' 선택'} />
+                            <small className={`grible-tier grible-tier-${recommendations[item.id].toLowerCase()}`}>{recommendations[item.id]}</small>
+                          </span>
+                          <strong className="grible-module-title">{item.label}</strong>
+                          <small className="grible-module-description">{item.description}</small>
+                        </label>
+                      ))}
+                    </div>
+                    <div className="grible-selection-summary"><strong>{selectedCount} / 8개 항목 선택</strong><span>선택 결과는 실제 생성 페이지와 SVG·PDF 출력에 반영됩니다.</span><button type="button" onClick={() => setSelectedCategories(getDefaultSelection(industry))}>추천 항목으로 초기화</button></div>
                   </div>
                   <div className="field-grid two-column">
                     <label className="field">
@@ -506,7 +618,7 @@ export default function App() {
             <div className="setup-actions creator-actions step-actions">
               <div className="action-copy">
                 <span className="action-step">STEP {String(setupStep).padStart(2, '0')} / 04</span>
-                <strong>{setupStep === 1 ? '브랜드 정보를 설정합니다.' : setupStep === 2 ? '로고를 분석하고 권장 규칙을 확인합니다.' : setupStep === 3 ? '컬러와 타이포그래피 시스템을 구성합니다.' : '최종 사용 규칙을 확인하고 문서를 생성합니다.'}</strong>
+                <strong>{setupStep === 1 ? `${industryLabel} · ${selectedCount}개 구성요소 선택` : setupStep === 2 ? '로고를 분석하고 권장 규칙을 확인합니다.' : setupStep === 3 ? '컬러와 타이포그래피 시스템을 구성합니다.' : '최종 사용 규칙을 확인하고 문서를 생성합니다.'}</strong>
                 <span>{pages.length} pages · A4 Landscape · Editable SVG · PDF Export</span>
               </div>
               <div className="step-action-buttons">
@@ -534,7 +646,7 @@ export default function App() {
             <div className="preview-sticky">
               <div className="preview-panel-heading">
                 <div>
-                  <span className="metadata-label">LIVE PREVIEW</span>
+                  <span className="metadata-label">LIVE PREVIEW · GRIBLE STUDIO</span>
                   <strong>{project.englishName || 'YOUR BRAND'}</strong>
                 </div>
                 <span className="preview-format">A4 · 297×210</span>
@@ -582,10 +694,10 @@ export default function App() {
                 <p>필수 설정이 완료되면 가이드라인 문서를 생성할 수 있습니다.</p>
               </div>
 
-              <div className="page-structure-card">
+              <div className="grible-onboarding-note"><span>GUIDELINE WORKSPACE</span><strong>로고 하나에서 시작하는 브랜드 시스템.</strong><p>선택한 구성에 따라 가이드라인의 목차와 결과물이 함께 변경됩니다.</p></div><div className="page-structure-card">
                 <div className="page-structure-heading">
                   <div>
-                    <span className="metadata-label">PAGE STRUCTURE</span>
+                    <span className="metadata-label">YOUR GUIDELINE</span>
                     <strong>가이드라인 구성</strong>
                   </div>
                   <span>{pages.length}P</span>
@@ -612,14 +724,15 @@ export default function App() {
       <header className="topbar editor-topbar">
         <div className="topbar-inner editor-header-inner">
           <div className="product-brand editor-product-brand">
-            <span className="product-mark">BC</span>
+            <span className="product-mark">g.</span>
             <div>
-              <strong className="brand-title">BrandCreator</strong>
+              <strong className="brand-title">grible</strong>
               <span className="project-name">{project.englishName} · {enabledPages.length} pages</span>
             </div>
           </div>
-          <div className="header-actions">
-            <button className="button ghost" onClick={() => setMode('setup')}>프로젝트 정보</button>
+          <div className="header-actions"><span className="grible-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
+            <button className="button ghost" onClick={saveProject}>프로젝트 저장</button>
+            <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); }}>구성 변경</button>
             <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
             <button className="button primary" onClick={() => window.print()}>PDF로 내보내기</button>
           </div>
@@ -633,7 +746,7 @@ export default function App() {
             <span>{enabledPages.length}/{pages.length}</span>
           </div>
           <div className="page-list grouped-page-list">
-            {(['intro', 'logo', 'color', 'typography', 'end'] as GuidelinePage['section'][]).map((section) => {
+            {(['intro', 'logo', 'color', 'typography', 'graphic', 'photography', 'verbal', 'application', 'end'] as GuidelinePage['section'][]).map((section) => {
               const groupPages = pages.filter((page) => page.section === section);
               if (!groupPages.length) return null;
               return (
@@ -712,6 +825,36 @@ export default function App() {
               </label>
             </div>
           </div>
+
+          {(['graphic', 'photography', 'verbal', 'application'] as GuidelineCategory[]).includes(currentPage.section as GuidelineCategory) ? (
+            <div className="setting-group grible-extension-settings">
+              <h3>브랜드별 가이드라인 작성</h3>
+              <p className="grible-setting-note">각 항목의 실제 브랜드 기준을 작성하세요. 변경 사항은 SVG 미리보기와 출력에 즉시 반영됩니다.</p>
+              {({
+                graphic: ['그래픽 모티프 및 반복 규칙', '아이콘·일러스트레이션 스타일', '모션 사용 환경과 속도 기준'],
+                photography: ['조명·색감·톤앤매너', '구도·배경·피사체 처리', '권장 / 비권장 사진 사례'],
+                verbal: ['브랜드 보이스와 문장 어조', '핵심 메시지 및 용어', '금지 표현·문구 사용 예시'],
+                application: ['주요 고객 접점과 채널', '디지털·인쇄 매체 적용', '운영 상황별 적용 예시'],
+              } as Record<string, string[]>)[currentPage.section].map((question, index) => (
+                <label className="field compact" key={question}>
+                  <span>{question}</span>
+                  <textarea
+                    maxLength={315}
+                    placeholder="브랜드 기준을 구체적으로 작성해주세요."
+                    value={project.extensionContent?.[currentPage.section as 'graphic' | 'photography' | 'verbal' | 'application']?.[index] ?? ''}
+                    onChange={(event) => {
+                      const group = currentPage.section as 'graphic' | 'photography' | 'verbal' | 'application';
+                      setProject(previous => {
+                        const lines = [...(previous.extensionContent?.[group] ?? ['', '', ''])];
+                        lines[index] = event.target.value;
+                        return { ...previous, extensionContent: { ...previous.extensionContent, [group]: lines } };
+                      });
+                    }}
+                  />
+                </label>
+              ))}
+            </div>
+          ) : null}
 
           <div className="setting-group">
             <h3>Document</h3>
