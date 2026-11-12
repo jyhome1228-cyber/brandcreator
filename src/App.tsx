@@ -198,9 +198,13 @@ export default function App() {
       const restoredModules = Array.isArray(snapshot.selectedCategories)
         ? CATEGORIES.filter(item => snapshot.selectedCategories!.includes(item.id)).map(item => item.id)
         : getDefaultSelection(restoredIndustry);
+      const saved = snapshot.project;
+      const safeLogo = saved.logo && typeof saved.logo.raw === 'string' && typeof saved.logo.fileName === 'string'
+        ? parseLogoSvg(saved.logo.raw, saved.logo.fileName)
+        : null;
       setIndustry(restoredIndustry);
       setSelectedCategories(restoredModules);
-      setProject(snapshot.project);
+      setProject({ ...saved, logo: safeLogo });
       setEnabled(snapshot.enabled || {});
       setCurrentId('01-cover');
       setSetupStep(1);
