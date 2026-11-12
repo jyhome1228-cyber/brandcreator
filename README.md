@@ -55,3 +55,14 @@ Run `npm install && npm run build` locally or in CI. Verify on desktop/mobile, c
 - Industry-aware module selector with editable recommendation tiers and reset option.
 - 'Core / Selective / Extended' are provisional research presets, not validated empirical findings.
 - Onboarding, live preview, grouped page editor and exports retain the existing workflow.
+
+### V2 workflow
+1. Select an industry and adjust the provisional Core / Selective / Extended guideline modules.
+2. Upload the primary SVG and specify the brand colors, typography and logo rules.
+3. Generate the document and edit the Graphic / Motion, Photography, Verbal Identity and Application content from the page editor.
+4. Export the selected pages to SVG or PDF. Save the editable project as JSON; import it later to continue work.
+5. Pages with incomplete optional sections are visibly labeled DRAFT until the user fills out their text. Filled text is still subject to professional review.
+
+### Brand naming
+Public-facing identity: **grible. / 그리블**, tagline **로고만 있으면, 브랜드 가이드라인이 뚝딱.**
+Domain and trademark clearance have not been completed.
