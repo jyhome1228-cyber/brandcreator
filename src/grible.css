@@ -1,0 +1,61 @@
+/* GRIBLE — product identity and interaction polish */
+:root {
+  --creator-canvas: #f5f5f3;
+  --creator-ink: #191919;
+  --creator-muted: #666b70;
+  --creator-line: #dedfdd;
+  --creator-soft: #f9f9f8;
+  --creator-blue: #191919;
+}
+.product-topbar,.editor-topbar { background: rgba(255,255,255,.96); border-bottom: 1px solid #e7e7e5; }
+.product-brand .brand-title { font-size: 21px; font-weight: 750; letter-spacing: -.055em !important; text-transform: lowercase; }
+.product-mark { border-radius: 10px; width: 38px; height: 38px; font-size: 20px; font-weight: 750; letter-spacing: -.08em !important; }
+.product-brand .topbar-meta { color: #7e7e7e; font-size: 11px; letter-spacing: .015em !important; }
+.setup-mode .module-heading h2 { font-size: clamp(22px,2.15vw,29px); letter-spacing: -.045em !important; }
+.setup-mode .module-description { line-height: 1.65; }
+.grible-industry-picker { margin-bottom: 28px; padding: 24px; border: 1px solid #e2e2e0; border-radius: 14px; background: #fbfbfa; }
+.grible-industry-picker > span { font-size: 15px; font-weight: 700; }
+.grible-industry-picker > select { font-weight: 600; }
+.grible-research-note { margin-top: 10px !important; font-size: 12px !important; line-height: 1.6 !important; color: #858585 !important; }
+.grible-module-grid { display:grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; margin-top: 22px; }
+.grible-module-card { position:relative; display:flex; flex-direction:column; gap:9px; min-width:0; padding:18px 18px 20px; border:1px solid #e4e4e2; border-radius:11px; background:#fff; cursor:pointer; transition: background .18s ease, border-color .18s ease, transform .18s ease, box-shadow .18s ease; }
+.grible-module-card:hover { transform:translateY(-1px); border-color:#9d9d99; box-shadow:0 5px 16px rgba(0,0,0,.035); }
+.grible-module-card.is-selected { background:#f3f3f1; border-color:#444; }
+.grible-module-card:focus-within { outline:2px solid #191919; outline-offset:2px; }
+.grible-module-card-top { display:flex; justify-content:space-between; align-items:center; gap:8px; }
+.grible-module-card-top input { margin:0; width:17px; height:17px; accent-color:#191919; }
+.grible-module-title { font-size:14px; font-weight:700; letter-spacing:-.025em !important; }
+.grible-module-description { font-size:12px; color:#777; line-height:1.5; }
+.grible-tier { padding:4px 7px; border-radius:4px; font-size:10px; font-weight:700; line-height:1.1; color:#676767; background:#ededeb; white-space:nowrap; }
+.grible-tier-core { background:#202020; color:#fff; }
+.grible-tier-selective { background:#e1e1de; color:#383838; }
+.grible-tier-extended { background:#f1f1f0; color:#777; }
+.grible-selection-summary { display:flex; flex-wrap:wrap; align-items:center; gap:10px; margin-top:20px; padding-top:17px; border-top:1px solid #e0e0de; }
+.grible-selection-summary strong { font-size:13px; }
+.grible-selection-summary span { flex:1; min-width:210px; color:#777; font-size:11px; line-height:1.5; }
+.grible-selection-summary button { background:transparent; border:1px solid #d1d1cf; border-radius:6px; padding:9px 11px; color:#414141; font-size:11px; font-weight:600; }
+.grible-selection-summary button:hover { background:#eaeae8; }
+.grible-onboarding-note { border:1px solid #e5e5e3; border-radius:12px; padding:22px; background:#fff; margin-bottom:16px; }
+.grible-onboarding-note > span { font-size:10px; letter-spacing:.1em !important; color:#898989; font-weight:700; }
+.grible-onboarding-note strong { display:block; margin:10px 0 6px; font-size:16px; letter-spacing:-.04em !important; }
+.grible-onboarding-note p { margin:0; font-size:12px; line-height:1.6; color:#777; }
+.grible-editor-industry { color:#777; font-size:11px; font-weight:650; white-space:nowrap; }
+.button,button { -webkit-tap-highlight-color:transparent; }
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible { outline:2px solid #141414; outline-offset:3px; }
+@media (max-width:1100px) {
+  .grible-module-grid { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .grible-editor-industry { display:none; }
+}
+@media (max-width:680px) {
+  .grible-industry-picker { padding:17px; margin-bottom:18px; }
+  .grible-module-grid { grid-template-columns:1fr; }
+  .grible-module-card { padding:15px 16px; }
+  .grible-selection-summary span { min-width:100%; }
+  .product-brand .brand-title { font-size:19px; }
+  .product-brand .topbar-meta { display:none; }
+  .grible-onboarding-note { padding:17px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .grible-module-card { transition:none; }
+  .grible-module-card:hover { transform:none; }
+}
