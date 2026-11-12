@@ -63,6 +63,7 @@ export interface LogoAsset {
 }
 
 export interface BrandProject {
+  extensionContent?: Partial<Record<'graphic' | 'photography' | 'verbal' | 'application', string[]>>;
   name: string;
   englishName: string;
   description: string;
