@@ -68,3 +68,7 @@ button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-vis
 .grible-import-button input { position:absolute; width:1px; height:1px; opacity:0; overflow:hidden; }
 @media (max-width:820px) { .grible-header-utilities { margin-right:0; } .grible-header-utilities .grible-import-button { display:none; } }
 @media (max-width:520px) { .grible-header-utilities .grible-save-button { font-size:10px; padding:0 9px; } }
+
+.grible-extension-settings { padding-top: 20px; border-top: 1px solid #e6e6e4; }
+.grible-setting-note { margin: 0 0 18px; color:#787878; font-size:12px; line-height:1.65; }
+.grible-extension-settings textarea { min-height: 92px; font-size: 13px; line-height: 1.6; }
