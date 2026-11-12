@@ -168,7 +168,7 @@ export default function App() {
   const saveProject = () => {
     const snapshot = {
       version: 1,
-      product: 'grible',
+      product: 'bramer',
       industry,
       selectedCategories,
       project,
@@ -177,7 +177,7 @@ export default function App() {
     const url = URL.createObjectURL(new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' }));
     const link = document.createElement('a');
     link.href = url;
-    link.download = `grible-${(project.englishName || project.name || 'project').replace(/[^a-z0-9가-힣_-]/gi, '-')}.json`;
+    link.download = `bramer-${(project.englishName || project.name || 'project').replace(/[^a-z0-9가-힣_-]/gi, '-')}.json`;
     link.click();
     URL.revokeObjectURL(url);
   };
@@ -188,7 +188,7 @@ export default function App() {
     try {
       const data: unknown = JSON.parse(await file.text());
       if (!data || typeof data !== 'object' || !('version' in data) || data.version !== 1 || !('project' in data) || !data.project || typeof data.project !== 'object') {
-        throw new Error('올바른 그리블 프로젝트 파일이 아닙니다.');
+        throw new Error('올바른 브레이머 프로젝트 파일이 아닙니다.');
       }
       const snapshot = data as { project: BrandProject; industry?: IndustryId; selectedCategories?: GuidelineCategory[]; enabled?: Record<string, boolean> };
       if (typeof snapshot.project.name !== 'string' || typeof snapshot.project.englishName !== 'string' || !snapshot.project.colors || !snapshot.project.typography || !snapshot.project.rules) {
@@ -249,13 +249,13 @@ export default function App() {
             <div className="product-brand">
               <span className="product-mark">g.</span>
               <div>
-                <strong className="brand-title">grible</strong>
+                <strong className="brand-title">bramer</strong>
                 <span className="topbar-meta">Brand Identity Creator</span>
               </div>
             </div>
-            <div className="grible-header-utilities">
-              <label className="grible-import-button">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={(event) => void restoreProject(event)} /></label>
-              <button className="grible-save-button" type="button" onClick={saveProject}>프로젝트 저장</button>
+            <div className="bramer-header-utilities">
+              <label className="bramer-import-button">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={(event) => void restoreProject(event)} /></label>
+              <button className="bramer-save-button" type="button" onClick={saveProject}>프로젝트 저장</button>
             </div>
             <div className="topbar-status">
               <span className="status-dot" />
@@ -270,7 +270,7 @@ export default function App() {
             <div className="step-nav-head">
               <span className="metadata-label">PROJECT SETUP</span>
               <strong>브랜드 시스템 설정</strong>
-              <p>로고를 올리고, 필요한 브랜드 규칙을 직접 선택하세요. 그리블이 가이드라인의 기본 구조를 구성합니다.</p>
+              <p>로고를 올리고, 필요한 브랜드 규칙을 직접 선택하세요. 브레이머이 가이드라인의 기본 구조를 구성합니다.</p>
             </div>
             <div className="step-nav-list">
               {([
@@ -316,25 +316,25 @@ export default function App() {
                     </div>
                     <span className="module-state">{project.name && project.englishName ? 'Complete' : 'Required'}</span>
                   </div>
-                  <div className="field grible-industry-picker">
+                  <div className="field bramer-industry-picker">
                     <span>업종에 맞는 가이드라인 추천</span>
                     <select value={industry} onChange={(event) => changeIndustry(event.target.value as IndustryId)} aria-label="브랜드 업종 선택" style={{ width: '100%', marginTop: 10 }}>
                       {INDUSTRIES.map(item => <option value={item.id} key={item.id}>{item.label}</option>)}
                     </select>
-                    <p className="module-description grible-research-note">업종별 기본 추천안으로, 22개 사례 연구의 최종 검증 결과는 아닙니다. 추천 항목은 직접 추가하거나 제외할 수 있습니다.</p>
-                    <div className="grible-module-grid">
+                    <p className="module-description bramer-research-note">업종별 기본 추천안으로, 22개 사례 연구의 최종 검증 결과는 아닙니다. 추천 항목은 직접 추가하거나 제외할 수 있습니다.</p>
+                    <div className="bramer-module-grid">
                       {CATEGORIES.map(item => (
-                        <label key={item.id} className={`grible-module-card ${selectedCategories.includes(item.id) ? 'is-selected' : ''}`}>
-                          <span className="grible-module-card-top">
+                        <label key={item.id} className={`bramer-module-card ${selectedCategories.includes(item.id) ? 'is-selected' : ''}`}>
+                          <span className="bramer-module-card-top">
                             <input type="checkbox" checked={selectedCategories.includes(item.id)} onChange={() => toggleCategory(item.id)} aria-label={item.label + ' 선택'} />
-                            <small className={`grible-tier grible-tier-${recommendations[item.id].toLowerCase()}`}>{recommendations[item.id]}</small>
+                            <small className={`bramer-tier bramer-tier-${recommendations[item.id].toLowerCase()}`}>{recommendations[item.id]}</small>
                           </span>
-                          <strong className="grible-module-title">{item.label}</strong>
-                          <small className="grible-module-description">{item.description}</small>
+                          <strong className="bramer-module-title">{item.label}</strong>
+                          <small className="bramer-module-description">{item.description}</small>
                         </label>
                       ))}
                     </div>
-                    <div className="grible-selection-summary"><strong>{selectedCount} / 8개 항목 선택</strong><span>선택 결과는 실제 생성 페이지와 SVG·PDF 출력에 반영됩니다.</span><button type="button" onClick={() => setSelectedCategories(getDefaultSelection(industry))}>추천 항목으로 초기화</button></div>
+                    <div className="bramer-selection-summary"><strong>{selectedCount} / 8개 항목 선택</strong><span>선택 결과는 실제 생성 페이지와 SVG·PDF 출력에 반영됩니다.</span><button type="button" onClick={() => setSelectedCategories(getDefaultSelection(industry))}>추천 항목으로 초기화</button></div>
                   </div>
                   <div className="field-grid two-column">
                     <label className="field">
@@ -646,7 +646,7 @@ export default function App() {
             <div className="preview-sticky">
               <div className="preview-panel-heading">
                 <div>
-                  <span className="metadata-label">LIVE PREVIEW · GRIBLE STUDIO</span>
+                  <span className="metadata-label">LIVE PREVIEW · BRAMER STUDIO</span>
                   <strong>{project.englishName || 'YOUR BRAND'}</strong>
                 </div>
                 <span className="preview-format">A4 · 297×210</span>
@@ -694,7 +694,7 @@ export default function App() {
                 <p>필수 설정이 완료되면 가이드라인 문서를 생성할 수 있습니다.</p>
               </div>
 
-              <div className="grible-onboarding-note"><span>GUIDELINE WORKSPACE</span><strong>로고 하나에서 시작하는 브랜드 시스템.</strong><p>선택한 구성에 따라 가이드라인의 목차와 결과물이 함께 변경됩니다.</p></div><div className="page-structure-card">
+              <div className="bramer-onboarding-note"><span>GUIDELINE WORKSPACE</span><strong>로고 하나에서 시작하는 브랜드 시스템.</strong><p>선택한 구성에 따라 가이드라인의 목차와 결과물이 함께 변경됩니다.</p></div><div className="page-structure-card">
                 <div className="page-structure-heading">
                   <div>
                     <span className="metadata-label">YOUR GUIDELINE</span>
@@ -726,11 +726,11 @@ export default function App() {
           <div className="product-brand editor-product-brand">
             <span className="product-mark">g.</span>
             <div>
-              <strong className="brand-title">grible</strong>
+              <strong className="brand-title">bramer</strong>
               <span className="project-name">{project.englishName} · {enabledPages.length} pages</span>
             </div>
           </div>
-          <div className="header-actions"><span className="grible-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
+          <div className="header-actions"><span className="bramer-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
             <button className="button ghost" onClick={saveProject}>프로젝트 저장</button>
             <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); }}>구성 변경</button>
             <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
@@ -827,9 +827,9 @@ export default function App() {
           </div>
 
           {(['graphic', 'photography', 'verbal', 'application'] as GuidelineCategory[]).includes(currentPage.section as GuidelineCategory) ? (
-            <div className="setting-group grible-extension-settings">
+            <div className="setting-group bramer-extension-settings">
               <h3>브랜드별 가이드라인 작성</h3>
-              <p className="grible-setting-note">각 항목의 실제 브랜드 기준을 작성하세요. 변경 사항은 SVG 미리보기와 출력에 즉시 반영됩니다.</p>
+              <p className="bramer-setting-note">각 항목의 실제 브랜드 기준을 작성하세요. 변경 사항은 SVG 미리보기와 출력에 즉시 반영됩니다.</p>
               {({
                 graphic: ['그래픽 모티프 및 반복 규칙', '아이콘·일러스트레이션 스타일', '모션 사용 환경과 속도 기준'],
                 photography: ['조명·색감·톤앤매너', '구도·배경·피사체 처리', '권장 / 비권장 사진 사례'],
