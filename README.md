@@ -1,8 +1,8 @@
-# grible. (그리블)
+# bramer. (브레이머)
 
 **로고만 있으면, 브랜드 가이드라인이 뚝딱.**
 
-기존 BrandCreator에서 리브랜딩한 GRIBLE은 로고 SVG와 최소한의 브랜드 데이터를 입력하면 A4 가로형 브랜드 가이드라인을 자동 생성하는 웹 애플리케이션입니다.
+기존 BrandCreator에서 리브랜딩한 BRAMER은 로고 SVG와 최소한의 브랜드 데이터를 입력하면 A4 가로형 브랜드 가이드라인을 자동 생성하는 웹 애플리케이션입니다.
 
 ## Core capabilities
 
@@ -49,7 +49,7 @@ npm run dev
 
 Run `npm install && npm run build` locally or in CI. Verify on desktop/mobile, confirm all selected page groups appear in PDF/SVG exports, and assess worksheet design and content quality before merging to `main`.
 
-## GRIBLE experience
+## BRAMER experience
 
 - Monochrome product identity and responsive layout polish.
 - Industry-aware module selector with editable recommendation tiers and reset option.
@@ -64,5 +64,5 @@ Run `npm install && npm run build` locally or in CI. Verify on desktop/mobile, c
 5. Pages with incomplete optional sections are visibly labeled DRAFT until the user fills out their text. Filled text is still subject to professional review.
 
 ### Brand naming
-Public-facing identity: **grible. / 그리블**, tagline **로고만 있으면, 브랜드 가이드라인이 뚝딱.**
+Public-facing identity: **bramer. / 브레이머**, tagline **로고만 있으면, 브랜드 가이드라인이 뚝딱.**
 Domain and trademark clearance have not been completed.
