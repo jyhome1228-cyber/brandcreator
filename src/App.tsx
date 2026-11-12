@@ -826,6 +826,36 @@ export default function App() {
             </div>
           </div>
 
+          {(['graphic', 'photography', 'verbal', 'application'] as GuidelineCategory[]).includes(currentPage.section as GuidelineCategory) ? (
+            <div className="setting-group grible-extension-settings">
+              <h3>브랜드별 가이드라인 작성</h3>
+              <p className="grible-setting-note">각 항목의 실제 브랜드 기준을 작성하세요. 변경 사항은 SVG 미리보기와 출력에 즉시 반영됩니다.</p>
+              {({
+                graphic: ['그래픽 모티프 및 반복 규칙', '아이콘·일러스트레이션 스타일', '모션 사용 환경과 속도 기준'],
+                photography: ['조명·색감·톤앤매너', '구도·배경·피사체 처리', '권장 / 비권장 사진 사례'],
+                verbal: ['브랜드 보이스와 문장 어조', '핵심 메시지 및 용어', '금지 표현·문구 사용 예시'],
+                application: ['주요 고객 접점과 채널', '디지털·인쇄 매체 적용', '운영 상황별 적용 예시'],
+              } as Record<string, string[]>)[currentPage.section].map((question, index) => (
+                <label className="field compact" key={question}>
+                  <span>{question}</span>
+                  <textarea
+                    maxLength={315}
+                    placeholder="브랜드 기준을 구체적으로 작성해주세요."
+                    value={project.extensionContent?.[currentPage.section as 'graphic' | 'photography' | 'verbal' | 'application']?.[index] ?? ''}
+                    onChange={(event) => {
+                      const group = currentPage.section as 'graphic' | 'photography' | 'verbal' | 'application';
+                      setProject(previous => {
+                        const lines = [...(previous.extensionContent?.[group] ?? ['', '', ''])];
+                        lines[index] = event.target.value;
+                        return { ...previous, extensionContent: { ...previous.extensionContent, [group]: lines } };
+                      });
+                    }}
+                  />
+                </label>
+              ))}
+            </div>
+          ) : null}
+
           <div className="setting-group">
             <h3>Document</h3>
             <div className="spec-row"><span>Artboard</span><strong>A4 Landscape</strong></div>
