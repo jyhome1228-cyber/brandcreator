@@ -34,3 +34,15 @@ npm run dev
 ```
 
 기본 스택은 React + TypeScript + Vite입니다.
+
+## Industry-aware guideline builder (research prototype)
+
+- Select from eight industry categories, then adjust eight guideline modules individually.
+- Core / Selective / Extended are **editable initial hypotheses**, not empirical findings from the 22-brand analysis. Replace preset assignments with evidence-backed classifications before publication.
+- Original Logo / Color / Typography pages are included or excluded based on the selected modules, and this selection is reflected in SVG / PDF export.
+- Optional Graphic / Motion, Photography, Verbal Identity and Application modules currently produce visibly marked **draft worksheets**. They are NOT finished brand standards: final brand-specific rules and examples require further authoring.
+- The existing SVG analysis, clear-space and minimum-size settings, and export functions remain available.
+
+### Validation still required
+
+Run `npm install && npm run build` locally or in CI. Verify on desktop/mobile, confirm all selected page groups appear in PDF/SVG exports, and assess worksheet design and content quality before merging to `main`.
