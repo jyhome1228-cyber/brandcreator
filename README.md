@@ -1,8 +1,10 @@
-# BrandCreator
+# grible. (그리블)
 
-BrandCreator는 로고 SVG와 최소한의 브랜드 데이터를 입력하면 A4 가로형 브랜드 가이드라인을 자동 생성하는 웹 애플리케이션입니다.
+**로고만 있으면, 브랜드 가이드라인이 뚝딱.**
 
-## V1 Scope
+기존 BrandCreator에서 리브랜딩한 GRIBLE은 로고 SVG와 최소한의 브랜드 데이터를 입력하면 A4 가로형 브랜드 가이드라인을 자동 생성하는 웹 애플리케이션입니다.
+
+## Core capabilities
 
 - 브랜드명 / 브랜드 설명 입력
 - Primary Logo SVG 업로드
@@ -46,3 +48,10 @@ npm run dev
 ### Validation still required
 
 Run `npm install && npm run build` locally or in CI. Verify on desktop/mobile, confirm all selected page groups appear in PDF/SVG exports, and assess worksheet design and content quality before merging to `main`.
+
+## GRIBLE experience
+
+- Monochrome product identity and responsive layout polish.
+- Industry-aware module selector with editable recommendation tiers and reset option.
+- 'Core / Selective / Extended' are provisional research presets, not validated empirical findings.
+- Onboarding, live preview, grouped page editor and exports retain the existing workflow.
