@@ -2,6 +2,8 @@ import { useMemo, useState, type ChangeEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { generateGuidelinePages } from './guideline-system/generatePages';
+import { generateExtensionPages } from './guideline-system/extensionPages';
+import { CATEGORIES, INDUSTRIES, getDefaultSelection, getRecommendations, type GuidelineCategory, type IndustryId } from './engines/industryRecommendations';
 import { postProcessGuidelinePages } from './guideline-system/postProcess';
 import type { BrandProject, GuidelinePage } from './types/guideline';
 
@@ -62,7 +64,30 @@ export default function App() {
   const [currentId, setCurrentId] = useState('01-cover');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
-  const pages = useMemo(() => postProcessGuidelinePages(generateGuidelinePages(project), project), [project]);
+  const [industry, setIndustry] = useState<IndustryId>('service');
+  const [selectedCategories, setSelectedCategories] = useState<GuidelineCategory[]>(getDefaultSelection('service'));
+  const recommendations = useMemo(() => getRecommendations(industry), [industry]);
+  const pages = useMemo(() => {
+    const originals = postProcessGuidelinePages(generateGuidelinePages(project), project);
+    const basics = originals.filter(page =>
+      page.section === 'end' ||
+      (page.section === 'intro' ? (selectedCategories.includes('overview') || page.id === '01-cover' || page.id === '02-index') :
+      selectedCategories.includes(page.section as GuidelineCategory))
+    );
+    const extensions = generateExtensionPages(project, selectedCategories);
+    const endPosition = basics.findIndex(page => page.section === 'end');
+    if (endPosition < 0) return [...basics, ...extensions];
+    return [...basics.slice(0, endPosition), ...extensions, ...basics.slice(endPosition)];
+  }, [project, selectedCategories]);
+  const changeIndustry = (value: IndustryId) => {
+    setIndustry(value);
+    setSelectedCategories(getDefaultSelection(value));
+  };
+  const toggleCategory = (value: GuidelineCategory) => {
+    setSelectedCategories(previous => previous.includes(value)
+      ? previous.filter(item => item !== value)
+      : CATEGORIES.filter(item => item.id === value || previous.includes(item.id)).map(item => item.id));
+  };
   const currentPage = pages.find((page) => page.id === currentId) ?? pages[0];
   const enabledPages = pages.filter((page) => enabled[page.id] !== false);
   const setupChecks = [
@@ -90,6 +115,10 @@ export default function App() {
     logo: 'LOGO',
     color: 'COLOR',
     typography: 'TYPOGRAPHY',
+    graphic: 'GRAPHIC',
+    photography: 'PHOTOGRAPHY',
+    verbal: 'VERBAL',
+    application: 'APPLICATION',
     end: 'END',
   };
 
@@ -223,6 +252,26 @@ export default function App() {
                       <p className="module-description">가이드라인 문서 전반에 사용되는 브랜드 기본 메타데이터를 설정합니다.</p>
                     </div>
                     <span className="module-state">{project.name && project.englishName ? 'Complete' : 'Required'}</span>
+                  </div>
+                  <div className="field" style={{ marginBottom: 26 }}>
+                    <span>브랜드 업종 · 산업별 가이드라인 구성</span>
+                    <select value={industry} onChange={(event) => changeIndustry(event.target.value as IndustryId)} aria-label="브랜드 업종 선택" style={{ width: '100%', marginTop: 10 }}>
+                      {INDUSTRIES.map(item => <option value={item.id} key={item.id}>{item.label}</option>)}
+                    </select>
+                    <p className="module-description" style={{ marginTop: 9 }}>업종별 초기 추천값입니다. 22개 브랜드 사례 분석으로 검증된 통계 결과는 아니며, 사용자가 자유롭게 조정할 수 있습니다.</p>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(170px,1fr))', gap: 9, marginTop: 16 }}>
+                      {CATEGORIES.map(item => (
+                        <label key={item.id} style={{ display: 'flex', flexDirection: 'column', gap: 7, padding: '15px', border: '1px solid #dedede', borderRadius: 6, background: selectedCategories.includes(item.id) ? '#f4f4f4' : '#fff', cursor: 'pointer' }}>
+                          <span style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 6 }}>
+                            <input type="checkbox" checked={selectedCategories.includes(item.id)} onChange={() => toggleCategory(item.id)} aria-label={item.label + ' 선택'} />
+                            <small style={{ color: '#777', fontSize: 11 }}>{recommendations[item.id]}</small>
+                          </span>
+                          <strong style={{ fontSize: 13 }}>{item.label}</strong>
+                          <small style={{ color: '#777', lineHeight: 1.5 }}>{item.description}</small>
+                        </label>
+                      ))}
+                    </div>
+                    <p className="module-description" style={{ marginTop: 12 }}>선택한 {selectedCategories.length}개 구성 범주가 실제 가이드라인 페이지와 출력 파일에 반영됩니다. Graphic·Photography·Verbal·Application은 내용 확정이 필요한 워크시트로 생성됩니다.</p>
                   </div>
                   <div className="field-grid two-column">
                     <label className="field">
@@ -619,7 +668,7 @@ export default function App() {
             </div>
           </div>
           <div className="header-actions">
-            <button className="button ghost" onClick={() => setMode('setup')}>프로젝트 정보</button>
+            <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); }}>업종 · 구성 변경</button>
             <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
             <button className="button primary" onClick={() => window.print()}>PDF로 내보내기</button>
           </div>
@@ -633,7 +682,7 @@ export default function App() {
             <span>{enabledPages.length}/{pages.length}</span>
           </div>
           <div className="page-list grouped-page-list">
-            {(['intro', 'logo', 'color', 'typography', 'end'] as GuidelinePage['section'][]).map((section) => {
+            {(['intro', 'logo', 'color', 'typography', 'graphic', 'photography', 'verbal', 'application', 'end'] as GuidelinePage['section'][]).map((section) => {
               const groupPages = pages.filter((page) => page.section === section);
               if (!groupPages.length) return null;
               return (
