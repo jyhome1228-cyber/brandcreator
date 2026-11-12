@@ -64,7 +64,6 @@ export default function App() {
   const [currentId, setCurrentId] = useState('01-cover');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
-  const [showQuickGuide, setShowQuickGuide] = useState(false);
   const [industry, setIndustry] = useState<IndustryId>('service');
   const [selectedCategories, setSelectedCategories] = useState<GuidelineCategory[]>(getDefaultSelection('service'));
   const recommendations = useMemo(() => getRecommendations(industry), [industry]);
@@ -166,6 +165,54 @@ export default function App() {
     }));
   };
 
+  const saveProject = () => {
+    const snapshot = {
+      version: 1,
+      product: 'grible',
+      industry,
+      selectedCategories,
+      project,
+      enabled,
+    };
+    const url = URL.createObjectURL(new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' }));
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `grible-${(project.englishName || project.name || 'project').replace(/[^a-z0-9가-힣_-]/gi, '-')}.json`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
+  const restoreProject = async (event: ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    try {
+      const data: unknown = JSON.parse(await file.text());
+      if (!data || typeof data !== 'object' || !('version' in data) || data.version !== 1 || !('project' in data) || !data.project || typeof data.project !== 'object') {
+        throw new Error('올바른 그리블 프로젝트 파일이 아닙니다.');
+      }
+      const snapshot = data as { project: BrandProject; industry?: IndustryId; selectedCategories?: GuidelineCategory[]; enabled?: Record<string, boolean> };
+      if (typeof snapshot.project.name !== 'string' || typeof snapshot.project.englishName !== 'string' || !snapshot.project.colors || !snapshot.project.typography || !snapshot.project.rules) {
+        throw new Error('프로젝트 파일에 필수 브랜드 정보가 없습니다.');
+      }
+      const restoredIndustry = INDUSTRIES.some(item => item.id === snapshot.industry) ? snapshot.industry! : 'service';
+      const restoredModules = Array.isArray(snapshot.selectedCategories)
+        ? CATEGORIES.filter(item => snapshot.selectedCategories!.includes(item.id)).map(item => item.id)
+        : getDefaultSelection(restoredIndustry);
+      setIndustry(restoredIndustry);
+      setSelectedCategories(restoredModules);
+      setProject(snapshot.project);
+      setEnabled(snapshot.enabled || {});
+      setCurrentId('01-cover');
+      setSetupStep(1);
+      setMode('setup');
+      setError('');
+    } catch (caught) {
+      setError(caught instanceof Error ? caught.message : '프로젝트 파일을 열지 못했습니다.');
+    } finally {
+      event.target.value = '';
+    }
+  };
+
   const generate = () => {
     if (!project.name.trim()) {
       setError('브랜드명을 입력해주세요.');
@@ -201,6 +248,10 @@ export default function App() {
                 <strong className="brand-title">grible</strong>
                 <span className="topbar-meta">Brand Identity Creator</span>
               </div>
+            </div>
+            <div className="grible-header-utilities">
+              <label className="grible-import-button">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={(event) => void restoreProject(event)} /></label>
+              <button className="grible-save-button" type="button" onClick={saveProject}>프로젝트 저장</button>
             </div>
             <div className="topbar-status">
               <span className="status-dot" />
@@ -676,6 +727,7 @@ export default function App() {
             </div>
           </div>
           <div className="header-actions"><span className="grible-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
+            <button className="button ghost" onClick={saveProject}>프로젝트 저장</button>
             <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); }}>구성 변경</button>
             <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
             <button className="button primary" onClick={() => window.print()}>PDF로 내보내기</button>
