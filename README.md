@@ -66,3 +66,14 @@ Run `npm install && npm run build` locally or in CI. Verify on desktop/mobile, c
 ### Brand naming
 Public-facing identity: **bramer. / 브레이머**, tagline **로고만 있으면, 브랜드 가이드라인이 뚝딱.**
 Domain and trademark clearance have not been completed.
+
+## Public landing and workspace routes
+
+Bramer opens to a public black landing page instead of a splash or setup screen.
+
+- Hash root (empty hash or #/): public landing page, guideline sample preview, how it works, feature overview and CTAs
+- #/create: existing guided setup, entered through the public CTAs
+- #/editor: in-session editor after generation; direct navigation without a project falls back to setup
+- Bramer brand button in the workspace returns to landing
+
+Hash routes work on GitHub Pages under /brandcreator/ without server-side route fallback. Existing project JSON, SVG and PDF export remain in the workspace. Landing guideline pages are illustrative samples, not actual generated pages.
