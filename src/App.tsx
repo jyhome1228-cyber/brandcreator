@@ -3,6 +3,7 @@ import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
 import Dashboard from './Dashboard';
 import BramerSelect from './components/BramerSelect';
+import { INDUSTRY_RATIONALE } from './engines/industryRationale';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { generateGuidelinePages } from './guideline-system/generatePages';
 import { generateExtensionPages } from './guideline-system/extensionPages';
@@ -426,7 +427,7 @@ export default function App() {
                     <p className="module-description bramer-research-note">선택한 업종에 따라 추천 항목이 달라집니다. 원하는 항목은 직접 추가하거나 제외할 수 있어요.</p>
                   <div className="bramer-industry-focus">
                     <strong>이 업종에서는 이런 기준이 중요해요.</strong>
-                    <p>{INDUSTRY_GUIDANCE[industry].focus}</p>
+                    <p>{INDUSTRY_RATIONALE[industry].why}</p>
                     <div>{INDUSTRY_GUIDANCE[industry].touchpoints.map(point => <span key={point}>{point}</span>)}</div>
                   </div>
                     <div className="bramer-module-grid">

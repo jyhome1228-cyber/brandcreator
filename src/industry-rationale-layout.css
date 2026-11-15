@@ -1,0 +1,23 @@
+/* Shared public width for header, help content and footer */
+.bramer-landing .bramer-site-header-inner,
+.bramer-landing .bramer-help-inner,
+.bramer-landing .bramer-footer-inner {
+ width:min(1240px,calc(100% - 48px))!important;max-width:1240px!important;
+ margin-inline:auto!important;box-sizing:border-box;
+}
+.bramer-landing .bramer-help-faq {width:100%;max-width:100%;margin-inline:0;}
+.bramer-landing .bramer-help-section,.bramer-landing .bramer-home-footer {padding-inline:0!important;}
+.bramer-landing .bramer-footer-columns {width:100%;}
+.bramer-dash .bramer-guide-overview p {max-width:820px;font-size:13px!important;line-height:1.85!important;word-break:keep-all;}
+.bramer-dash .bramer-guide-items>div {align-items:flex-start;gap:20px;padding:16px 0;}
+.bramer-dash .bramer-guide-items>div>div {min-width:0;flex:1;}
+.bramer-dash .bramer-guide-items small {display:block;margin-top:6px;font-size:12px!important;line-height:1.7!important;color:#777;word-break:keep-all;}
+.bramer-dash .bramer-guide-checklist label {align-items:flex-start;gap:12px;min-height:65px;padding:14px 0;}
+.bramer-dash .bramer-guide-checklist label input {flex:0 0 17px;margin-top:3px;}
+.bramer-dash .bramer-guide-checklist label>span {display:flex;flex-direction:column;gap:5px;min-width:0;}
+.bramer-dash .bramer-guide-checklist label strong {font-size:12px;line-height:1.45;font-weight:600;}
+.bramer-dash .bramer-guide-checklist label small {font-size:11px;line-height:1.6;color:#83837d;word-break:keep-all;}
+@media(max-width:760px){
+ .bramer-landing .bramer-site-header-inner,.bramer-landing .bramer-help-inner,.bramer-landing .bramer-footer-inner{width:calc(100% - 36px)!important;}
+ .bramer-dash .bramer-guide-items small{font-size:11px!important;}
+}

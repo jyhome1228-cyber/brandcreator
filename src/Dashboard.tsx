@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent } from 'react';
 import BramerSelect from './components/BramerSelect';
+import { INDUSTRY_RATIONALE } from './engines/industryRationale';
 import { CATEGORIES, INDUSTRIES, INDUSTRY_GUIDANCE, getRecommendations, type IndustryId } from './engines/industryRecommendations';
 
 type DashboardProps = {
@@ -83,12 +84,12 @@ export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,on
             <div className="bramer-guide-select"><span>브랜드 업종</span>
               <BramerSelect ariaLabel="브랜드 업종 선택" value={industry} options={INDUSTRIES.map(item => ({ value: item.id, label: item.label }))} onChange={value => { setIndustry(value as IndustryId); setChecked({}); setSearch(''); }}/>
             </div>
-            <div className="bramer-guide-overview"><h2>{industryLabel}</h2><p>{INDUSTRY_GUIDANCE[industry].focus}</p><div>{INDUSTRY_GUIDANCE[industry].touchpoints.map(x=><span key={x}>{x}</span>)}</div></div>
+            <div className="bramer-guide-overview"><h2>{industryLabel}</h2><p>{INDUSTRY_RATIONALE[industry].why}</p><div>{INDUSTRY_GUIDANCE[industry].touchpoints.map(x=><span key={x}>{x}</span>)}</div></div>
             <div className="bramer-guide-columns">
-              <div><h3>권장 가이드라인 구성</h3><div className="bramer-guide-items">{recommended.map(item=><div key={item.id}><div><strong>{names[item.id]}</strong><small>{item.description}</small></div><span>{recommendation[item.id]==='Core'?'기본':'추천'}</span></div>)}</div><p className="bramer-guide-footnote">추천 항목은 초기 실무 가이드이며, 브랜드 환경에 따라 조정할 수 있습니다.</p></div>
+              <div><h3>권장 가이드라인 구성</h3><div className="bramer-guide-items">{recommended.map(item=><div key={item.id}><div><strong>{names[item.id]}</strong><small>{INDUSTRY_RATIONALE[industry].components[item.id] ?? item.description}</small></div><span>{recommendation[item.id]==='Core'?'기본':'추천'}</span></div>)}</div><p className="bramer-guide-footnote">추천 항목은 초기 실무 가이드이며, 브랜드 환경에 따라 조정할 수 있습니다.</p></div>
               <div><div className="bramer-guide-doc-head"><h3>준비할 자료</h3><span>{documents[industry].filter(item=>checked[item]).length}/{documents[industry].length}</span></div>
                 <input className="bramer-guide-search" type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="자료 검색" aria-label="준비할 자료 검색"/>
-                <div className="bramer-guide-checklist">{selectedDocs.map(item=><label key={item}><input type="checkbox" checked={Boolean(checked[item])} onChange={e=>setChecked(p=>({...p,[item]:e.target.checked}))}/>{item}</label>)}</div>
+                <div className="bramer-guide-checklist">{selectedDocs.map(item=><label key={item}><input type="checkbox" checked={Boolean(checked[item])} onChange={e=>setChecked(p=>({...p,[item]:e.target.checked}))}/><span><strong>{item}</strong><small>{INDUSTRY_RATIONALE[industry].files[item]}</small></span></label>)}</div>
                 <p className="bramer-guide-footnote">로고 SVG 외의 자료는 선택한 항목에 따라 준비하면 돼요.</p>
               </div>
             </div>
