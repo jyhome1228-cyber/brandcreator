@@ -66,7 +66,7 @@ export default function Landing({ onStart }: LandingProps) {
   return <div className="bramer-landing" ref={rootRef}>
     <header className="bramer-site-header">
       <div className="bramer-site-header-inner">
-        <a className="bramer-site-logo" href="#top" aria-label="Bramer 홈">Bramer.</a>
+        <a className="bramer-site-logo" href="#top" aria-label="Bramer 홈">BRAMER.</a>
         <nav aria-label="메인 메뉴" className="bramer-site-menu">
           <a href="#preview">서비스 소개</a>
           <a href="#how">이용 방법</a>
@@ -165,7 +165,7 @@ export default function Landing({ onStart }: LandingProps) {
           <div className="bramer-footer-col"><h3>지원</h3><a href="#help">도움말</a><a href="#faq">자주 묻는 질문</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">업데이트 내역</a></div>
           <div className="bramer-footer-col"><h3>이용 안내</h3><a href="#privacy-info">파일 이용 안내</a><a href="#data-info">저장 방식 안내</a><a href="#technology">기술 및 제작 방식</a></div>
         </div>
-        <div className="bramer-footer-bottom"><div><strong>Bramer.</strong><span>브랜드 가이드라인 제작 서비스</span></div><small>현재 제공되는 기능을 기준으로 안내합니다.</small></div>
+        <div className="bramer-footer-bottom"><div><strong>BRAMER.</strong><span>브랜드 가이드라인 제작 서비스</span></div><small>현재 제공되는 기능을 기준으로 안내합니다.</small></div>
       </div>
     </footer>
   </div>;
