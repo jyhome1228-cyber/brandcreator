@@ -298,30 +298,26 @@ export default function App() {
 
   if (mode === 'setup') {
     return (
-      <div className="app-shell setup-mode">
-        <header className="topbar product-topbar">
-          <div className="topbar-inner product-topbar-inner">
-            <div className="product-brand">
-              <span className="product-mark">g.</span>
-              <div>
-                <button type="button" className="bramer-brand-home" onClick={goHome} aria-label="Bramer 홈으로 이동">Bramer.</button>
-                <span className="topbar-meta">Brand Identity Creator</span>
-              </div>
-            </div>
-            <div className="bramer-header-utilities">
-              <button className="bramer-save-button" type="button" onClick={() => navigateWorkspace('dashboard')}>대시보드</button>
-              <label className="bramer-import-button">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={(event) => void restoreProject(event)} /></label>
-              <button className="bramer-save-button" type="button" onClick={saveProject}>프로젝트 저장</button>
-            </div>
-            <div className="topbar-status">
-              <span className="status-dot" />
-              <span>PROJECT SETUP</span>
-              <strong>{setupProgress}%</strong>
-            </div>
-          </div>
+      <div className="bramer-dash bramer-create-shell setup-mode">
+        <header className="bramer-dash-header">
+          <button type="button" className="bramer-dash-logo" onClick={goHome} aria-label="Bramer 서비스 소개로 이동">Bramer.</button>
+          <span className="bramer-dash-product">브랜드 가이드라인 제작</span>
+          <button type="button" className="bramer-dash-header-start" onClick={saveProject}>프로젝트 저장</button>
         </header>
-
-        <main className="setup-workspace">
+        <div className="bramer-dash-layout">
+          <aside className="bramer-dash-sidebar" aria-label="서비스 메뉴">
+            <div className="bramer-dash-nav">
+              <button type="button" onClick={() => navigateWorkspace('dashboard')}>홈</button>
+              <button type="button" onClick={() => navigateWorkspace('guide')}>업종별 가이드</button>
+              <button type="button" className="active" aria-current="page" onClick={() => setSetupStep(1)}>새로 만들기</button>
+            </div>
+            <div className="bramer-dash-sidebar-bottom">
+              <p>브랜드 정보와 로고를 등록하고, 필요한 규칙을 선택하여 가이드라인을 만들어보세요.</p>
+              <button type="button" onClick={() => navigateWorkspace('dashboard')}>대시보드로 돌아가기</button>
+            </div>
+          </aside>
+          <main className="bramer-dash-content bramer-create-content">
+        <div className="setup-workspace">
           <nav className="setup-step-nav" aria-label="Project setup steps">
             <div className="step-nav-head">
               <span className="metadata-label">PROJECT SETUP</span>
@@ -362,9 +358,9 @@ export default function App() {
 
           <section className="setup-main">
             <div className="bramer-workspace-heading">
-              <div><span className="bramer-workspace-kicker">BRAMER / BRAND WORKSPACE</span>
-                <h1>브랜드 가이드라인 제작</h1>
-                <p>브랜드의 기본 정보를 설정하고, 필요한 규칙을 선택해 하나의 일관된 시스템으로 완성합니다.</p>
+              <div><span className="bramer-workspace-kicker">가이드라인 제작</span>
+                <h1>새 브랜드 가이드라인 만들기</h1>
+                <p>브랜드 정보를 입력하고 필요한 규칙을 선택해 주세요. 단계별로 가이드라인을 완성할 수 있어요.</p>
               </div>
               <div className="bramer-workspace-meta"><span>WORKSPACE</span><strong>{String(setupStep).padStart(2, '0')} / 05</strong></div>
             </div>
@@ -726,7 +722,7 @@ export default function App() {
             </div>
           </section>
 
-          <aside className="setup-preview-panel">
+          <aside className={`setup-preview-panel ${setupStep < 3 ? 'bramer-preview-hidden' : ''}`}>
             <div className="preview-sticky">
               <div className="preview-panel-heading">
                 <div>
@@ -798,7 +794,9 @@ export default function App() {
               </div>
             </div>
           </aside>
-        </main>
+        </div>
+          </main>
+        </div>
       </div>
     );
   }
