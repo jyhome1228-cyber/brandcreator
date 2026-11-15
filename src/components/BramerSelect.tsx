@@ -41,6 +41,7 @@ export default function BramerSelect({ value, options, onChange, ariaLabel, plac
 
   useEffect(() => {
     if (!open) return;
+    listRef.current?.focus();
     listRef.current?.querySelector<HTMLElement>('[data-active="true"]')?.scrollIntoView({ block: 'nearest' });
   }, [open, active]);
 
