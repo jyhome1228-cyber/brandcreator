@@ -37,3 +37,5 @@ import './svg-upload-help.css';
 import './audience.css';
 
 import './beta-experience.css';
+
+import './direct-create.css';

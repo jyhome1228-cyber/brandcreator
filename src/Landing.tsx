@@ -182,13 +182,13 @@ export default function Landing({ onStart }: LandingProps) {
           </article>
           <article id="data-info">
             <h3>프로젝트 저장과 불러오기</h3>
-            <p>현재는 계정 저장 방식이 아니에요. 제작 중인 프로젝트를 JSON 파일로 저장하고, 대시보드에서 다시 불러올 수 있어요.</p>
-            <a href="#/dashboard">대시보드 열기</a>
+            <p>현재는 계정 저장 방식이 아니에요. 제작 중인 프로젝트를 JSON 파일로 저장하고, 제작 화면에서 다시 불러올 수 있어요.</p>
+            <a href="#/create">제작 화면 열기</a>
           </article>
           <article id="privacy-info">
             <h3>파일 이용 안내</h3>
             <p>입력한 브랜드 자료는 브라우저에서 가이드라인을 구성하는 데 사용됩니다. 별도의 계정 및 클라우드 저장 기능은 현재 제공하지 않아요.</p>
-            <a href="#/dashboard">제작 공간 둘러보기</a>
+            <a href="#/create">제작 공간 둘러보기</a>
           </article>
         </div>
         <section className="bramer-tech-section" id="technology" aria-labelledby="bramer-tech-title">
@@ -215,7 +215,7 @@ export default function Landing({ onStart }: LandingProps) {
       <div className="bramer-footer-inner">
         <div className="bramer-footer-columns">
           <div className="bramer-footer-col"><h3>Bramer</h3><a href="#top">서비스 소개</a><a href="#preview">결과물 미리보기</a><a href="#how">이용 방법</a></div>
-          <div className="bramer-footer-col"><h3>가이드라인</h3><a href="#/create">새 가이드라인 만들기</a><a href="#/dashboard">제작 대시보드</a><a href="#preview">샘플 가이드라인</a></div>
+          <div className="bramer-footer-col"><h3>가이드라인</h3><a href="#/create">새 가이드라인 만들기</a><a href="#/create">가이드라인 제작</a><a href="#preview">샘플 가이드라인</a></div>
           <div className="bramer-footer-col"><h3>업종별 가이드</h3><a href="#/guide">업종별 추천 구성</a><a href="#/guide">필요한 가이드 항목</a><a href="#/guide">자료 체크리스트</a></div>
           <div className="bramer-footer-col"><h3>자료 준비</h3><a href="#resources">준비 자료 안내</a><a href="#technology">SVG 업로드 안내</a><a href="#data-info">프로젝트 저장 안내</a></div>
           <div className="bramer-footer-col"><h3>지원</h3><a href="#help">도움말</a><a href="#faq">자주 묻는 질문</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">업데이트 내역</a></div>
@@ -232,7 +232,7 @@ export default function Landing({ onStart }: LandingProps) {
         <p id="bramer-beta-description">현재 BRAMER는 기능과 사용성을 개선하는 베타테스트 기간입니다. 회원가입 없이 무료로 가이드라인 제작 기능을 체험할 수 있어요.</p>
         <div className="bramer-beta-info">
           <p><strong>바로 체험 가능</strong><span>로고 SVG 분석, 업종별 항목 선택, 가이드라인 편집 및 출력</span></p>
-          <p><strong>프로젝트 보관</strong><span>계정이나 클라우드 저장은 아직 제공하지 않습니다. 작업을 이어가려면 프로젝트 JSON 파일을 저장해 주세요.</span></p>
+          <p><strong>프로젝트 보관</strong><span>계정이나 클라우드 저장은 아직 제공하지 않습니다. 작업을 이어가려면 프로젝트 JSON 파일을 저장한 뒤 제작 화면에서 불러와 주세요.</span></p>
           <p><strong>이용 전 확인</strong><span>일부 자동 추천·생성 기능은 개선 중입니다. 최종 사용·인쇄 전 직접 결과물을 검토해 주세요.</span></p>
         </div>
         <div className="bramer-beta-actions">

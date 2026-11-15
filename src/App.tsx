@@ -63,10 +63,11 @@ function isHex(value: string): boolean {
 
 export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
-  const [mode, setMode] = useState<'landing' | 'dashboard' | 'guide' | 'setup' | 'editor'>(() => location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/guide' ? 'guide' : 'landing');
+  const [mode, setMode] = useState<'landing' | 'dashboard' | 'guide' | 'setup' | 'editor'>(() => location.hash === '#/create' || location.hash === '#/editor' || location.hash === '#/dashboard' ? 'setup' : location.hash === '#/guide' ? 'guide' : 'landing');
   const enterWorkspace = () => {
-    window.location.hash = '/dashboard';
-    setMode('dashboard');
+    setSetupStep(1);
+    window.location.hash = '/create';
+    setMode('setup');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const openCreate = (nextIndustry?: IndustryId) => {
@@ -80,8 +81,13 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const navigateWorkspace = (view: 'dashboard' | 'guide') => {
-    window.location.hash = view === 'guide' ? '/guide' : '/dashboard';
-    setMode(view);
+    if (view === 'guide') {
+      window.location.hash = '/guide';
+      setMode('guide');
+    } else {
+      window.location.hash = '/create';
+      setMode('setup');
+    }
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const goHome = () => {
@@ -91,7 +97,7 @@ export default function App() {
   };
   useEffect(() => {
     const syncRoute = () => {
-      if (window.location.hash === '#/dashboard') setMode('dashboard');
+      if (window.location.hash === '#/dashboard') setMode('setup');
       else if (window.location.hash === '#/guide') setMode('guide');
       else if (window.location.hash === '#/create') setMode('setup');
       else if (window.location.hash === '#/editor') setMode(previous => previous === 'editor' ? 'editor' : 'setup');
@@ -309,7 +315,10 @@ export default function App() {
         <header className="bramer-dash-header">
           <button type="button" className="bramer-dash-logo" onClick={goHome} aria-label="Bramer 서비스 소개로 이동">BRAMER.</button>
           <span className="bramer-dash-product">브랜드 가이드라인 제작</span>
-          <button type="button" className="bramer-dash-header-start" onClick={saveProject}>프로젝트 저장</button>
+          <div className="bramer-create-header-actions">
+            <label className="bramer-create-import">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={event => void restoreProject(event)} /></label>
+            <button type="button" className="bramer-dash-header-start" onClick={saveProject}>프로젝트 저장</button>
+          </div>
         </header>
         <div className="bramer-dash-layout">
           <aside className="bramer-dash-sidebar" aria-label="서비스 메뉴">
@@ -320,7 +329,7 @@ export default function App() {
             </div>
             <div className="bramer-dash-sidebar-bottom">
               <p>브랜드 정보와 로고를 등록하고, 필요한 규칙을 선택하여 가이드라인을 만들어보세요.</p>
-              <button type="button" onClick={() => navigateWorkspace('dashboard')}>대시보드로 돌아가기</button>
+              <button type="button" onClick={() => navigateWorkspace('dashboard')}>제작 화면으로 돌아가기</button>
             </div>
           </aside>
           <main className="bramer-dash-content bramer-create-content">
@@ -455,15 +464,19 @@ export default function App() {
                     <div>
                       <span className="module-kicker">PRIMARY ASSET</span>
                       <h2>로고 업로드</h2>
-                      <p className="module-description">일러스트레이터에서 만든 로고도 괜찮아요. SVG로 저장해 올리면 로고의 비율과 컬러를 분석합니다.</p>
+                      <p className="module-description">일러스트레이터 AI 파일도 SVG 형식으로 저장하면 사용할 수 있어요. SVG 로고의 비율과 컬러를 분석해 기본 규칙을 제안합니다.</p>
                     </div>
                     <span className="module-state">{project.logo ? 'Detected' : 'Required'}</span>
+                  </div>
+                  <div className="bramer-svg-requirement" role="note">
+                    <strong>업로드 가능: SVG 파일만</strong>
+                    <p><strong>AI 파일은 직접 업로드할 수 없습니다.</strong> Adobe Illustrator에서 AI 파일을 연 뒤, <b>파일 → 다른 이름으로 저장 → SVG</b>로 저장하고 업로드해 주세요.</p>
                   </div>
                   <label className={`upload-zone creator-upload ${project.logo ? 'has-file' : ''}`}>
                     <input type="file" accept=".svg,image/svg+xml" onChange={handleLogo} />
                     <span className="upload-icon">{project.logo ? '✓' : '+'}</span>
                     <strong>{project.logo ? project.logo.fileName : 'SVG 로고 파일 업로드'}</strong>
-                    <span>{project.logo ? `Ratio ${project.logo.aspectRatio.toFixed(2)} : 1 · ${project.logo.colors.length} colors detected` : 'SVG 파일을 선택해 주세요. AI 파일은 아래 방법으로 SVG로 저장할 수 있어요.'}</span>
+                    <span>{project.logo ? `Ratio ${project.logo.aspectRatio.toFixed(2)} : 1 · ${project.logo.colors.length} colors detected` : 'SVG 로고 파일을 선택해 주세요. AI 원본은 Illustrator에서 SVG로 저장한 뒤 업로드해야 합니다.'}</span>
                     <em>{project.logo ? '파일 변경' : '파일 선택'}</em>
                   </label>
                   <details className="bramer-svg-help">
