@@ -4,7 +4,7 @@ import Landing from './Landing';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { generateGuidelinePages } from './guideline-system/generatePages';
 import { generateExtensionPages } from './guideline-system/extensionPages';
-import { CATEGORIES, INDUSTRIES, getDefaultSelection, getRecommendations, type GuidelineCategory, type IndustryId } from './engines/industryRecommendations';
+import { CATEGORIES, INDUSTRIES, INDUSTRY_GUIDANCE, getDefaultSelection, getRecommendations, type GuidelineCategory, type IndustryId } from './engines/industryRecommendations';
 import { postProcessGuidelinePages } from './guideline-system/postProcess';
 import type { BrandProject, GuidelinePage } from './types/guideline';
 
@@ -80,7 +80,7 @@ export default function App() {
     window.addEventListener('hashchange', syncRoute);
     return () => window.removeEventListener('hashchange', syncRoute);
   }, []);
-  const [setupStep, setSetupStep] = useState<1 | 2 | 3 | 4>(1);
+  const [setupStep, setSetupStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [currentId, setCurrentId] = useState('01-cover');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
@@ -123,9 +123,10 @@ export default function App() {
   const setupProgress = Math.round((setupChecks.filter(Boolean).length / setupChecks.length) * 100);
   const stepStatus = {
     1: Boolean(project.name.trim() && project.englishName.trim()),
-    2: Boolean(project.logo),
-    3: Boolean(isHex(project.colors.primary) && project.typography.title && project.typography.body),
-    4: Boolean(project.rules.clearSpace > 0 && project.rules.minimumPrintMm > 0 && project.rules.minimumDigitalPx > 0),
+    2: selectedCategories.length > 0,
+    3: Boolean(project.logo),
+    4: Boolean(isHex(project.colors.primary) && project.typography.title && project.typography.body),
+    5: Boolean(project.rules.clearSpace > 0 && project.rules.minimumPrintMm > 0 && project.rules.minimumDigitalPx > 0),
   } as const;
   const recommendationsApplied = Boolean(
     project.logo &&
@@ -254,7 +255,7 @@ export default function App() {
     }
     if (selectedCategories.length === 0) {
       setError('가이드라인에 포함할 구성요소를 하나 이상 선택해주세요.');
-      setSetupStep(1);
+      setSetupStep(2);
       return;
     }
     setError('');
@@ -300,10 +301,11 @@ export default function App() {
             </div>
             <div className="step-nav-list">
               {([
-                [1, 'Brand', '기본 정보'],
-                [2, 'Logo', 'SVG 분석'],
-                [3, 'System', '컬러 · 서체'],
-                [4, 'Rules', '사용 규정'],
+                [1, '브랜드 정보', '브랜드 입력'],
+                [2, '업종별 구성', '항목 추천'],
+                [3, '로고 업로드', 'SVG 분석'],
+                [4, '컬러 · 서체', '스타일 설정'],
+                [5, '사용 규정', '가이드라인 제작'],
               ] as const).map(([step, label, detail]) => (
                 <button
                   key={step}
@@ -335,7 +337,7 @@ export default function App() {
                 <h1>브랜드 가이드라인 제작</h1>
                 <p>브랜드의 기본 정보를 설정하고, 필요한 규칙을 선택해 하나의 일관된 시스템으로 완성합니다.</p>
               </div>
-              <div className="bramer-workspace-meta"><span>WORKSPACE</span><strong>{String(setupStep).padStart(2, '0')} / 04</strong></div>
+              <div className="bramer-workspace-meta"><span>WORKSPACE</span><strong>{String(setupStep).padStart(2, '0')} / 05</strong></div>
             </div>
             <div className="setup-module-stack">
               <section className={`setup-module setup-panel ${setupStep === 1 ? 'active' : ''}`}>
@@ -348,26 +350,6 @@ export default function App() {
                       <p className="module-description">브랜드의 정보를 입력하고 업종에 따라 필요한 가이드라인 항목을 선택하세요.</p>
                     </div>
                     <span className="module-state">{project.name && project.englishName ? 'Complete' : 'Required'}</span>
-                  </div>
-                  <div className="field bramer-industry-picker">
-                    <span>업종에 맞는 가이드라인 추천</span>
-                    <select value={industry} onChange={(event) => changeIndustry(event.target.value as IndustryId)} aria-label="브랜드 업종 선택" style={{ width: '100%', marginTop: 10 }}>
-                      {INDUSTRIES.map(item => <option value={item.id} key={item.id}>{item.label}</option>)}
-                    </select>
-                    <p className="module-description bramer-research-note">업종별 기본 추천안으로, 22개 사례 연구의 최종 검증 결과는 아닙니다. 추천 항목은 직접 추가하거나 제외할 수 있습니다.</p>
-                    <div className="bramer-module-grid">
-                      {CATEGORIES.map(item => (
-                        <label key={item.id} className={`bramer-module-card ${selectedCategories.includes(item.id) ? 'is-selected' : ''}`}>
-                          <span className="bramer-module-card-top">
-                            <input type="checkbox" checked={selectedCategories.includes(item.id)} onChange={() => toggleCategory(item.id)} aria-label={item.label + ' 선택'} />
-                            <small className={`bramer-tier bramer-tier-${recommendations[item.id].toLowerCase()}`}>{recommendations[item.id]}</small>
-                          </span>
-                          <strong className="bramer-module-title">{item.label}</strong>
-                          <small className="bramer-module-description">{item.description}</small>
-                        </label>
-                      ))}
-                    </div>
-                    <div className="bramer-selection-summary"><strong>{selectedCount} / 8개 항목 선택</strong><span>선택 결과는 실제 생성 페이지와 SVG·PDF 출력에 반영됩니다.</span><button type="button" onClick={() => setSelectedCategories(getDefaultSelection(industry))}>추천 항목으로 초기화</button></div>
                   </div>
                   <div className="field-grid two-column">
                     <label className="field">
@@ -398,6 +380,46 @@ export default function App() {
 
               <section className={`setup-module setup-panel ${setupStep === 2 ? 'active' : ''}`}>
                 <div className="module-index">02</div>
+                <div className="module-content">
+                  <div className="module-heading">
+                    <div>
+                      <span className="module-kicker">INDUSTRY GUIDELINES</span>
+                      <h2>우리 브랜드에 필요한 항목을 골라보세요.</h2>
+                      <p className="module-description">업종을 선택하면 가이드라인 구성요소를 추천해 드려요. 필요한 항목은 자유롭게 조정할 수 있어요.</p>
+                    </div>
+                    <span className="module-state">선택 가능</span>
+                  </div>
+                  <div className="field bramer-industry-picker">
+                    <span>어떤 업종의 브랜드인가요?</span>
+                    <select value={industry} onChange={(event) => changeIndustry(event.target.value as IndustryId)} aria-label="브랜드 업종 선택" style={{ width: '100%', marginTop: 10 }}>
+                      {INDUSTRIES.map(item => <option value={item.id} key={item.id}>{item.label}</option>)}
+                    </select>
+                    <p className="module-description bramer-research-note">선택한 업종에 따라 추천 항목이 달라집니다. 원하는 항목은 직접 추가하거나 제외할 수 있어요.</p>
+                  <div className="bramer-industry-focus">
+                    <strong>이 업종에서는 이런 기준이 중요해요.</strong>
+                    <p>{INDUSTRY_GUIDANCE[industry].focus}</p>
+                    <div>{INDUSTRY_GUIDANCE[industry].touchpoints.map(point => <span key={point}>{point}</span>)}</div>
+                  </div>
+                    <div className="bramer-module-grid">
+                      {CATEGORIES.map(item => (
+                        <label key={item.id} className={`bramer-module-card ${selectedCategories.includes(item.id) ? 'is-selected' : ''}`}>
+                          <span className="bramer-module-card-top">
+                            <input type="checkbox" checked={selectedCategories.includes(item.id)} onChange={() => toggleCategory(item.id)} aria-label={item.label + ' 선택'} />
+                            <small className={`bramer-tier bramer-tier-${recommendations[item.id].toLowerCase()}`}>{recommendations[item.id]}</small>
+                          </span>
+                          <strong className="bramer-module-title">{item.label}</strong>
+                          <small className="bramer-module-description">{item.description}</small>
+                        </label>
+                      ))}
+                    </div>
+                    <div className="bramer-selection-summary"><strong>{selectedCount} / 8개 항목 선택</strong><span>선택 결과는 실제 생성 페이지와 SVG·PDF 출력에 반영됩니다.</span><button type="button" onClick={() => setSelectedCategories(getDefaultSelection(industry))}>추천 항목으로 초기화</button></div>
+                  </div>
+                  <p className="bramer-research-note">업종별 추천 기준은 연구 검증 전의 초기 설정값입니다. 22개 브랜드 분석 결과에 따라 보완할 예정입니다.</p>
+                </div>
+              </section>
+
+              <section className={`setup-module setup-panel ${setupStep === 3 ? 'active' : ''}`}>
+                <div className="module-index">03</div>
                 <div className="module-content">
                   <div className="module-heading">
                     <div>
@@ -549,8 +571,8 @@ export default function App() {
                 </div>
               </section>
 
-              <section className={`setup-module setup-panel ${setupStep === 3 ? 'active' : ''}`}>
-                <div className="module-index">03</div>
+              <section className={`setup-module setup-panel ${setupStep === 4 ? 'active' : ''}`}>
+                <div className="module-index">04</div>
                 <div className="module-content">
                   <div className="module-heading">
                     <div>
@@ -617,8 +639,8 @@ export default function App() {
                 </div>
               </section>
 
-              <section className={`setup-module setup-panel ${setupStep === 4 ? 'active' : ''}`}>
-                <div className="module-index">04</div>
+              <section className={`setup-module setup-panel ${setupStep === 5 ? 'active' : ''}`}>
+                <div className="module-index">05</div>
                 <div className="module-content">
                   <div className="module-heading">
                     <div>
@@ -650,18 +672,18 @@ export default function App() {
 
             <div className="setup-actions creator-actions step-actions">
               <div className="action-copy">
-                <span className="action-step">STEP {String(setupStep).padStart(2, '0')} / 04</span>
-                <strong>{setupStep === 1 ? `${industryLabel} · ${selectedCount}개 구성요소 선택` : setupStep === 2 ? '로고를 분석하고 권장 규칙을 확인합니다.' : setupStep === 3 ? '컬러와 타이포그래피 시스템을 구성합니다.' : '최종 사용 규칙을 확인하고 문서를 생성합니다.'}</strong>
+                <span className="action-step">STEP {String(setupStep).padStart(2, '0')} / 05</span>
+                <strong>{setupStep === 1 ? '브랜드의 기본 정보를 입력하세요.' : setupStep === 2 ? `${industryLabel} · ${selectedCount}개 항목 선택` : setupStep === 3 ? '로고를 업로드하고 권장 규칙을 확인하세요.' : setupStep === 4 ? '컬러와 서체를 설정하세요.' : '최종 사용 규칙을 확인하고 문서를 생성하세요.'}</strong>
                 <span>{pages.length} pages · A4 Landscape · Editable SVG · PDF Export</span>
               </div>
               <div className="step-action-buttons">
                 {setupStep > 1 ? (
-                  <button className="button secondary step-back" type="button" onClick={() => setSetupStep((setupStep - 1) as 1 | 2 | 3 | 4)}>
+                  <button className="button secondary step-back" type="button" onClick={() => setSetupStep((setupStep - 1) as 1 | 2 | 3 | 4 | 5)}>
                     이전
                   </button>
                 ) : null}
-                {setupStep < 4 ? (
-                  <button className="button primary creator-primary" type="button" onClick={() => setSetupStep((setupStep + 1) as 1 | 2 | 3 | 4)}>
+                {setupStep < 5 ? (
+                  <button className="button primary creator-primary" type="button" onClick={() => setSetupStep((setupStep + 1) as 1 | 2 | 3 | 4 | 5)}>
                     다음 단계
                     <span aria-hidden="true">→</span>
                   </button>
