@@ -1,0 +1,99 @@
+/* BRAMER alignment and thin wordmark — shared final design tokens.
+   All page containers use the same centered edge. Interior reading widths may remain narrower. */
+:root {
+  --bramer-page-width:1240px;
+  --bramer-page-gutter:24px;
+  --bramer-logo-weight:400;
+}
+.bramer-landing .bramer-site-header-inner,
+.bramer-landing .bramer-help-inner,
+.bramer-landing .bramer-footer-inner,
+.bramer-landing .bramer-home-hero-content,
+.bramer-landing .bramer-home-section-heading,
+.bramer-landing .bramer-preview,
+.bramer-landing .bramer-home-steps,
+.bramer-landing .bramer-home-last-section {
+  box-sizing:border-box;
+}
+/* The actual edges of header, main content and footer are all one 1240px frame. */
+.bramer-landing .bramer-site-header-inner,
+.bramer-landing .bramer-help-inner,
+.bramer-landing .bramer-footer-inner {
+  width:min(var(--bramer-page-width),calc(100% - 2 * var(--bramer-page-gutter)))!important;
+  max-width:var(--bramer-page-width)!important;
+  margin-left:auto!important;
+  margin-right:auto!important;
+}
+.bramer-landing .bramer-help-section,
+.bramer-landing .bramer-home-footer {
+  padding-left:0!important;
+  padding-right:0!important;
+}
+.bramer-landing .bramer-help-grid,
+.bramer-landing .bramer-tech-section,
+.bramer-landing .bramer-footer-columns {
+  width:100%;
+  max-width:100%;
+}
+.bramer-landing .bramer-help-faq {
+  max-width:100%!important;
+  width:100%!important;
+  margin-left:0!important;
+  margin-right:0!important;
+}
+.bramer-landing .bramer-home-hero-content {
+  width:min(100%,820px);
+  margin-inline:auto;
+}
+/* Thin, text-only Bramer wordmark everywhere including footer and editor. */
+.bramer-landing .bramer-site-logo,
+.bramer-landing .bramer-footer-bottom strong,
+.bramer-dash .bramer-dash-logo,
+.bramer-create-shell .bramer-dash-logo,
+.app-shell .bramer-brand-home,
+.editor-mode .editor-product-brand .bramer-brand-home,
+.app-shell .product-brand .brand-title {
+  font-family:Pretendard,'Apple SD Gothic Neo','Noto Sans KR',sans-serif!important;
+  font-weight:400!important;
+  letter-spacing:-.045em!important;
+  text-transform:none!important;
+  font-synthesis:none;
+}
+.bramer-landing .bramer-site-logo {font-size:26px!important;line-height:1.1!important;}
+.bramer-dash .bramer-dash-logo,.bramer-create-shell .bramer-dash-logo,
+.app-shell .bramer-brand-home,.editor-mode .editor-product-brand .bramer-brand-home {
+  font-size:25px!important;line-height:1.15!important;
+}
+.bramer-landing .bramer-footer-bottom strong {font-size:23px!important;line-height:1.2!important;}
+/* Keep product introductions centered; align the supporting blocks to the same parent. */
+.bramer-landing .bramer-help-inner>.bramer-home-section-heading {
+  max-width:820px;
+  margin-left:auto;
+  margin-right:auto;
+}
+.bramer-landing .bramer-help-grid {
+  margin-left:0;
+  margin-right:0;
+}
+.bramer-landing .bramer-tech-section {
+  margin-left:0;
+  margin-right:0;
+  max-width:100%;
+}
+.bramer-landing .bramer-footer-bottom {
+  width:100%;
+}
+/* Avoid accidental horizontal overflow from six footer columns. */
+.bramer-landing .bramer-footer-columns {grid-template-columns:repeat(6,minmax(0,1fr));}
+.bramer-landing .bramer-footer-col {min-width:0;}
+@media (max-width:1050px) {
+  .bramer-landing .bramer-footer-columns {grid-template-columns:repeat(3,minmax(0,1fr));}
+}
+@media (max-width:760px) {
+  :root {--bramer-page-gutter:18px;}
+  .bramer-landing .bramer-site-logo{font-size:22px!important;}
+  .bramer-landing .bramer-footer-bottom strong{font-size:21px!important;}
+  .bramer-dash .bramer-dash-logo,.bramer-create-shell .bramer-dash-logo,
+  .app-shell .bramer-brand-home,.editor-mode .editor-product-brand .bramer-brand-home{font-size:22px!important;}
+  .bramer-landing .bramer-footer-columns{grid-template-columns:repeat(2,minmax(0,1fr));}
+}
