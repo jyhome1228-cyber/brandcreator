@@ -31,3 +31,5 @@ import './industry-rationale-layout.css';
 import './brand-alignment.css';
 
 import './wordmark.css';
+
+import './svg-upload-help.css';
