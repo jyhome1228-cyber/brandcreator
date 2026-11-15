@@ -133,9 +133,17 @@ function logo(asset: LogoAsset | null, x: number, y: number, width: number, heig
   if (!asset) {
     return `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="none" stroke="${LINE}" stroke-width="2"/><text x="${x + width / 2}" y="${y + height / 2}" fill="${MUTED}" font-size="34" text-anchor="middle">LOGO SVG</text>`;
   }
-  const inner = color ? recolorInner(asset.inner, color) : asset.inner;
+  const normalized = color?.toUpperCase();
+  const monochrome = normalized === WHITE || normalized === BLACK;
+  const inner = color && !monochrome ? recolorInner(asset.inner, color) : asset.inner;
   const v = asset.viewBox;
-  return `<svg x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${v.x} ${v.y} ${v.width} ${v.height}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
+  // An SVG may define its fills in nested CSS classes, not only fill attributes.
+  // A color-matrix forces an exact monochrome variant while preserving opacity.
+  const id = `bramer-mono-${Math.round(x)}-${Math.round(y)}-${normalized === WHITE ? 'w' : 'b'}`;
+  const channel = normalized === WHITE ? 1 : 0;
+  const filter = monochrome ? `<defs><filter id="${id}" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 ${channel}  0 0 0 0 ${channel}  0 0 0 0 ${channel}  0 0 0 1 0"/></filter></defs>` : '';
+  const content = monochrome ? `<g filter="url(#${id})">${inner}</g>` : inner;
+  return `<svg x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${v.x} ${v.y} ${v.width} ${v.height}" preserveAspectRatio="xMidYMid meet">${filter}${content}</svg>`;
 }
 
 function fitLogo(asset: LogoAsset | null, x: number, y: number, width: number, height: number, padding = 0): { x: number; y: number; width: number; height: number } {
