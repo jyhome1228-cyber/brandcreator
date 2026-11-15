@@ -104,6 +104,7 @@ export default function App() {
       : CATEGORIES.filter(item => item.id === value || previous.includes(item.id)).map(item => item.id));
   };
   const currentPage = pages.find((page) => page.id === currentId) ?? pages[0];
+  const currentPageNumber = Math.max(1, pages.findIndex(page => page.id === currentPage?.id) + 1);
   const enabledPages = pages.filter((page) => enabled[page.id] !== false);
   const industryLabel = INDUSTRIES.find(item => item.id === industry)?.label ?? '브랜드';
   const selectedCount = selectedCategories.length;
@@ -804,8 +805,9 @@ export default function App() {
               <strong>{currentPage.subtitle || currentPage.id}</strong>
             </div>
             <div className="preview-toolbar-meta">
+              <span>{String(currentPageNumber).padStart(2, '0')} / {String(pages.length).padStart(2, '0')}</span>
               <span>A4 Landscape</span>
-              <span>Vector</span>
+              <span>SVG Vector</span>
               <button className="button tertiary small" onClick={() => downloadSvg(currentPage, project.englishName || project.name)}>SVG 다운로드</button>
             </div>
           </div>
