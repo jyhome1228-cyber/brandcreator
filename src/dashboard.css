@@ -1,0 +1,100 @@
+/* BRAMER workspace dashboard — familiar, calm SaaS layout, no decorative oversized text. */
+.bramer-dash{font-family:Pretendard,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;min-height:100vh;background:#f7f7f5;color:#191919;font-size:14px;-webkit-font-smoothing:antialiased;}
+.bramer-dash *{box-sizing:border-box;}
+.bramer-dash button,.bramer-dash input,.bramer-dash select{font:inherit;}
+.bramer-dash button{cursor:pointer;}
+.bramer-dash-header{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid #e9e9e7;min-height:66px;display:flex;gap:22px;align-items:center;padding:0 34px;}
+.bramer-dash-logo{border:0;background:transparent;padding:0;font-size:22px!important;font-weight:700;letter-spacing:-.055em!important;color:#161616;}
+.bramer-dash-product{font-size:12px;color:#777;margin-right:auto;}
+.bramer-dash-header-start{border:0;border-radius:7px;background:#191919;color:#fff;font-size:12px!important;padding:11px 17px;min-height:38px;}
+.bramer-dash-header-start:hover,.bramer-dash-primary:hover{background:#444;}
+.bramer-dash-layout{display:grid;grid-template-columns:228px minmax(0,1fr);min-height:calc(100vh - 66px);}
+.bramer-dash-sidebar{position:sticky;top:66px;height:calc(100vh - 66px);padding:30px 17px 24px;border-right:1px solid #e6e6e3;background:#fff;display:flex;flex-direction:column;justify-content:space-between;gap:22px;}
+.bramer-dash-nav{display:grid;gap:6px;}
+.bramer-dash-nav button{width:100%;text-align:left;display:flex;align-items:center;gap:13px;color:#5f5f5c;background:transparent;border:0;border-radius:8px;padding:13px 14px;min-height:45px;font-size:13px!important;font-weight:550;}
+.bramer-dash-nav button:hover{background:#f4f4f2;color:#161616;}
+.bramer-dash-nav button.active{background:#ececea;color:#161616;font-weight:700;}
+.bramer-dash-nav-icon{width:20px;text-align:center;font-size:15px;line-height:1;}
+.bramer-dash-sidebar-bottom{border-top:1px solid #ebebe8;padding:18px 9px 0;}
+.bramer-dash-sidebar-bottom p{color:#777;font-size:11px;line-height:1.8;margin:0 0 15px;}
+.bramer-dash-sidebar-bottom button{border:0;background:transparent;padding:0;color:#555;text-decoration:underline;text-underline-offset:3px;font-size:11px!important;}
+.bramer-dash-content{width:100%;max-width:1250px;margin:0 auto;padding:46px clamp(24px,4vw,60px) 90px;min-width:0;}
+.bramer-dash-welcome{padding:43px 46px 46px;background:#eaeae7;border-radius:13px;}
+.bramer-dash-eyebrow{font-size:11px!important;color:#777;margin:0 0 16px;line-height:1.4;}
+.bramer-dash-welcome h1,.bramer-dash-page-title h1{font-size:clamp(25px,2.7vw,34px)!important;line-height:1.38!important;letter-spacing:-.05em!important;font-weight:650;margin:0;}
+.bramer-dash-welcome>p:last-of-type,.bramer-dash-page-title>p:last-of-type{max-width:640px;font-size:14px!important;line-height:1.8!important;color:#696965;margin:16px 0 26px;word-break:keep-all;}
+.bramer-dash-primary{padding:12px 22px;min-height:43px;border:0;border-radius:7px;background:#191919;color:#fff;font-size:13px!important;font-weight:600;}
+.bramer-dash-section{margin-top:44px;}
+.bramer-dash-section>h2{font-size:19px!important;line-height:1.4;font-weight:650;letter-spacing:-.035em!important;margin:0 0 18px;}
+.bramer-dash-action-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;}
+.bramer-dash-action-grid>button,.bramer-dash-action-upload{display:flex;align-items:stretch;flex-direction:column;min-width:0;min-height:225px;text-align:left;border:1px solid #e5e5e1;border-radius:10px;background:#fff;padding:14px;transition:border-color .2s,transform .2s;cursor:pointer;}
+.bramer-dash-action-grid>button:hover,.bramer-dash-action-upload:hover{border-color:#a9a9a4;transform:translateY(-2px);}
+.bramer-dash-action-upload input{position:absolute;opacity:0;width:1px;height:1px;pointer-events:none;}
+.bramer-dash-action-upload:focus-within{outline:2px solid #222;outline-offset:3px;}
+.bramer-dash-action-visual{height:110px;background:#252525;color:#fff;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:670;letter-spacing:-.06em;}
+.bramer-dash-action-visual.light{background:#e8e8e5;color:#2b2b2b;}
+.bramer-dash-action-visual.neutral{background:#d9dad7;color:#252525;font-size:17px;font-weight:600;letter-spacing:0;}
+.bramer-dash-action-grid strong{display:block;margin:17px 3px 5px;font-size:14px;font-weight:650;line-height:1.4;}
+.bramer-dash-action-grid small{display:block;margin:0 3px 4px;color:#7c7c77;font-size:11px;line-height:1.65;word-break:keep-all;}
+.bramer-dash-current{background:#fff;border:1px solid #e7e7e3;border-radius:9px;padding:24px;display:flex;align-items:center;justify-content:space-between;gap:15px;}
+.bramer-dash-current span{font-size:11px;color:#777;}
+.bramer-dash-current strong{display:block;font-size:17px;margin-top:7px;}
+.bramer-dash-current p{font-size:12px;color:#777;line-height:1.65;margin:9px 0 0;}
+.bramer-dash-current>button{border:1px solid #222;border-radius:6px;background:#fff;padding:11px 17px;font-size:12px!important;white-space:nowrap;}
+.bramer-dash-current>button:hover{background:#222;color:#fff;}
+.bramer-dash-industries{display:flex;flex-wrap:wrap;gap:9px;}
+.bramer-dash-industries>button{font-size:12px!important;padding:11px 14px;border:1px solid #dcdcd8;border-radius:7px;background:#fff;color:#444;}
+.bramer-dash-industries>button:hover{border-color:#777;color:#161616;}
+.bramer-dash-page-title{margin:3px 0 32px;}
+.bramer-dash-page-title>p:last-of-type{margin-bottom:0;}
+.bramer-guide-content{margin-top:0;background:#fff;border:1px solid #e6e6e2;border-radius:12px;padding:30px;}
+.bramer-guide-select{font-size:12px;font-weight:650;display:grid;gap:10px;max-width:430px;}
+.bramer-guide-select select{width:100%;min-height:46px;border:1px solid #d7d7d3;border-radius:6px;background:#fff;font-size:14px;padding:0 14px;color:#191919;}
+.bramer-guide-overview{padding:24px 26px;margin:25px 0 32px;background:#f5f5f3;border-radius:9px;}
+.bramer-guide-overview h2{font-size:18px!important;line-height:1.4;margin:0 0 9px;font-weight:650;}
+.bramer-guide-overview p{font-size:13px;line-height:1.75;color:#666;margin:0;}
+.bramer-guide-overview>div{display:flex;gap:7px;flex-wrap:wrap;margin-top:16px;}
+.bramer-guide-overview>div span{font-size:11px;color:#50504e;background:#fff;border:1px solid #e3e3df;padding:7px 11px;border-radius:5px;}
+.bramer-guide-columns{display:grid;grid-template-columns:1.1fr 1fr;gap:32px;}
+.bramer-guide-columns h3{font-size:15px!important;font-weight:670;margin:0 0 17px;}
+.bramer-guide-items{border-top:1px solid #e9e9e6;}
+.bramer-guide-items>div{padding:13px 0;display:flex;align-items:center;justify-content:space-between;gap:12px;border-bottom:1px solid #eee;}
+.bramer-guide-items strong{display:block;font-size:13px;font-weight:620;margin-bottom:4px;}
+.bramer-guide-items small{font-size:11px;color:#81817c;line-height:1.4;}
+.bramer-guide-items>div>span{border-radius:4px;background:#ededeb;color:#5c5c58;padding:5px 8px;font-size:10px;white-space:nowrap;}
+.bramer-guide-doc-head{display:flex;justify-content:space-between;gap:10px;align-items:start;}
+.bramer-guide-doc-head>span{font-size:11px;color:#777;}
+.bramer-guide-search{width:100%;height:39px;border:1px solid #e1e1dd;background:#fff;border-radius:6px;padding:0 12px;font-size:12px!important;margin:0 0 9px;}
+.bramer-guide-checklist{display:grid;gap:0;border-top:1px solid #eee;}
+.bramer-guide-checklist label{display:flex;gap:12px;align-items:center;padding:15px 0;border-bottom:1px solid #eee;font-size:12px;color:#444;cursor:pointer;}
+.bramer-guide-checklist input{width:17px;height:17px;accent-color:#222;}
+.bramer-guide-footnote{margin:16px 0 0;font-size:11px;line-height:1.65;color:#94948f;}
+.bramer-guide-bottom{margin-top:30px;padding-top:24px;border-top:1px solid #eee;display:flex;justify-content:flex-end;}
+.bramer-dash :is(button,input,select):focus-visible{outline:2px solid #171717;outline-offset:3px;}
+@media(max-width:1040px){.bramer-dash-layout{grid-template-columns:190px minmax(0,1fr);}.bramer-dash-sidebar{padding-inline:10px;}.bramer-dash-content{padding-inline:24px;}.bramer-dash-action-grid{gap:10px;}.bramer-dash-action-grid>button,.bramer-dash-action-upload{padding:10px;}}
+@media(max-width:760px){
+ .bramer-dash-header{min-height:62px;padding:0 17px;gap:12px;}
+ .bramer-dash-logo{font-size:21px!important;}
+ .bramer-dash-product{display:none;}
+ .bramer-dash-header-start{margin-left:auto;font-size:11px!important;padding:9px 12px;}
+ .bramer-dash-layout{display:block;}
+ .bramer-dash-sidebar{position:static;height:auto;padding:10px 14px;border-right:0;border-bottom:1px solid #e6e6e3;}
+ .bramer-dash-nav{display:flex;overflow-x:auto;gap:4px;}
+ .bramer-dash-nav button{flex:0 0 auto;white-space:nowrap;font-size:12px!important;padding:9px 11px;min-height:39px;}
+ .bramer-dash-sidebar-bottom{display:none;}
+ .bramer-dash-content{padding:20px 16px 55px;}
+ .bramer-dash-welcome{padding:32px 23px;}
+ .bramer-dash-welcome h1,.bramer-dash-page-title h1{font-size:25px!important;}
+ .bramer-dash-welcome>p:last-of-type,.bramer-dash-page-title>p:last-of-type{font-size:13px!important;}
+ .bramer-dash-section{margin-top:35px;}
+ .bramer-dash-section>h2{font-size:17px!important;}
+ .bramer-dash-action-grid{grid-template-columns:1fr;}
+ .bramer-dash-action-grid>button,.bramer-dash-action-upload{min-height:auto;padding:12px;}
+ .bramer-dash-action-visual{height:100px;}
+ .bramer-dash-current{align-items:start;flex-direction:column;}
+ .bramer-guide-content{padding:21px 17px;}
+ .bramer-guide-overview{padding:19px;margin:20px 0 25px;}
+ .bramer-guide-columns{grid-template-columns:1fr;gap:29px;}
+ .bramer-guide-bottom .bramer-dash-primary{width:100%;}
+ .bramer-guide-select select,.bramer-guide-search{font-size:16px!important;}
+}
