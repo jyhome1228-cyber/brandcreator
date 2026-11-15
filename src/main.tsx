@@ -9,6 +9,7 @@ import './nineworks-layout.css';
 import './typography-qa.css';
 import './landing.css';
 import './landing-integration.css';
+import './landing-motion.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
