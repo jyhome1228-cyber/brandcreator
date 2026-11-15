@@ -309,6 +309,7 @@ export default function App() {
               </div>
             </div>
             <div className="bramer-header-utilities">
+              <button className="bramer-save-button" type="button" onClick={() => navigateWorkspace('dashboard')}>대시보드</button>
               <label className="bramer-import-button">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={(event) => void restoreProject(event)} /></label>
               <button className="bramer-save-button" type="button" onClick={saveProject}>프로젝트 저장</button>
             </div>
@@ -813,7 +814,7 @@ export default function App() {
               <span className="project-name">{project.englishName} · {enabledPages.length} pages</span>
             </div>
           </div>
-          <div className="header-actions"><span className="bramer-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
+          <div className="header-actions"><button className="button ghost" onClick={() => navigateWorkspace('dashboard')}>대시보드</button><span className="bramer-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
             <button className="button ghost" onClick={saveProject}>프로젝트 저장</button>
             <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); window.location.hash = '/create'; }}>구성 변경</button>
             <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
