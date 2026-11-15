@@ -135,6 +135,16 @@ export default function Landing({ onStart }: LandingProps) {
             <a href="#/dashboard">제작 공간 둘러보기</a>
           </article>
         </div>
+        <section className="bramer-tech-section" id="technology" aria-labelledby="bramer-tech-title">
+          <h3 id="bramer-tech-title">Bramer는 이렇게 작동합니다.</h3>
+          <p>브레이머는 업로드한 SVG 로고와 브랜드 정보를 바탕으로 기본적인 사용 규칙을 구성합니다. 로고의 비율과 컬러를 분석하고, 사용자가 선택한 업종과 항목에 따라 가이드라인 페이지를 생성합니다.</p>
+          <div className="bramer-tech-grid">
+            <div><strong>SVG 분석</strong><span>로고의 구조·비율·컬러를 읽고 기본 규칙 설정에 활용합니다.</span></div>
+            <div><strong>업종별 구성</strong><span>초기 추천안을 제공하며 필요한 항목은 직접 추가하거나 제외할 수 있습니다.</span></div>
+            <div><strong>문서 생성과 편집</strong><span>페이지별 내용을 수정하고 SVG 또는 PDF로 결과물을 내보낼 수 있습니다.</span></div>
+          </div>
+          <p className="bramer-tech-note">로고 여백과 최소 크기는 자동 제안값이며 최종 인쇄·사용 환경에서 확인이 필요합니다. Illustrator AI 원본은 현재 직접 변환하지 않으므로 SVG로 내보내 업로드해 주세요. 자동 생성 항목은 브랜드별 검토가 필요합니다.</p>
+        </section>
         <div className="bramer-help-faq" id="faq">
           <h3>자주 묻는 질문</h3>
           <details><summary>어떤 로고 파일을 업로드해야 하나요?</summary><p>Primary Logo를 SVG 형식으로 준비해 주세요. SVG가 없으면 디자인 프로그램에서 벡터 형식으로 저장해야 합니다.</p></details>
@@ -151,9 +161,9 @@ export default function Landing({ onStart }: LandingProps) {
           <div className="bramer-footer-col"><h3>Bramer</h3><a href="#top">서비스 소개</a><a href="#preview">결과물 미리보기</a><a href="#how">이용 방법</a></div>
           <div className="bramer-footer-col"><h3>가이드라인</h3><a href="#/create">새 가이드라인 만들기</a><a href="#/dashboard">제작 대시보드</a><a href="#preview">샘플 가이드라인</a></div>
           <div className="bramer-footer-col"><h3>업종별 가이드</h3><a href="#/guide">업종별 추천 구성</a><a href="#/guide">필요한 가이드 항목</a><a href="#/guide">자료 체크리스트</a></div>
-          <div className="bramer-footer-col"><h3>자료 준비</h3><a href="#resources">준비 자료 안내</a><a href="#faq">SVG 업로드 안내</a><a href="#data-info">프로젝트 저장 안내</a></div>
+          <div className="bramer-footer-col"><h3>자료 준비</h3><a href="#resources">준비 자료 안내</a><a href="#technology">SVG 업로드 안내</a><a href="#data-info">프로젝트 저장 안내</a></div>
           <div className="bramer-footer-col"><h3>지원</h3><a href="#help">도움말</a><a href="#faq">자주 묻는 질문</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">업데이트 내역</a></div>
-          <div className="bramer-footer-col"><h3>이용 안내</h3><a href="#privacy-info">파일 이용 안내</a><a href="#data-info">저장 방식 안내</a><a href="#faq">서비스 기능 안내</a></div>
+          <div className="bramer-footer-col"><h3>이용 안내</h3><a href="#privacy-info">파일 이용 안내</a><a href="#data-info">저장 방식 안내</a><a href="#technology">기술 및 제작 방식</a></div>
         </div>
         <div className="bramer-footer-bottom"><div><strong>Bramer.</strong><span>브랜드 가이드라인 제작 서비스</span></div><small>현재 제공되는 기능을 기준으로 안내합니다.</small></div>
       </div>
