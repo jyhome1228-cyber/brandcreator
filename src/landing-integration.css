@@ -1,0 +1,3 @@
+.bramer-brand-home{border:0;background:transparent;padding:0;color:inherit;font:inherit;font-size:25px;font-weight:700;line-height:1;letter-spacing:-.065em!important;cursor:pointer;text-align:left;}
+.bramer-brand-home:hover{opacity:.65;}
+@media(max-width:767px){.bramer-brand-home{font-size:21px;}}
