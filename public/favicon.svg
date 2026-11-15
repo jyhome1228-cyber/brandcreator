@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-labelledby="title">
+  <title id="title">BRAMER B</title>
+  <rect width="64" height="64" rx="8" fill="#0B0B0B"/>
+  <path d="M20 13.5V50.5H33.2C41.8 50.5 46 46.2 46 40C46 34.9 42.5 31.8 36.6 31.1C41.5 30.3 44.2 27.1 44.2 22.6C44.2 17.1 40.3 13.5 32.4 13.5H20ZM24.5 17.4H32.1C37.6 17.4 39.8 19.3 39.8 23.2C39.8 27.6 36.8 29.2 31.8 29.2H24.5V17.4ZM24.5 33.1H32.8C39 33.1 41.5 35.1 41.5 39.7C41.5 44.2 38.6 46.6 32.9 46.6H24.5V33.1Z" fill="#FFFFFF"/>
+</svg>
