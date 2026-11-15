@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
+import BramerSelect from './components/BramerSelect';
 import { CATEGORIES, INDUSTRIES, INDUSTRY_GUIDANCE, getRecommendations, type IndustryId } from './engines/industryRecommendations';
 
 type DashboardProps = {
@@ -79,11 +80,9 @@ export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,on
             <p>업종에 따라 추천되는 구성요소와 준비할 자료를 확인해보세요. 원하는 항목은 제작 과정에서 직접 조정할 수 있습니다.</p>
           </div>
           <section className="bramer-dash-section bramer-guide-content">
-            <label className="bramer-guide-select">브랜드 업종
-              <select value={industry} onChange={e=>{setIndustry(e.target.value as IndustryId);setChecked({});setSearch('');}}>
-                {INDUSTRIES.map(item=><option key={item.id} value={item.id}>{item.label}</option>)}
-              </select>
-            </label>
+            <div className="bramer-guide-select"><span>브랜드 업종</span>
+              <BramerSelect ariaLabel="브랜드 업종 선택" value={industry} options={INDUSTRIES.map(item => ({ value: item.id, label: item.label }))} onChange={value => { setIndustry(value as IndustryId); setChecked({}); setSearch(''); }}/>
+            </div>
             <div className="bramer-guide-overview"><h2>{industryLabel}</h2><p>{INDUSTRY_GUIDANCE[industry].focus}</p><div>{INDUSTRY_GUIDANCE[industry].touchpoints.map(x=><span key={x}>{x}</span>)}</div></div>
             <div className="bramer-guide-columns">
               <div><h3>권장 가이드라인 구성</h3><div className="bramer-guide-items">{recommended.map(item=><div key={item.id}><div><strong>{names[item.id]}</strong><small>{item.description}</small></div><span>{recommendation[item.id]==='Core'?'기본':'추천'}</span></div>)}</div><p className="bramer-guide-footnote">추천 항목은 초기 실무 가이드이며, 브랜드 환경에 따라 조정할 수 있습니다.</p></div>
