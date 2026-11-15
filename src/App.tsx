@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
+import Dashboard from './Dashboard';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { generateGuidelinePages } from './guideline-system/generatePages';
 import { generateExtensionPages } from './guideline-system/extensionPages';
@@ -60,10 +61,25 @@ function isHex(value: string): boolean {
 
 export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
-  const [mode, setMode] = useState<'landing' | 'setup' | 'editor'>(() => location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : 'landing');
+  const [mode, setMode] = useState<'landing' | 'dashboard' | 'guide' | 'setup' | 'editor'>(() => location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/guide' ? 'guide' : 'landing');
   const enterWorkspace = () => {
+    window.location.hash = '/dashboard';
+    setMode('dashboard');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+  const openCreate = (nextIndustry?: IndustryId) => {
+    if (nextIndustry) {
+      setIndustry(nextIndustry);
+      setSelectedCategories(getDefaultSelection(nextIndustry));
+      setSetupStep(2);
+    } else setSetupStep(1);
     window.location.hash = '/create';
     setMode('setup');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+  const navigateWorkspace = (view: 'dashboard' | 'guide') => {
+    window.location.hash = view === 'guide' ? '/guide' : '/dashboard';
+    setMode(view);
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const goHome = () => {
@@ -73,7 +89,9 @@ export default function App() {
   };
   useEffect(() => {
     const syncRoute = () => {
-      if (window.location.hash === '#/create') setMode('setup');
+      if (window.location.hash === '#/dashboard') setMode('dashboard');
+      else if (window.location.hash === '#/guide') setMode('guide');
+      else if (window.location.hash === '#/create') setMode('setup');
       else if (window.location.hash === '#/editor') setMode(previous => previous === 'editor' ? 'editor' : 'setup');
       else setMode('landing');
     };
@@ -267,6 +285,16 @@ export default function App() {
   };
 
   if (mode === 'landing') return <Landing onStart={enterWorkspace} />;
+  if (mode === 'dashboard' || mode === 'guide') return <Dashboard
+    view={mode}
+    onNavigate={navigateWorkspace}
+    onHome={goHome}
+    onCreate={openCreate}
+    onContinue={() => { window.location.hash = '/create'; setMode('setup'); }}
+    onImport={event => void restoreProject(event)}
+    currentProject={project.name.trim() || undefined}
+    currentIndustry={industry}
+  />;
 
   if (mode === 'setup') {
     return (
