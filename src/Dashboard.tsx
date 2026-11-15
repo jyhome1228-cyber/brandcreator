@@ -45,9 +45,9 @@ export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,on
     <div className="bramer-dash-layout">
       <aside className="bramer-dash-sidebar" aria-label="서비스 메뉴">
         <div className="bramer-dash-nav">
-          <button type="button" className={view==='dashboard'?'active':''} aria-current={view==='dashboard'?'page':undefined} onClick={()=>onNavigate('dashboard')}><span className="bramer-dash-nav-icon">▦</span>홈</button>
-          <button type="button" className={view==='guide'?'active':''} aria-current={view==='guide'?'page':undefined} onClick={()=>onNavigate('guide')}><span className="bramer-dash-nav-icon">☷</span>업종별 가이드</button>
-          <button type="button" onClick={()=>onCreate()}><span className="bramer-dash-nav-icon">＋</span>새로 만들기</button>
+          <button type="button" className={view==='dashboard'?'active':''} aria-current={view==='dashboard'?'page':undefined} onClick={()=>onNavigate('dashboard')}>홈</button>
+          <button type="button" className={view==='guide'?'active':''} aria-current={view==='guide'?'page':undefined} onClick={()=>onNavigate('guide')}>업종별 가이드</button>
+          <button type="button" onClick={()=>onCreate()}>새로 만들기</button>
         </div>
         <div className="bramer-dash-sidebar-bottom">
           <p>처음 만드는 브랜드 가이드라인도 필요한 항목부터 차근차근 구성해 보세요.</p>
