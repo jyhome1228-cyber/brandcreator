@@ -173,6 +173,11 @@ export default function App() {
     const file = event.target.files?.[0];
     if (!file) return;
     setError('');
+    if (/\.ai$/i.test(file.name)) {
+      setError('AI 원본 파일은 아직 직접 변환할 수 없습니다. Illustrator에서 파일 > 다른 이름으로 저장 > SVG를 선택한 후 업로드해 주세요. PDF 호환 AI라도 내부 벡터 구조에 따라 변환 품질이 달라집니다.');
+      event.target.value = '';
+      return;
+    }
     try {
       const raw = await file.text();
       const logo = parseLogoSvg(raw, file.name);
@@ -454,10 +459,10 @@ export default function App() {
                     <span className="module-state">{project.logo ? 'Detected' : 'Required'}</span>
                   </div>
                   <label className={`upload-zone creator-upload ${project.logo ? 'has-file' : ''}`}>
-                    <input type="file" accept=".svg,image/svg+xml" onChange={handleLogo} />
+                    <input type="file" accept=".svg,.ai,image/svg+xml,application/postscript" onChange={handleLogo} />
                     <span className="upload-icon">{project.logo ? '✓' : '+'}</span>
                     <strong>{project.logo ? project.logo.fileName : 'Primary Logo SVG'}</strong>
-                    <span>{project.logo ? `Ratio ${project.logo.aspectRatio.toFixed(2)} : 1 · ${project.logo.colors.length} colors detected` : 'SVG 파일을 올리면 컬러와 비율을 자동 분석합니다.'}</span>
+                    <span>{project.logo ? `Ratio ${project.logo.aspectRatio.toFixed(2)} : 1 · ${project.logo.colors.length} colors detected` : 'SVG를 업로드하면 컬러와 비율을 분석합니다. AI 원본은 Illustrator에서 SVG로 저장한 후 업로드해 주세요.'}</span>
                     <em>{project.logo ? '파일 변경' : '파일 선택'}</em>
                   </label>
                   {project.logo ? (
@@ -817,8 +822,8 @@ export default function App() {
       </header>
 
       <div className="bramer-editor-overview">
-        <div><span>BRAMER / GUIDELINE EDITOR</span><h1>{project.englishName || project.name}</h1></div>
-        <div><strong>{enabledPages.length} PAGES</strong><small>{industryLabel} · A4 Landscape</small></div>
+        <div><span>가이드라인 편집</span><h1>{project.englishName || project.name}</h1></div>
+        <div><strong>{enabledPages.length}개 페이지</strong><small>{industryLabel} · A4 Landscape</small></div>
       </div>
       <main className="editor-layout">
         <aside className="page-sidebar" aria-label="가이드라인 목차">
@@ -863,12 +868,12 @@ export default function App() {
           <div className="preview-toolbar creator-preview-toolbar">
             <div className="preview-title-block">
               <span className="metadata-label">{currentPage.title}</span>
-              <strong>{currentPage.subtitle || currentPage.id}</strong>
+              <strong>{currentPage.subtitle || currentPage.title}</strong>
             </div>
             <div className="preview-toolbar-meta">
               <span>{String(currentPageNumber).padStart(2, '0')} / {String(pages.length).padStart(2, '0')}</span>
-              <span>A4 Landscape</span>
-              <span>SVG Vector</span>
+              <span>A4 가로형</span>
+              <span>벡터 문서</span>
               <button className="button tertiary small" onClick={() => downloadSvg(currentPage, project.englishName || project.name)}>SVG 다운로드</button>
             </div>
           </div>
@@ -879,7 +884,7 @@ export default function App() {
 
         <aside className="settings-panel">
           <div className="settings-heading">
-            <p className="eyebrow">PAGE SETTINGS</p>
+            <p className="eyebrow">페이지 설정</p>
             <h2>{currentPage.subtitle || currentPage.title}</h2>
           </div>
 
@@ -891,7 +896,7 @@ export default function App() {
           </div>
 
           <div className="setting-group">
-            <h3>Logo Rules</h3>
+            <h3>로고 사용 규정</h3>
             <label className="field compact">
               <span>Clear Space</span>
               <div className="suffix-input"><input type="number" min="0.1" max="2" step="0.05" value={project.rules.clearSpace} onChange={(e) => setProject((previous) => ({ ...previous, rules: { ...previous.rules, clearSpace: Number(e.target.value) } }))} /><span>X</span></div>
@@ -939,7 +944,7 @@ export default function App() {
           ) : null}
 
           <div className="setting-group">
-            <h3>Document</h3>
+            <h3>문서 정보</h3>
             <div className="spec-row"><span>Artboard</span><strong>A4 Landscape</strong></div>
             <div className="spec-row"><span>Size</span><strong>297 × 210 mm</strong></div>
             <div className="spec-row"><span>Tracking</span><strong>-3%</strong></div>

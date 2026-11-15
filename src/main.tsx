@@ -23,3 +23,5 @@ import './site-navigation.css';
 import './create-dashboard.css';
 
 import './select.css';
+
+import './editor-refresh.css';
