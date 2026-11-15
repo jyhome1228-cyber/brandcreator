@@ -40,7 +40,7 @@ export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,on
   const selectedDocs = documents[industry].filter(item=>item.toLowerCase().includes(search.toLowerCase()));
   return <div className="bramer-dash">
     <header className="bramer-dash-header">
-      <button className="bramer-dash-logo" onClick={onHome} type="button" aria-label="Bramer 랜딩페이지로 이동">Bramer.</button>
+      <button className="bramer-dash-logo" onClick={onHome} type="button" aria-label="Bramer 랜딩페이지로 이동">BRAMER.</button>
       <span className="bramer-dash-product">브랜드 가이드라인 제작</span>
       <button className="bramer-dash-header-start" onClick={()=>onCreate()} type="button">새 가이드라인 만들기</button>
     </header>

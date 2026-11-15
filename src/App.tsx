@@ -307,7 +307,7 @@ export default function App() {
     return (
       <div className="bramer-dash bramer-create-shell setup-mode">
         <header className="bramer-dash-header">
-          <button type="button" className="bramer-dash-logo" onClick={goHome} aria-label="Bramer 서비스 소개로 이동">Bramer.</button>
+          <button type="button" className="bramer-dash-logo" onClick={goHome} aria-label="Bramer 서비스 소개로 이동">BRAMER.</button>
           <span className="bramer-dash-product">브랜드 가이드라인 제작</span>
           <button type="button" className="bramer-dash-header-start" onClick={saveProject}>프로젝트 저장</button>
         </header>
@@ -809,7 +809,7 @@ export default function App() {
           <div className="product-brand editor-product-brand">
             <span className="product-mark">g.</span>
             <div>
-              <button type="button" className="bramer-brand-home" onClick={goHome} aria-label="Bramer 홈으로 이동">Bramer.</button>
+              <button type="button" className="bramer-brand-home" onClick={goHome} aria-label="Bramer 홈으로 이동">BRAMER.</button>
               <span className="project-name">{project.englishName} · {enabledPages.length} pages</span>
             </div>
           </div>

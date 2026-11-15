@@ -1,0 +1,29 @@
+/* BRAMER. unified thin uppercase wordmark
+   Visual reference: light geometric sans uppercase, generous but restrained spacing. */
+.bramer-landing .bramer-site-logo,
+.bramer-landing .bramer-footer-bottom strong,
+.bramer-dash .bramer-dash-logo,
+.bramer-create-shell .bramer-dash-logo,
+.app-shell .bramer-brand-home,
+.editor-mode .editor-product-brand .bramer-brand-home,
+.app-shell .product-brand .brand-title {
+  font-family: Pretendard, 'Helvetica Neue', Arial, sans-serif !important;
+  font-weight: 300 !important;
+  font-synthesis: none !important;
+  letter-spacing: .015em !important;
+  line-height: 1.15 !important;
+  text-transform: uppercase !important;
+  white-space: nowrap;
+}
+.bramer-landing .bramer-site-logo{font-size:25px !important;}
+.bramer-landing .bramer-footer-bottom strong{font-size:23px !important;}
+.bramer-dash .bramer-dash-logo,
+.bramer-create-shell .bramer-dash-logo,
+.app-shell .bramer-brand-home,
+.editor-mode .editor-product-brand .bramer-brand-home{font-size:24px !important;}
+@media(max-width:760px){
+  .bramer-landing .bramer-site-logo{font-size:22px !important;}
+  .bramer-landing .bramer-footer-bottom strong{font-size:21px !important;}
+  .bramer-dash .bramer-dash-logo,.bramer-create-shell .bramer-dash-logo,
+  .app-shell .bramer-brand-home,.editor-mode .editor-product-brand .bramer-brand-home{font-size:21px !important;}
+}
