@@ -1,0 +1,111 @@
+/* BRAMER typography + content QA 2026-11-15
+   Final stylesheet in cascade; SVG guideline artboards and print output remain unchanged. */
+:root {
+  --br-type-xxs: 11px;
+  --br-type-xs: 12px;
+  --br-type-sm: 13px;
+  --br-type-md: 14px;
+  --br-type-body: 14px;
+  --br-type-section: 21px;
+  --br-type-page: 30px;
+}
+.app-shell:not(.bramer-intro) {font-size:var(--br-type-body);line-height:1.55;}
+.setup-mode, .editor-mode {overflow-x:clip;}
+.setup-mode :is(.setup-main,.module-content,.setup-preview-panel,.preview-sticky,.setup-module-stack),
+.editor-mode :is(.page-sidebar,.preview-area,.settings-panel) {min-width:0;}
+/* Explicit, bounded type scale: no large accidental inherited heading sizes. */
+.bramer-workspace-heading h1 {font-size:clamp(25px,2.3vw,32px)!important;line-height:1.26!important;font-weight:600;}
+.bramer-editor-overview h1 {font-size:clamp(24px,2.4vw,34px)!important;line-height:1.28!important;font-weight:600;}
+.setup-panel .module-heading h2 {font-size:clamp(19px,1.7vw,23px)!important;line-height:1.35!important;font-weight:650;}
+.setup-panel .module-heading {align-items:start;min-width:0;}
+.setup-panel .module-heading>div {min-width:0;}
+.setup-panel .module-heading .module-state {font-size:11px;line-height:1.25;padding:5px 9px;height:auto;max-width:95px;text-align:center;white-space:normal;}
+.bramer-workspace-heading p,.step-nav-head p,.module-description,.bramer-research-note {font-size:13px!important;line-height:1.68!important;}
+.setup-panel .module-kicker,.bramer-workspace-kicker,.bramer-editor-overview>div:first-child>span {font-size:10px!important;line-height:1.4;}
+.setup-mode .setup-module :is(.field>span,.system-block-title strong,.analysis-heading strong) {font-size:12px!important;line-height:1.55;}
+.setup-mode .setup-module :is(input:not([type="checkbox"]),textarea,select) {font-size:13px!important;}
+.setup-panel .field textarea {line-height:1.65!important;}
+.setup-panel :is(input,textarea,select) {max-width:100%;}
+.setup-panel .field-grid,.setup-panel .rules-grid,.setup-panel .system-split {min-width:0;}
+/* Steps and progress: readable and compact without artificial microtext. */
+.setup-step-nav .step-nav-head strong {font-size:15px!important;line-height:1.4;}
+.setup-step-nav .step-nav-copy strong {font-size:12px!important;line-height:1.4;}
+.setup-step-nav .step-nav-copy small {font-size:10px!important;line-height:1.4;}
+.setup-step-nav .step-nav-number {font-size:10px!important;}
+.setup-step-nav .step-nav-progress :is(span,strong) {font-size:11px!important;line-height:1.45;}
+.setup-actions .action-copy strong {font-size:13px!important;line-height:1.5;}
+.setup-actions .action-copy span {font-size:11px!important;line-height:1.45;}
+.setup-actions .action-step {font-size:10px!important;}
+.setup-actions .button {font-size:12px!important;line-height:1.3;white-space:normal;}
+/* Industry cards and supporting messages. */
+.bramer-module-card {gap:8px;min-width:0;}
+.bramer-module-title {font-size:13px!important;line-height:1.4!important;overflow-wrap:break-word;}
+.bramer-module-description {font-size:11px!important;line-height:1.55!important;}
+.bramer-tier {font-size:10px!important;line-height:1.2;}
+.bramer-selection-summary strong {font-size:12px!important;}
+.bramer-selection-summary span,.bramer-selection-summary button {font-size:11px!important;line-height:1.5;}
+.bramer-industry-picker>span {font-size:13px!important;}
+/* SVG analysis: accurate information hierarchy, not giant labels/numbers. */
+.setup-mode .svg-analysis .analysis-heading strong {font-size:14px!important;}
+.setup-mode .svg-analysis .analysis-heading .metadata-label {font-size:10px!important;}
+.setup-mode .svg-analysis .analysis-confidence {font-size:11px!important;}
+.setup-mode .svg-analysis .analysis-primary-card strong,
+.setup-mode .svg-analysis .analysis-metric strong {font-size:16px!important;line-height:1.25!important;overflow-wrap:anywhere;}
+.setup-mode .svg-analysis .analysis-primary-card>span,
+.setup-mode .svg-analysis .analysis-metric>span,
+.setup-mode .svg-analysis .analysis-detail-row span,
+.setup-mode .svg-analysis .recommendation-grid span {font-size:10px!important;line-height:1.4;}
+.setup-mode .svg-analysis .analysis-primary-card small,
+.setup-mode .svg-analysis .analysis-metric small,
+.setup-mode .svg-analysis .recommendation-grid small {font-size:10px!important;line-height:1.5;}
+.setup-mode .svg-analysis .analysis-detail-row strong {font-size:11px!important;line-height:1.5;}
+.setup-mode .svg-analysis .recommendation-grid strong {font-size:17px!important;line-height:1.35;}
+.setup-mode .svg-analysis .recommendation-reasons :is(span,small,p) {font-size:11px!important;line-height:1.6;}
+.setup-mode .creator-upload :is(strong,span,em),.setup-mode .detected-colors :is(small,button) {font-size:12px!important;line-height:1.5;}
+.setup-mode .system-block-title>span,.setup-mode .system-index {font-size:10px!important;}
+/* Preview: keep the graphic itself editorial, keep side metadata usable. */
+.setup-preview-panel .preview-panel-heading strong {font-size:14px!important;line-height:1.45;}
+.setup-preview-panel .preview-format {font-size:10px!important;}
+.setup-preview-panel .preview-stat span {font-size:10px!important;}
+.setup-preview-panel .preview-stat strong {font-size:18px!important;line-height:1.3;}
+.setup-preview-panel .preview-stat small {font-size:10px!important;line-height:1.4;}
+.setup-preview-panel .preview-progress-card :is(p,span,strong) {font-size:11px!important;line-height:1.55;}
+.setup-preview-panel .page-structure-heading strong {font-size:13px!important;}
+.setup-preview-panel .structure-row :is(.structure-number,.structure-section) {font-size:10px!important;}
+.setup-preview-panel .structure-title {font-size:11px!important;}
+.setup-preview-panel .bramer-onboarding-note strong {font-size:13px!important;}
+.setup-preview-panel .bramer-onboarding-note p {font-size:11px!important;line-height:1.65;}
+/* Editor: secondary interface stays below project title in hierarchy. */
+.editor-mode .sidebar-heading {font-size:11px!important;}
+.editor-mode .page-group-label {font-size:10px!important;}
+.editor-mode .page-select {font-size:12px!important;line-height:1.45;}
+.editor-mode .page-select span:first-child {font-size:10px!important;}
+.editor-mode .preview-title-block .metadata-label {font-size:10px!important;}
+.editor-mode .preview-title-block strong {font-size:14px!important;line-height:1.45;}
+.editor-mode .preview-toolbar-meta :is(span,button) {font-size:11px!important;}
+.editor-mode .settings-heading h2 {font-size:18px!important;line-height:1.4;overflow-wrap:anywhere;}
+.editor-mode .setting-group h3 {font-size:13px!important;line-height:1.45;}
+.editor-mode .field.compact>span,.editor-mode .spec-row {font-size:12px!important;line-height:1.5;}
+.editor-mode .setting-group textarea,.editor-mode .setting-group input {font-size:13px!important;line-height:1.55;}
+.editor-mode .bramer-setting-note {font-size:12px!important;line-height:1.6;}
+.editor-mode .header-actions button {font-size:12px!important;}
+.editor-mode .bramer-editor-industry {font-size:11px!important;}
+/* Prevent long project names and labels from breaking the columns. */
+.bramer-editor-overview>div:first-child,.bramer-workspace-heading>div:first-child,.editor-mode .settings-panel {min-width:0;}
+.bramer-editor-overview h1 {overflow-wrap:anywhere;}
+.bramer-editor-overview>div:last-child {max-width:40%;white-space:normal;}
+.editor-mode .page-select span:last-child {overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+/* Mobile input legibility; no accidental iOS zoom from small font controls. */
+@media(max-width:767px) {
+ .bramer-workspace-heading h1 {font-size:24px!important;}
+ .bramer-editor-overview h1 {font-size:23px!important;}
+ .setup-panel .module-heading h2 {font-size:20px!important;}
+ .setup-mode .setup-module :is(input:not([type="checkbox"]),textarea,select),
+ .editor-mode .setting-group :is(input,textarea,select) {font-size:16px!important;}
+ .setup-step-nav .step-nav-copy strong {font-size:11px!important;}
+ .setup-actions .action-copy strong {font-size:12px!important;}
+ .setup-actions .button {font-size:12px!important;}
+ .setup-preview-panel .page-structure-list {max-height:270px;overflow:auto;}
+ .editor-mode .header-actions {width:100%;justify-content:flex-start!important;}
+ .editor-mode .header-actions button {font-size:11px!important;min-height:38px;}
+}
