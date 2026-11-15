@@ -9,7 +9,7 @@
 }
 .bramer-create-shell .setup-step-nav {
   display:block!important;position:static!important;top:auto!important;
-  width:100%;padding:7px 0 16px!important;margin:0 0 24px!important;
+  width:100%!important;max-width:930px!important;padding:7px 0 16px!important;margin:0 auto 24px!important;
   background:transparent!important;border:0!important;border-bottom:1px solid #e6e6e3!important;
   border-radius:0!important;box-shadow:none!important;color:#333!important;
 }
@@ -34,7 +34,7 @@
 .bramer-create-shell .step-nav-copy strong {display:block;font-size:12px!important;line-height:1.4!important;white-space:normal!important;font-weight:650;}
 .bramer-create-shell .step-nav-copy small,.bramer-create-shell .step-nav-item i {display:none!important;}
 .bramer-create-shell .setup-main {display:block!important;width:100%!important;min-width:0!important;}
-.bramer-create-shell .bramer-workspace-heading {max-width:930px;display:block;margin:0 auto 25px;padding:0 0 23px;border-bottom:0;text-align:left;}
+.bramer-create-shell .bramer-workspace-heading {width:100%!important;max-width:930px!important;display:block;margin:0 auto 25px!important;padding:0 0 23px;border-bottom:0;text-align:left;}
 .bramer-create-shell .bramer-workspace-kicker {font-size:11px!important;font-weight:500;color:#8c8c8c;letter-spacing:0!important;}
 .bramer-create-shell .bramer-workspace-heading h1 {font-size:clamp(24px,2.4vw,32px)!important;line-height:1.38!important;letter-spacing:-.045em!important;font-weight:650;margin:12px 0;}
 .bramer-create-shell .bramer-workspace-heading p {font-size:13px!important;color:#777;line-height:1.75!important;max-width:720px;margin:0;}
@@ -90,4 +90,62 @@
  .bramer-create-shell .preview-sticky {display:block!important;}
  .bramer-create-shell .creator-document-preview {margin-bottom:12px;}
  .bramer-create-shell .preview-system-grid,.bramer-create-shell .preview-progress-card,.bramer-create-shell .bramer-onboarding-note,.bramer-create-shell .page-structure-card {margin:10px 0!important;}
+}
+
+/* One centered alignment grid: progress tabs, headline, form, actions, preview. */
+.bramer-create-shell .setup-workspace {
+  --bramer-form-width: 930px;
+  align-items: center !important;
+}
+.bramer-create-shell .setup-step-nav,
+.bramer-create-shell .setup-main,
+.bramer-create-shell .bramer-workspace-heading,
+.bramer-create-shell .setup-module-stack,
+.bramer-create-shell .setup-actions,
+.bramer-create-shell .setup-preview-panel {
+  width: min(100%, var(--bramer-form-width)) !important;
+  max-width: var(--bramer-form-width) !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  box-sizing: border-box;
+}
+.bramer-create-shell .setup-main {
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: stretch !important;
+}
+.bramer-create-shell .setup-panel,
+.bramer-create-shell .step-actions {
+  width: 100% !important;
+}
+.bramer-create-shell .setup-step-nav {
+  align-self: center !important;
+}
+.bramer-create-shell .step-nav-list {
+  width: 100%;
+  min-width: 0;
+}
+.bramer-create-shell .setup-panel .module-content {
+  width: 100%;
+  box-sizing: border-box;
+}
+.bramer-create-shell .setup-panel .field-grid > *,
+.bramer-create-shell .setup-panel .system-split > * {
+  min-width: 0;
+}
+@media (max-width:760px) {
+  .bramer-create-shell .setup-step-nav,
+  .bramer-create-shell .setup-main,
+  .bramer-create-shell .bramer-workspace-heading,
+  .bramer-create-shell .setup-module-stack,
+  .bramer-create-shell .setup-actions,
+  .bramer-create-shell .setup-preview-panel {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  .bramer-create-shell .step-nav-list {
+    max-width: 100%;
+    overflow-x: auto !important;
+  }
 }
