@@ -1,0 +1,96 @@
+/* Bramer native-select replacement. Shared by dashboard and guideline creation. */
+.bramer-custom-select{
+  position:relative;
+  width:100%;
+  min-width:0;
+  z-index:1;
+  font-family:Pretendard,'Apple SD Gothic Neo',sans-serif;
+}
+.bramer-custom-select.is-open{z-index:90;}
+.bramer-custom-select .bramer-select-trigger{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  width:100%;
+  min-width:0;
+  min-height:47px;
+  padding:0 15px;
+  background:#fff;
+  color:#1b1b1b;
+  border:1px solid #d7d7d4;
+  border-radius:8px;
+  box-shadow:none;
+  text-align:left;
+  font-family:inherit;
+  font-size:14px!important;
+  font-weight:570;
+  line-height:1.5;
+  letter-spacing:-.02em!important;
+  transition:border-color .15s ease,background .15s ease;
+  cursor:pointer;
+}
+.bramer-select-trigger span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.bramer-select-trigger svg{flex:0 0 auto;transition:transform .18s ease;}
+.bramer-custom-select.is-open .bramer-select-trigger svg{transform:rotate(180deg);}
+.bramer-custom-select .bramer-select-trigger:hover{border-color:#aaa9a5;}
+.bramer-custom-select.is-open .bramer-select-trigger{border-color:#4d4d4d;}
+.bramer-custom-select .bramer-select-trigger:focus-visible{outline:2px solid #222!important;outline-offset:3px!important;}
+.bramer-select-list{
+  position:absolute;
+  z-index:100;
+  top:calc(100% + 7px);
+  left:0;
+  right:0;
+  padding:7px;
+  max-height:min(300px,45vh);
+  overflow-y:auto;
+  overscroll-behavior:contain;
+  background:#fff;
+  border:1px solid #e0e0dd;
+  border-radius:10px;
+  box-shadow:0 15px 35px rgba(0,0,0,.11),0 2px 8px rgba(0,0,0,.03);
+  scrollbar-width:thin;
+  outline:none;
+}
+.bramer-select-option{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:15px;
+  min-height:39px;
+  padding:9px 12px;
+  border-radius:6px;
+  background:transparent;
+  color:#424242;
+  font-size:13px;
+  line-height:1.45;
+  font-weight:500;
+  cursor:pointer;
+  user-select:none;
+}
+.bramer-select-option span{min-width:0;overflow-wrap:anywhere;}
+.bramer-select-option svg{flex:0 0 auto;color:#161616;}
+.bramer-select-option.is-active{background:#f1f1ef;}
+.bramer-select-option.is-selected{font-weight:680;color:#111;}
+.bramer-select-option.is-selected.is-active{background:#e8e8e5;}
+/* Native form wrappers previously clipped all absolute menus. */
+.bramer-create-shell .setup-panel.active,
+.bramer-create-shell .setup-module,
+.bramer-create-shell .module-content,
+.bramer-create-shell .system-split,
+.bramer-create-shell .system-block,
+.bramer-create-shell .bramer-industry-picker,
+.bramer-create-shell .field{
+  overflow:visible!important;
+}
+.bramer-create-shell .setup-panel.active:has(.bramer-custom-select.is-open){position:relative;z-index:20;}
+.bramer-create-shell .bramer-industry-picker .bramer-custom-select{margin-top:10px;}
+.bramer-dash .bramer-guide-select .bramer-custom-select{margin-top:0;}
+.bramer-create-shell .field:has(.bramer-custom-select.is-open){z-index:30;position:relative;}
+@media(max-width:760px){
+  .bramer-custom-select .bramer-select-trigger{min-height:48px;font-size:16px!important;}
+  .bramer-select-option{min-height:44px;font-size:14px;}
+  .bramer-select-list{max-height:min(270px,45vh);}
+}
+@media(prefers-reduced-motion:reduce){.bramer-select-trigger,.bramer-select-trigger svg{transition:none!important;}}
