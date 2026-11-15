@@ -70,6 +70,8 @@ export default function Landing({ onStart }: LandingProps) {
         <nav aria-label="메인 메뉴" className="bramer-site-menu">
           <a href="#preview">서비스 소개</a>
           <a href="#how">이용 방법</a>
+          <a href="#/guide">업종별 가이드</a>
+          <a href="#help">도움말</a>
         </nav>
         <button type="button" className="bramer-site-start" onClick={onStart}>시작하기</button>
       </div>
@@ -110,7 +112,51 @@ export default function Landing({ onStart }: LandingProps) {
         <p>로고에서 시작해, 브랜드를 더 일관되게.</p>
         <button type="button" className="bramer-home-primary" onClick={onStart}>지금 시작하기</button>
       </section>
+<section className="bramer-help-section" id="help" aria-labelledby="bramer-help-heading">
+      <div className="bramer-help-inner">
+        <div className="bramer-home-section-heading">
+          <h2 id="bramer-help-heading">이용하면서 궁금한 점이 있나요?</h2>
+          <p>준비할 자료부터 파일 저장까지, 자주 묻는 내용을 모았어요.</p>
+        </div>
+        <div className="bramer-help-grid">
+          <article id="resources">
+            <h3>준비할 자료</h3>
+            <p>브랜드명과 SVG 로고를 먼저 준비해 주세요. 업종에 따라 컬러 정보, 제품 사진, 패키지 이미지 등을 추가하면 좋아요.</p>
+            <a href="#/guide">업종별 준비 자료 확인</a>
+          </article>
+          <article id="data-info">
+            <h3>프로젝트 저장과 불러오기</h3>
+            <p>현재는 계정 저장 방식이 아니에요. 제작 중인 프로젝트를 JSON 파일로 저장하고, 대시보드에서 다시 불러올 수 있어요.</p>
+            <a href="#/dashboard">대시보드 열기</a>
+          </article>
+          <article id="privacy-info">
+            <h3>파일 이용 안내</h3>
+            <p>입력한 브랜드 자료는 브라우저에서 가이드라인을 구성하는 데 사용됩니다. 별도의 계정 및 클라우드 저장 기능은 현재 제공하지 않아요.</p>
+            <a href="#/dashboard">제작 공간 둘러보기</a>
+          </article>
+        </div>
+        <div className="bramer-help-faq" id="faq">
+          <h3>자주 묻는 질문</h3>
+          <details><summary>어떤 로고 파일을 업로드해야 하나요?</summary><p>Primary Logo를 SVG 형식으로 준비해 주세요. SVG가 없으면 디자인 프로그램에서 벡터 형식으로 저장해야 합니다.</p></details>
+          <details><summary>업종별 추천 항목을 수정할 수 있나요?</summary><p>네. 추천 항목은 제작 화면에서 추가하거나 제외할 수 있습니다. 현재의 추천값은 연구 검증 전의 초기 설정입니다.</p></details>
+          <details><summary>완성한 가이드라인은 어떻게 저장하나요?</summary><p>페이지별 SVG, 전체 SVG 또는 PDF로 내보낼 수 있습니다. 이후 수정할 계획이라면 프로젝트 JSON도 별도로 저장해 주세요.</p></details>
+          <details><summary>모든 가이드라인이 자동으로 완성되나요?</summary><p>로고와 컬러의 기본 규칙은 자동으로 구성할 수 있지만, 사진 스타일·언어·응용 디자인 등은 브랜드별 내용을 직접 확정해야 합니다.</p></details>
+        </div>
+      </div>
+    </section>
     </main>
-    <footer className="bramer-home-footer"><span>Bramer.</span><span>브랜드 가이드라인 제작 서비스</span></footer>
+    <footer className="bramer-home-footer">
+      <div className="bramer-footer-inner">
+        <div className="bramer-footer-columns">
+          <div className="bramer-footer-col"><h3>Bramer</h3><a href="#top">서비스 소개</a><a href="#preview">결과물 미리보기</a><a href="#how">이용 방법</a></div>
+          <div className="bramer-footer-col"><h3>가이드라인</h3><a href="#/create">새 가이드라인 만들기</a><a href="#/dashboard">제작 대시보드</a><a href="#preview">샘플 가이드라인</a></div>
+          <div className="bramer-footer-col"><h3>업종별 가이드</h3><a href="#/guide">업종별 추천 구성</a><a href="#/guide">필요한 가이드 항목</a><a href="#/guide">자료 체크리스트</a></div>
+          <div className="bramer-footer-col"><h3>자료 준비</h3><a href="#resources">준비 자료 안내</a><a href="#faq">SVG 업로드 안내</a><a href="#data-info">프로젝트 저장 안내</a></div>
+          <div className="bramer-footer-col"><h3>지원</h3><a href="#help">도움말</a><a href="#faq">자주 묻는 질문</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">업데이트 내역</a></div>
+          <div className="bramer-footer-col"><h3>이용 안내</h3><a href="#privacy-info">파일 이용 안내</a><a href="#data-info">저장 방식 안내</a><a href="#faq">서비스 기능 안내</a></div>
+        </div>
+        <div className="bramer-footer-bottom"><div><strong>Bramer.</strong><span>브랜드 가이드라인 제작 서비스</span></div><small>현재 제공되는 기능을 기준으로 안내합니다.</small></div>
+      </div>
+    </footer>
   </div>;
 }
