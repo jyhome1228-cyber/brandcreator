@@ -1,4 +1,4 @@
-import { useMemo, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { generateGuidelinePages } from './guideline-system/generatePages';
@@ -58,6 +58,21 @@ function isHex(value: string): boolean {
 }
 
 export default function App() {
+  const [introVisible, setIntroVisible] = useState(() => {
+    try { return sessionStorage.getItem('bramer-intro-seen') !== '1'; } catch { return true; }
+  });
+  useEffect(() => {
+    if (!introVisible) return;
+    const timer = window.setTimeout(() => {
+      setIntroVisible(false);
+      try { sessionStorage.setItem('bramer-intro-seen', '1'); } catch { /* unavailable storage */ }
+    }, 1500);
+    return () => window.clearTimeout(timer);
+  }, [introVisible]);
+  const dismissIntro = () => {
+    setIntroVisible(false);
+    try { sessionStorage.setItem('bramer-intro-seen', '1'); } catch { /* unavailable storage */ }
+  };
   const [project, setProject] = useState<BrandProject>(initialProject);
   const [mode, setMode] = useState<'setup' | 'editor'>('setup');
   const [setupStep, setSetupStep] = useState<1 | 2 | 3 | 4>(1);
@@ -244,12 +259,16 @@ export default function App() {
   if (mode === 'setup') {
     return (
       <div className="app-shell setup-mode">
+        {introVisible ? <div className="bramer-intro" role="status" aria-label="Bramer 시작 화면">
+          <div className="bramer-intro-content"><strong>Bramer.</strong><span>BRAND IDENTITY CREATOR</span></div>
+          <button type="button" onClick={dismissIntro} aria-label="인트로 건너뛰기">SKIP</button>
+        </div> : null}
         <header className="topbar product-topbar">
           <div className="topbar-inner product-topbar-inner">
             <div className="product-brand">
               <span className="product-mark">g.</span>
               <div>
-                <strong className="brand-title">bramer</strong>
+                <strong className="brand-title">Bramer.</strong>
                 <span className="topbar-meta">Brand Identity Creator</span>
               </div>
             </div>
@@ -270,7 +289,7 @@ export default function App() {
             <div className="step-nav-head">
               <span className="metadata-label">PROJECT SETUP</span>
               <strong>브랜드 시스템 설정</strong>
-              <p>로고를 올리고, 필요한 브랜드 규칙을 직접 선택하세요. 브레이머이 가이드라인의 기본 구조를 구성합니다.</p>
+              <p>로고를 올리고, 필요한 브랜드 규칙을 직접 선택하세요. 브레이머가 가이드라인의 기본 구조를 구성합니다.</p>
             </div>
             <div className="step-nav-list">
               {([
@@ -726,7 +745,7 @@ export default function App() {
           <div className="product-brand editor-product-brand">
             <span className="product-mark">g.</span>
             <div>
-              <strong className="brand-title">bramer</strong>
+              <strong className="brand-title">Bramer.</strong>
               <span className="project-name">{project.englishName} · {enabledPages.length} pages</span>
             </div>
           </div>
