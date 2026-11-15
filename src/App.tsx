@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
+import Landing from './Landing';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { generateGuidelinePages } from './guideline-system/generatePages';
 import { generateExtensionPages } from './guideline-system/extensionPages';
@@ -58,23 +59,27 @@ function isHex(value: string): boolean {
 }
 
 export default function App() {
-  const [introVisible, setIntroVisible] = useState(() => {
-    try { return sessionStorage.getItem('bramer-intro-seen') !== '1'; } catch { return true; }
-  });
-  useEffect(() => {
-    if (!introVisible) return;
-    const timer = window.setTimeout(() => {
-      setIntroVisible(false);
-      try { sessionStorage.setItem('bramer-intro-seen', '1'); } catch { /* unavailable storage */ }
-    }, 1500);
-    return () => window.clearTimeout(timer);
-  }, [introVisible]);
-  const dismissIntro = () => {
-    setIntroVisible(false);
-    try { sessionStorage.setItem('bramer-intro-seen', '1'); } catch { /* unavailable storage */ }
-  };
   const [project, setProject] = useState<BrandProject>(initialProject);
-  const [mode, setMode] = useState<'setup' | 'editor'>('setup');
+  const [mode, setMode] = useState<'landing' | 'setup' | 'editor'>(() => location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : 'landing');
+  const enterWorkspace = () => {
+    window.location.hash = '/create';
+    setMode('setup');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+  const goHome = () => {
+    window.location.hash = '/';
+    setMode('landing');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+  useEffect(() => {
+    const syncRoute = () => {
+      if (window.location.hash === '#/create') setMode('setup');
+      else if (window.location.hash === '#/editor') setMode(previous => previous === 'editor' ? 'editor' : 'setup');
+      else setMode('landing');
+    };
+    window.addEventListener('hashchange', syncRoute);
+    return () => window.removeEventListener('hashchange', syncRoute);
+  }, []);
   const [setupStep, setSetupStep] = useState<1 | 2 | 3 | 4>(1);
   const [currentId, setCurrentId] = useState('01-cover');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
@@ -225,6 +230,7 @@ export default function App() {
       setCurrentId('01-cover');
       setSetupStep(1);
       setMode('setup');
+      window.location.hash = '/create';
       setError('');
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : '프로젝트 파일을 열지 못했습니다.');
@@ -255,21 +261,21 @@ export default function App() {
     setEnabled(Object.fromEntries(pages.map((page) => [page.id, true])));
     setCurrentId(pages[0].id);
     setMode('editor');
+    window.location.hash = '/editor';
+    window.scrollTo({ top: 0, behavior: 'instant' });
   };
+
+  if (mode === 'landing') return <Landing onStart={enterWorkspace} />;
 
   if (mode === 'setup') {
     return (
       <div className="app-shell setup-mode">
-        {introVisible ? <div className="bramer-intro" role="status" aria-label="Bramer 시작 화면">
-          <div className="bramer-intro-content"><strong>Bramer.</strong><span>BRAND IDENTITY CREATOR</span></div>
-          <button type="button" onClick={dismissIntro} aria-label="인트로 건너뛰기">SKIP</button>
-        </div> : null}
         <header className="topbar product-topbar">
           <div className="topbar-inner product-topbar-inner">
             <div className="product-brand">
               <span className="product-mark">g.</span>
               <div>
-                <strong className="brand-title">Bramer.</strong>
+                <button type="button" className="bramer-brand-home" onClick={goHome} aria-label="Bramer 홈으로 이동">Bramer.</button>
                 <span className="topbar-meta">Brand Identity Creator</span>
               </div>
             </div>
@@ -753,13 +759,13 @@ export default function App() {
           <div className="product-brand editor-product-brand">
             <span className="product-mark">g.</span>
             <div>
-              <strong className="brand-title">Bramer.</strong>
+              <button type="button" className="bramer-brand-home" onClick={goHome} aria-label="Bramer 홈으로 이동">Bramer.</button>
               <span className="project-name">{project.englishName} · {enabledPages.length} pages</span>
             </div>
           </div>
           <div className="header-actions"><span className="bramer-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
             <button className="button ghost" onClick={saveProject}>프로젝트 저장</button>
-            <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); }}>구성 변경</button>
+            <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); window.location.hash = '/create'; }}>구성 변경</button>
             <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
             <button className="button primary" onClick={() => window.print()}>PDF로 내보내기</button>
           </div>
