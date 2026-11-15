@@ -175,7 +175,7 @@ export default function App() {
     if (!file) return;
     setError('');
     if (/\.ai$/i.test(file.name)) {
-      setError('AI 원본 파일은 아직 직접 변환할 수 없습니다. Illustrator에서 파일 > 다른 이름으로 저장 > SVG를 선택한 후 업로드해 주세요. PDF 호환 AI라도 내부 벡터 구조에 따라 변환 품질이 달라집니다.');
+      setError('AI 파일은 직접 업로드할 수 없어요. Illustrator에서 로고를 연 뒤, 파일 > 다른 이름으로 저장 > 파일 형식 SVG를 선택해 저장한 후 다시 업로드해 주세요.');
       event.target.value = '';
       return;
     }
@@ -275,7 +275,7 @@ export default function App() {
       return;
     }
     if (!project.logo) {
-      setError('Primary Logo SVG를 업로드해주세요.');
+      setError('SVG 형식의 로고 파일을 업로드해 주세요. AI 파일은 Illustrator에서 SVG로 저장하면 됩니다.');
       return;
     }
     if (selectedCategories.length === 0) {
@@ -455,17 +455,30 @@ export default function App() {
                     <div>
                       <span className="module-kicker">PRIMARY ASSET</span>
                       <h2>로고 업로드</h2>
-                      <p className="module-description">Primary Logo SVG를 업로드하면 구조와 컬러를 분석해 사용 규칙을 제안합니다.</p>
+                      <p className="module-description">일러스트레이터에서 만든 로고도 괜찮아요. SVG로 저장해 올리면 로고의 비율과 컬러를 분석합니다.</p>
                     </div>
                     <span className="module-state">{project.logo ? 'Detected' : 'Required'}</span>
                   </div>
                   <label className={`upload-zone creator-upload ${project.logo ? 'has-file' : ''}`}>
-                    <input type="file" accept=".svg,.ai,image/svg+xml,application/postscript" onChange={handleLogo} />
+                    <input type="file" accept=".svg,image/svg+xml" onChange={handleLogo} />
                     <span className="upload-icon">{project.logo ? '✓' : '+'}</span>
-                    <strong>{project.logo ? project.logo.fileName : 'Primary Logo SVG'}</strong>
-                    <span>{project.logo ? `Ratio ${project.logo.aspectRatio.toFixed(2)} : 1 · ${project.logo.colors.length} colors detected` : 'SVG를 업로드하면 컬러와 비율을 분석합니다. AI 원본은 Illustrator에서 SVG로 저장한 후 업로드해 주세요.'}</span>
+                    <strong>{project.logo ? project.logo.fileName : 'SVG 로고 파일 업로드'}</strong>
+                    <span>{project.logo ? `Ratio ${project.logo.aspectRatio.toFixed(2)} : 1 · ${project.logo.colors.length} colors detected` : 'SVG 파일을 선택해 주세요. AI 파일은 아래 방법으로 SVG로 저장할 수 있어요.'}</span>
                     <em>{project.logo ? '파일 변경' : '파일 선택'}</em>
                   </label>
+                  <details className="bramer-svg-help">
+                    <summary>AI(일러스트레이터) 파일만 가지고 있나요?</summary>
+                    <div className="bramer-svg-help-content">
+                      <p>SVG는 로고의 선과 형태를 유지하는 벡터 파일이에요. Illustrator에서 AI 파일을 SVG로 저장하면 Bramer에 사용할 수 있습니다.</p>
+                      <ol>
+                        <li>Adobe Illustrator에서 로고 AI 파일을 엽니다.</li>
+                        <li><strong>파일 → 다른 이름으로 저장</strong>을 선택합니다.</li>
+                        <li>파일 형식에서 <strong>SVG (*.SVG)</strong>를 선택하고 저장합니다.</li>
+                        <li>저장한 SVG 파일을 위 업로드 영역에 올립니다.</li>
+                      </ol>
+                      <p>로고의 글자가 다른 컴퓨터에서 달라 보이지 않게 하려면, 필요할 때 글꼴을 윤곽선으로 변환한 복사본을 저장하세요. 원본 AI 파일은 따로 보관하는 것을 권장합니다.</p>
+                    </div>
+                  </details>
                   {project.logo ? (
                     <div className="svg-analysis">
                       <div className="analysis-heading">

@@ -1,0 +1,17 @@
+/* Clear, approachable SVG help below the logo upload area. */
+.bramer-create-shell .bramer-svg-help{
+  width:100%;margin:15px 0 5px;border:1px solid #e4e4e0;border-radius:8px;
+  background:#f8f8f7;color:#292929;overflow:hidden;
+}
+.bramer-create-shell .bramer-svg-help summary{
+  padding:16px 19px;font-size:13px;font-weight:650;line-height:1.5;cursor:pointer;
+}
+.bramer-create-shell .bramer-svg-help summary:hover{background:#f1f1ef;}
+.bramer-create-shell .bramer-svg-help[open] summary{border-bottom:1px solid #e5e5e2;}
+.bramer-create-shell .bramer-svg-help-content{padding:17px 20px 20px;}
+.bramer-create-shell .bramer-svg-help-content p{font-size:12px;line-height:1.8;color:#666;margin:0 0 15px;}
+.bramer-create-shell .bramer-svg-help-content p:last-child{margin:13px 0 0;}
+.bramer-create-shell .bramer-svg-help-content ol{margin:0;padding-left:22px;display:grid;gap:9px;}
+.bramer-create-shell .bramer-svg-help-content li{font-size:13px;line-height:1.65;}
+.bramer-create-shell .bramer-svg-help-content strong{font-weight:650;color:#222;}
+@media(max-width:760px){.bramer-create-shell .bramer-svg-help summary{padding:15px;font-size:13px;}.bramer-create-shell .bramer-svg-help-content{padding:15px;}}
