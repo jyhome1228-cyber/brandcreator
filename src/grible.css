@@ -133,3 +133,13 @@ body { word-break:keep-all; }
  .field-grid.two-column,.field-grid.three-column { grid-template-columns:1fr; }
  .bramer-module-grid { grid-template-columns:1fr; }
 }
+
+/* Bramer introduction — short, skippable, only once per session */
+.bramer-intro { position:fixed; inset:0; z-index:10000; background:#0c0c0c; color:#fff; display:flex; align-items:center; justify-content:center; isolation:isolate; }
+.bramer-intro-content { display:flex; flex-direction:column; align-items:center; gap:17px; animation:bramer-intro-appear .65s cubic-bezier(.2,.6,.1,1) both; }
+.bramer-intro-content strong { font-family:Pretendard,'Apple SD Gothic Neo',sans-serif; font-size:clamp(52px,10vw,112px); letter-spacing:-.09em!important; font-weight:650; line-height:1; }
+.bramer-intro-content span { font-size:11px; color:#aaa; font-weight:550; letter-spacing:.22em!important; }
+.bramer-intro > button { position:absolute; right:clamp(24px,4vw,70px); bottom:clamp(25px,4vw,65px); border:1px solid #505050; color:#dedede; border-radius:6px; background:transparent; padding:11px 19px; font-size:11px; letter-spacing:.08em!important; cursor:pointer; }
+.bramer-intro > button:hover,.bramer-intro > button:focus-visible { background:#fff; color:#111; }
+@keyframes bramer-intro-appear { from { opacity:0; transform:translateY(9px); } to { opacity:1; transform:translateY(0); } }
+@media(prefers-reduced-motion:reduce){ .bramer-intro-content { animation:none; } }
