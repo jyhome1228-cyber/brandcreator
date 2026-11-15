@@ -4,6 +4,7 @@ import App from './App';
 import './styles.css';
 import './refinements.css';
 import './bramer.css';
+import './workspace-v2.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
