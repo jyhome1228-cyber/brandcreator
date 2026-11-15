@@ -8,6 +8,7 @@ import './workspace-v2.css';
 import './nineworks-layout.css';
 import './typography-qa.css';
 import './landing.css';
+import './landing-integration.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
