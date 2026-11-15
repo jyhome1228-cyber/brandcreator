@@ -7,6 +7,7 @@ import './bramer.css';
 import './workspace-v2.css';
 import './nineworks-layout.css';
 import './typography-qa.css';
+import './landing.css';
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
