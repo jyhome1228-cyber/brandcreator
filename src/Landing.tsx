@@ -112,7 +112,7 @@ export default function Landing({ onStart }: LandingProps) {
     const onKeyDown = (event: globalThis.KeyboardEvent) => {
       if (event.key === 'Escape') closeBeta();
       if (event.key === 'Tab') {
-        const controls = dialogRef.current?.querySelectorAll<HTMLElement>('button:not([disabled])');
+        const controls = dialogRef.current?.querySelectorAll<HTMLElement>('button:not([disabled]), input:not([disabled]), select:not([disabled])');
         if (!controls?.length) return;
         const first = controls[0], last = controls[controls.length - 1];
         if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
@@ -271,10 +271,10 @@ export default function Landing({ onStart }: LandingProps) {
             <label><span>직업</span><select value={betaForm.occupation} onChange={event => setBetaForm(previous => ({ ...previous, occupation: event.target.value }))} required><option value="">선택해 주세요</option><option value="디자이너">디자이너</option><option value="기업 담당자">기업 담당자</option><option value="브랜드 운영자">브랜드 운영자</option><option value="학생·연구자">학생·연구자</option><option value="기타">기타</option></select></label>
           </div>
           <div className="bramer-beta-privacy">
-            <label className="bramer-beta-consent"><input type="checkbox" checked={agreed} onChange={event => setAgreed(event.target.checked)} required /><span>개인정보 이용 안내를 확인하고 동의합니다. (필수)</span></label>
-            <button type="button" className="bramer-beta-privacy-button" aria-expanded={privacyOpen} onClick={() => setPrivacyOpen(previous => !previous)}>개인정보처리 안내 {privacyOpen ? '접기' : '보기'}</button>
+            <label className="bramer-beta-consent"><input type="checkbox" checked={agreed} onChange={event => setAgreed(event.target.checked)} required /><span>개인정보처리방침(베타 체험 안내)에 동의합니다. (필수)</span></label>
+            <button type="button" className="bramer-beta-privacy-button" aria-expanded={privacyOpen} onClick={() => setPrivacyOpen(previous => !previous)}>개인정보처리방침 {privacyOpen ? '접기' : '보기'}</button>
             {privacyOpen ? <div className="bramer-beta-privacy-text">
-              <strong>베타 체험 개인정보 이용 안내</strong>
+              <strong>베타 체험 개인정보처리방침</strong>
               <p>입력 항목: 성함, 아이디, 연락처, 직업. 목적: 베타 체험 등록 화면 확인 및 이용 의사 표시.</p>
               <p><strong>현재 중앙 등록 서버는 연결되어 있지 않습니다.</strong> 입력한 개인정보는 서버로 전송·저장되지 않으며, 화면을 떠나면 입력값이 사라집니다. 브라우저 세션에는 체험 여부만 저장합니다. 연락처로 별도 연락하거나 사용자 계정을 생성하지 않습니다.</p>
               <p>브라우저 세션의 체험 표시를 없애려면 브라우저의 해당 사이트 세션 데이터를 삭제하면 됩니다. 정식 회원 관리 및 개인정보처리방침은 서버 구축 후 별도 공지해야 합니다.</p>
