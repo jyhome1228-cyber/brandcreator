@@ -2,6 +2,11 @@ import { useEffect, useRef, useState } from 'react';
 
 type LandingProps = { onStart: () => void };
 
+const audiences = [
+  { key: 'brand', audience: '브랜드 운영 기업', headline: '로고만 가진 기업을 위해', description: '브랜드 운영에 필요한 사용 규칙을 쉽고 체계적으로 정리합니다.' },
+  { key: 'designer', audience: '브랜드 디자이너', headline: '로고를 만드는 디자이너를 위해', description: '가이드라인 제작 과정을 더 편리하게 이어갈 수 있도록 돕습니다.' },
+] as const;
+
 const samples = [
   { title: '브랜드 표지', type: 'cover' },
   { title: '로고 규칙', type: 'logo' },
@@ -48,6 +53,46 @@ function GuidelinePreview() {
 
 export default function Landing({ onStart }: LandingProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const [audienceIndex, setAudienceIndex] = useState(0);
+  const [rollPaused, setRollPaused] = useState(false);
+  const [betaOpen, setBetaOpen] = useState(false);
+  const dialogRef = useRef<HTMLDivElement>(null);
+  const lastTrigger = useRef<HTMLElement | null>(null);
+  const openBeta = (event?: React.MouseEvent<HTMLButtonElement>) => {
+    lastTrigger.current = event?.currentTarget ?? null;
+    setBetaOpen(true);
+  };
+  const closeBeta = () => {
+    setBetaOpen(false);
+    requestAnimationFrame(() => lastTrigger.current?.focus());
+  };
+  const tryBeta = () => {
+    setBetaOpen(false);
+    onStart();
+  };
+  useEffect(() => {
+    if (rollPaused || betaOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const interval = window.setInterval(() => setAudienceIndex(index => (index + 1) % audiences.length), 4000);
+    return () => window.clearInterval(interval);
+  }, [rollPaused, betaOpen]);
+  useEffect(() => {
+    if (!betaOpen) return;
+    const oldOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const focusTimer = window.setTimeout(() => dialogRef.current?.focus(), 0);
+    const onKeyDown = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') closeBeta();
+      if (event.key === 'Tab') {
+        const controls = dialogRef.current?.querySelectorAll<HTMLElement>('button:not([disabled])');
+        if (!controls?.length) return;
+        const first = controls[0], last = controls[controls.length - 1];
+        if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+        else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+      }
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => { document.body.style.overflow = oldOverflow; window.clearTimeout(focusTimer); document.removeEventListener('keydown', onKeyDown); };
+  }, [betaOpen]);
   useEffect(() => {
     const root = rootRef.current;
     if (!root || typeof IntersectionObserver === 'undefined' || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
@@ -73,7 +118,7 @@ export default function Landing({ onStart }: LandingProps) {
           <a href="#/guide">업종별 가이드</a>
           <a href="#help">도움말</a>
         </nav>
-        <button type="button" className="bramer-site-start" onClick={onStart}>시작하기</button>
+        <button type="button" className="bramer-site-start" onClick={openBeta}>시작하기</button>
       </div>
     </header>
 
@@ -82,29 +127,19 @@ export default function Landing({ onStart }: LandingProps) {
         <div className="bramer-home-hero-content" data-reveal>
           <p className="bramer-home-overline">브랜드 가이드라인 제작 솔루션</p>
           <h1>로고만 있다면,<br/>브랜드의 기준까지.</h1>
-          <p className="bramer-home-description">로고만 가진 기업에는 필요한 사용 규칙을.<br className="bramer-desktop-break"/> 로고를 만드는 디자이너에게는 편리한 가이드라인 제작 환경을.<br className="bramer-desktop-break"/> BRAMER가 브랜드 가이드라인 제작을 도와드립니다.</p>
-          <button type="button" className="bramer-home-primary" onClick={onStart}>가이드라인 만들기</button>
-        </div>
-      </section>
-
-      <section className="bramer-audience-section" aria-labelledby="bramer-audience-title">
-        <div className="bramer-audience-inner">
-          <div className="bramer-home-section-heading" data-reveal>
-            <h2 id="bramer-audience-title">기업에도, 디자이너에게도.</h2>
-            <p>브랜드를 운영하는 사람과 만드는 사람 모두를 위한 가이드라인 솔루션입니다.</p>
+          <div className="bramer-audience-roller" aria-label="BRAMER 이용 대상 소개" onMouseEnter={() => setRollPaused(true)} onMouseLeave={() => setRollPaused(false)} onFocusCapture={() => setRollPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setRollPaused(false); }}>
+            <div className="bramer-roller-frame" aria-live="off">
+              <div key={audiences[audienceIndex].key} className="bramer-roller-slide">
+                <span>{audiences[audienceIndex].audience}</span>
+                <strong>{audiences[audienceIndex].headline}</strong>
+                <p>{audiences[audienceIndex].description}</p>
+              </div>
+            </div>
+            <div className="bramer-roller-controls" aria-label="소개 대상 선택">
+              {audiences.map((item,index) => <button key={item.key} type="button" aria-label={item.audience + ' 보기'} aria-pressed={index === audienceIndex} className={index === audienceIndex ? 'active' : ''} onClick={() => setAudienceIndex(index)} />)}
+            </div>
           </div>
-          <div className="bramer-audience-grid" data-reveal>
-            <article>
-              <span>브랜드 운영 기업</span>
-              <h3>로고는 있지만, 사용 기준이 없다면.</h3>
-              <p>로고의 여백과 최소 크기, 컬러와 서체 등 브랜드를 일관되게 사용하는 데 필요한 기본 규칙부터 정리해보세요.</p>
-            </article>
-            <article>
-              <span>브랜드 디자이너</span>
-              <h3>디자인 이후의 가이드라인까지.</h3>
-              <p>완성한 로고 SVG로 기본 규칙을 구성하고, 업종별 항목을 선택·편집해 가이드라인 제작 과정을 보다 체계적으로 관리하세요.</p>
-            </article>
-          </div>
+          <button type="button" className="bramer-home-primary" onClick={openBeta}>베타 무료 체험하기</button>
         </div>
       </section>
 
@@ -131,7 +166,7 @@ export default function Landing({ onStart }: LandingProps) {
       <section className="bramer-home-last-section" data-reveal>
         <h2>브랜드의 기준을 만들어볼까요?</h2>
         <p>로고에서 시작해, 브랜드를 더 일관되게.</p>
-        <button type="button" className="bramer-home-primary" onClick={onStart}>지금 시작하기</button>
+        <button type="button" className="bramer-home-primary" onClick={openBeta}>지금 시작하기</button>
       </section>
 <section className="bramer-help-section" id="help" aria-labelledby="bramer-help-heading">
       <div className="bramer-help-inner">
@@ -189,5 +224,22 @@ export default function Landing({ onStart }: LandingProps) {
         <div className="bramer-footer-bottom"><div><strong>BRAMER.</strong><span>브랜드 가이드라인 제작 서비스</span></div><small>현재 제공되는 기능을 기준으로 안내합니다.</small></div>
       </div>
     </footer>
+    {betaOpen ? <div className="bramer-beta-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) closeBeta(); }}>
+      <div className="bramer-beta-dialog" role="dialog" aria-modal="true" aria-labelledby="bramer-beta-title" aria-describedby="bramer-beta-description" ref={dialogRef} tabIndex={-1}>
+        <button type="button" className="bramer-beta-close" aria-label="닫기" onClick={closeBeta}>닫기</button>
+        <span className="bramer-beta-label">BETA TEST</span>
+        <h2 id="bramer-beta-title">BRAMER 베타테스트에 오신 것을 환영합니다.</h2>
+        <p id="bramer-beta-description">현재 BRAMER는 기능과 사용성을 개선하는 베타테스트 기간입니다. 회원가입 없이 무료로 가이드라인 제작 기능을 체험할 수 있어요.</p>
+        <div className="bramer-beta-info">
+          <p><strong>바로 체험 가능</strong><span>로고 SVG 분석, 업종별 항목 선택, 가이드라인 편집 및 출력</span></p>
+          <p><strong>프로젝트 보관</strong><span>계정이나 클라우드 저장은 아직 제공하지 않습니다. 작업을 이어가려면 프로젝트 JSON 파일을 저장해 주세요.</span></p>
+          <p><strong>이용 전 확인</strong><span>일부 자동 추천·생성 기능은 개선 중입니다. 최종 사용·인쇄 전 직접 결과물을 검토해 주세요.</span></p>
+        </div>
+        <div className="bramer-beta-actions">
+          <button type="button" onClick={closeBeta} className="bramer-beta-secondary">다음에 이용하기</button>
+          <button type="button" onClick={tryBeta} className="bramer-beta-primary">무료로 체험하기</button>
+        </div>
+      </div>
+    </div> : null}
   </div>;
 }

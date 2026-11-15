@@ -1,0 +1,41 @@
+/* BRAMER beta experience. Restrained hero message transition and accessible entry. */
+.bramer-landing .bramer-home-hero-content {max-width:850px;}
+.bramer-audience-roller {width:min(100%,670px);margin:26px auto 27px;text-align:center;}
+.bramer-roller-frame{height:122px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.bramer-roller-slide{display:flex;flex-direction:column;align-items:center;gap:7px;width:100%;animation:bramer-roll-in .55s cubic-bezier(.22,.7,.25,1) both;}
+.bramer-roller-slide>span{font-size:11px;font-weight:550;color:#929292;}
+.bramer-roller-slide strong{font-size:18px!important;font-weight:620;letter-spacing:-.03em!important;color:#f3f3f3;line-height:1.45;}
+.bramer-roller-slide p{margin:0;font-size:13px!important;color:#aaa;line-height:1.65!important;word-break:keep-all;}
+.bramer-roller-controls{display:flex;align-items:center;justify-content:center;gap:7px;padding:8px 0 0;}
+.bramer-roller-controls button{width:23px;height:12px;display:flex;align-items:center;justify-content:center;border:0;padding:0;background:transparent;}
+.bramer-roller-controls button::before{content:"";width:23px;height:3px;border-radius:10px;background:#535353;transition:background .2s;}
+.bramer-roller-controls button.active::before{background:#e6e6e6;}
+@keyframes bramer-roll-in {from{opacity:0;transform:translateY(9px);}to{opacity:1;transform:translateY(0);}}
+.bramer-beta-overlay{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px;}
+.bramer-beta-dialog{position:relative;width:min(100%,540px);max-height:min(90dvh,760px);overflow-y:auto;background:#fff;color:#191919;text-align:left;padding:39px 38px 32px;border-radius:12px;box-shadow:0 24px 75px rgba(0,0,0,.25);outline:none;}
+.bramer-beta-close{position:absolute;top:24px;right:25px;border:0;background:transparent;color:#777;font-size:12px!important;padding:6px 4px;}
+.bramer-beta-close:hover{color:#222;}
+.bramer-beta-label{display:block;font-size:11px;letter-spacing:.08em!important;color:#777;margin-bottom:15px;}
+.bramer-beta-dialog h2{font-size:25px!important;line-height:1.4!important;letter-spacing:-.04em!important;font-weight:650;margin:0 35px 16px 0;word-break:keep-all;}
+.bramer-beta-dialog>p{font-size:13px!important;line-height:1.85!important;color:#666;margin:0 0 24px;word-break:keep-all;}
+.bramer-beta-info{border-top:1px solid #e6e6e3;border-bottom:1px solid #e6e6e3;padding:6px 0;}
+.bramer-beta-info p{display:flex;flex-direction:column;gap:5px;margin:0;padding:14px 0;}
+.bramer-beta-info strong{font-size:12px!important;color:#202020;font-weight:650;}
+.bramer-beta-info span{font-size:12px!important;color:#777;line-height:1.65;}
+.bramer-beta-actions{display:flex;justify-content:flex-end;gap:9px;margin-top:25px;}
+.bramer-beta-actions button{min-height:44px;padding:0 17px;border-radius:6px;font-size:13px!important;font-weight:600;}
+.bramer-beta-secondary{border:1px solid #dcdcd9;background:#fff;color:#555;}
+.bramer-beta-primary{border:1px solid #181818;background:#181818;color:#fff;}
+.bramer-beta-primary:hover{background:#3a3a3a;}
+.bramer-beta-secondary:hover{background:#f4f4f2;}
+@media(max-width:760px){
+ .bramer-roller-frame{height:130px;}
+ .bramer-roller-slide strong{font-size:16px!important;}
+ .bramer-roller-slide p{font-size:12px!important;}
+ .bramer-audience-roller{margin:23px auto 25px;}
+ .bramer-beta-dialog{padding:33px 23px 25px;}
+ .bramer-beta-dialog h2{font-size:21px!important;}
+ .bramer-beta-actions{flex-direction:column-reverse;}
+ .bramer-beta-actions button{width:100%;}
+}
+@media(prefers-reduced-motion:reduce){.bramer-roller-slide{animation:none!important;}.bramer-roller-controls button::before{transition:none!important;}}
