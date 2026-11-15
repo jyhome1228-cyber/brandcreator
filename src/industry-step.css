@@ -1,0 +1,16 @@
+/* Industry selection: dedicated step, clean and accessible for public users */
+.bramer-industry-focus {margin:17px 0 20px;padding:20px 19px;background:#f4f4f2;border:1px solid #e4e4e0;display:grid;gap:9px;}
+.bramer-industry-focus strong{font-size:13px;font-weight:660;color:#202020;line-height:1.5;}
+.bramer-industry-focus p{font-size:12px!important;line-height:1.7!important;margin:0;color:#6a6a66;}
+.bramer-industry-focus>div{display:flex;flex-wrap:wrap;gap:6px;margin-top:5px;}
+.bramer-industry-focus>div span{border:1px solid #d7d7d3;background:#fff;padding:6px 9px;color:#555;font-size:11px;line-height:1.3;}
+.setup-mode .bramer-research-note{color:#888;font-size:11px!important;line-height:1.65!important;margin-top:14px;}
+.setup-mode .bramer-module-card:has(input:checked){border-color:#181818;}
+.setup-mode .bramer-module-card input[type=checkbox]{width:17px;height:17px;accent-color:#181818;}
+@media(max-width:767px){
+ .setup-step-nav .step-nav-list {display:flex!important;overflow-x:auto;scrollbar-width:thin;padding:0 0 4px;gap:0!important;}
+ .setup-step-nav .step-nav-item {flex:0 0 105px;min-width:105px;border-right:1px solid #292929!important;}
+ .setup-step-nav .step-nav-copy strong{white-space:nowrap;font-size:11px!important;}
+ .bramer-industry-focus{padding:15px;}
+ .bramer-industry-focus p{font-size:12px!important;}
+}
