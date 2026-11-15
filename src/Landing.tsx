@@ -80,10 +80,31 @@ export default function Landing({ onStart }: LandingProps) {
     <main id="top">
       <section className="bramer-home-hero">
         <div className="bramer-home-hero-content" data-reveal>
-          <p className="bramer-home-overline">브랜드 가이드라인 제작 서비스</p>
-          <h1>로고만 있다면,<br/>브랜드 가이드라인을 시작해보세요.</h1>
-          <p className="bramer-home-description">브레이머는 로고와 브랜드 정보를 바탕으로<br className="bramer-desktop-break"/> 필요한 규칙을 정리하고 가이드라인을 제작할 수 있도록 도와줍니다.</p>
+          <p className="bramer-home-overline">브랜드 가이드라인 제작 솔루션</p>
+          <h1>로고만 있다면,<br/>브랜드의 기준까지.</h1>
+          <p className="bramer-home-description">로고만 가진 기업에는 필요한 사용 규칙을.<br className="bramer-desktop-break"/> 로고를 만드는 디자이너에게는 편리한 가이드라인 제작 환경을.<br className="bramer-desktop-break"/> BRAMER가 브랜드 가이드라인 제작을 도와드립니다.</p>
           <button type="button" className="bramer-home-primary" onClick={onStart}>가이드라인 만들기</button>
+        </div>
+      </section>
+
+      <section className="bramer-audience-section" aria-labelledby="bramer-audience-title">
+        <div className="bramer-audience-inner">
+          <div className="bramer-home-section-heading" data-reveal>
+            <h2 id="bramer-audience-title">기업에도, 디자이너에게도.</h2>
+            <p>브랜드를 운영하는 사람과 만드는 사람 모두를 위한 가이드라인 솔루션입니다.</p>
+          </div>
+          <div className="bramer-audience-grid" data-reveal>
+            <article>
+              <span>브랜드 운영 기업</span>
+              <h3>로고는 있지만, 사용 기준이 없다면.</h3>
+              <p>로고의 여백과 최소 크기, 컬러와 서체 등 브랜드를 일관되게 사용하는 데 필요한 기본 규칙부터 정리해보세요.</p>
+            </article>
+            <article>
+              <span>브랜드 디자이너</span>
+              <h3>디자인 이후의 가이드라인까지.</h3>
+              <p>완성한 로고 SVG로 기본 규칙을 구성하고, 업종별 항목을 선택·편집해 가이드라인 제작 과정을 보다 체계적으로 관리하세요.</p>
+            </article>
+          </div>
         </div>
       </section>
 
