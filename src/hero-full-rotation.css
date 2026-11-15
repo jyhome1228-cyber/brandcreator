@@ -1,0 +1,71 @@
+/* BRAMER — whole hero rotates as one unit, not only supporting copy. */
+.bramer-landing .bramer-hero-rotation{
+  width:100%;
+  max-width:1000px;
+  margin:0 auto 23px;
+}
+.bramer-landing .bramer-hero-rotation-stage{
+  display:grid;
+  place-items:center;
+  width:100%;
+  min-height:345px;
+  overflow:hidden;
+}
+.bramer-landing .bramer-hero-rotation-slide{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  width:100%;
+  gap:0;
+  animation:bramer-entire-hero-in .65s cubic-bezier(.22,.72,.23,1) both;
+}
+.bramer-landing .bramer-hero-audience-label{
+  display:block;
+  font-size:12px!important;
+  line-height:1.6;
+  font-weight:500;
+  color:#b6b2be;
+  margin:0 0 24px;
+}
+.bramer-landing .bramer-hero-rotation-slide h1 {
+  font-size:clamp(35px,4.25vw,59px)!important;
+  line-height:1.36!important;
+  letter-spacing:-.057em!important;
+  font-weight:650!important;
+  margin:0;
+  max-width:1000px;
+  text-align:center;
+  word-break:keep-all;
+}
+.bramer-landing .bramer-hero-rotation-slide h1 span{color:#b7a7f7;}
+.bramer-landing .bramer-hero-slide-description {
+  max-width:640px;
+  margin:25px auto 0;
+  color:#b2aeb9;
+  font-size:14px!important;
+  line-height:1.85!important;
+  word-break:keep-all;
+  text-align:center;
+}
+.bramer-landing .bramer-hero-rotation .bramer-roller-controls{padding:8px 0 0;gap:9px;}
+.bramer-landing .bramer-hero-rotation .bramer-roller-controls button:focus-visible{
+  outline:2px solid #d0c3ff;outline-offset:3px;
+}
+@keyframes bramer-entire-hero-in{
+  from{opacity:0;transform:translateY(11px);}
+  to{opacity:1;transform:translateY(0);}
+}
+@media(max-width:760px){
+ .bramer-landing .bramer-hero-rotation-stage{min-height:315px;}
+ .bramer-landing .bramer-hero-audience-label{margin-bottom:21px;font-size:11px!important;}
+ .bramer-landing .bramer-hero-rotation-slide h1{font-size:clamp(29px,6vw,43px)!important;line-height:1.43!important;}
+ .bramer-landing .bramer-hero-slide-description{font-size:12px!important;line-height:1.75!important;margin-top:20px;max-width:490px;}
+}
+@media(max-width:450px){
+ .bramer-landing .bramer-hero-rotation-stage{min-height:330px;}
+ .bramer-landing .bramer-hero-rotation-slide h1{font-size:30px!important;}
+}
+@media(prefers-reduced-motion:reduce){
+ .bramer-landing .bramer-hero-rotation-slide{animation:none!important;}
+}

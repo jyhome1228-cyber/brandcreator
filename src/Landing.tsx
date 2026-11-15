@@ -7,8 +7,16 @@ const BETA_END = '2026년 12월 31일';
 const initialBetaForm: BetaForm = { name: '', userId: '', phone: '', occupation: '' };
 
 const audiences = [
-  { key: 'brand', audience: '브랜드 운영 기업', headline: '로고만 가진 기업을 위해', description: '브랜드 운영에 필요한 사용 규칙을 쉽고 체계적으로 정리합니다.' },
-  { key: 'designer', audience: '브랜드 디자이너', headline: '로고를 만드는 디자이너를 위해', description: '가이드라인 제작 과정을 더 편리하게 이어갈 수 있도록 돕습니다.' },
+  {
+    key: 'brand', audience: '브랜드 운영 기업',
+    titleTop: '로고는 있는데,', titleBottom: '브랜드 기준이 없다면.',
+    description: '브랜드 운영에 필요한 로고 사용 규정, 컬러, 서체와 응용 기준을 쉽고 체계적으로 정리합니다.',
+  },
+  {
+    key: 'designer', audience: '브랜드 디자이너',
+    titleTop: '로고는 완성했는데,', titleBottom: '가이드라인 전달이 막막하다면.',
+    description: '디자인 이후 가이드라인의 제작과 편집, 전달 과정을 더 편리하게 이어갈 수 있도록 돕습니다.',
+  },
 ] as const;
 
 const samples = [
@@ -155,18 +163,23 @@ export default function Landing({ onStart }: LandingProps) {
       <section className="bramer-home-hero">
         <div className="bramer-home-hero-content" data-reveal>
           <p className="bramer-home-overline">브랜드 가이드라인 제작 솔루션</p>
-          <h1>로고는 완성했는데,<br/><span>가이드라인이 막막하다면.</span></h1>
-          <p className="bramer-hero-support">브랜드 운영을 위한 규칙부터 디자이너의 제작 실무까지.</p>
-          <div className="bramer-audience-roller" aria-label="BRAMER 이용 대상 소개" onMouseEnter={() => setRollPaused(true)} onMouseLeave={() => setRollPaused(false)} onFocusCapture={() => setRollPaused(true)} onBlurCapture={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setRollPaused(false); }}>
-            <div className="bramer-roller-frame" aria-live="off">
-              <div key={audiences[audienceIndex].key} className="bramer-roller-slide">
-                <span>{audiences[audienceIndex].audience}</span>
-                <strong>{audiences[audienceIndex].headline}</strong>
-                <p>{audiences[audienceIndex].description}</p>
+          <div className="bramer-hero-rotation" aria-label="기업과 디자이너를 위한 서비스 소개"
+            onMouseEnter={() => setRollPaused(true)}
+            onMouseLeave={() => setRollPaused(false)}
+            onFocusCapture={() => setRollPaused(true)}
+            onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setRollPaused(false); }}>
+            <div className="bramer-hero-rotation-stage" aria-live="off">
+              <div className="bramer-hero-rotation-slide" key={audiences[audienceIndex].key}>
+                <span className="bramer-hero-audience-label">{audiences[audienceIndex].audience}</span>
+                <h1>{audiences[audienceIndex].titleTop}<br/><span>{audiences[audienceIndex].titleBottom}</span></h1>
+                <p className="bramer-hero-slide-description">{audiences[audienceIndex].description}</p>
               </div>
             </div>
-            <div className="bramer-roller-controls" aria-label="소개 대상 선택">
-              {audiences.map((item,index) => <button key={item.key} type="button" aria-label={item.audience + ' 보기'} aria-pressed={index === audienceIndex} className={index === audienceIndex ? 'active' : ''} onClick={() => setAudienceIndex(index)} />)}
+            <div className="bramer-roller-controls" aria-label="대상별 소개 선택">
+              {audiences.map((item,index) => <button key={item.key} type="button"
+                aria-label={item.audience + ' 소개 보기'} aria-pressed={index === audienceIndex}
+                className={index === audienceIndex ? 'active' : ''}
+                onClick={() => setAudienceIndex(index)}/>)}
             </div>
           </div>
           <button type="button" className="bramer-home-primary" onClick={openBeta}>베타 무료 체험하기</button>
