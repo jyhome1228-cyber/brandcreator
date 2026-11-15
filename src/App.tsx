@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
 import Dashboard from './Dashboard';
+import BramerSelect from './components/BramerSelect';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { generateGuidelinePages } from './guideline-system/generatePages';
 import { generateExtensionPages } from './guideline-system/extensionPages';
@@ -416,9 +417,7 @@ export default function App() {
                   </div>
                   <div className="field bramer-industry-picker">
                     <span>어떤 업종의 브랜드인가요?</span>
-                    <select value={industry} onChange={(event) => changeIndustry(event.target.value as IndustryId)} aria-label="브랜드 업종 선택" style={{ width: '100%', marginTop: 10 }}>
-                      {INDUSTRIES.map(item => <option value={item.id} key={item.id}>{item.label}</option>)}
-                    </select>
+                    <BramerSelect value={industry} onChange={value => changeIndustry(value as IndustryId)} ariaLabel="브랜드 업종 선택" options={INDUSTRIES.map(item => ({ value: item.id, label: item.label }))}/>
                     <p className="module-description bramer-research-note">선택한 업종에 따라 추천 항목이 달라집니다. 원하는 항목은 직접 추가하거나 제외할 수 있어요.</p>
                   <div className="bramer-industry-focus">
                     <strong>이 업종에서는 이런 기준이 중요해요.</strong>
@@ -646,18 +645,14 @@ export default function App() {
                         <span>Title / Body typeface</span>
                       </div>
                       <div className="field-grid two-column">
-                        <label className="field">
+                        <div className="field">
                           <span>Title Typeface</span>
-                          <select value={project.typography.title} onChange={(e) => setProject((previous) => ({ ...previous, typography: { ...previous.typography, title: e.target.value } }))}>
-                            {FONT_OPTIONS.map((font) => <option key={font} value={font}>{font}</option>)}
-                          </select>
-                        </label>
-                        <label className="field">
+                          <BramerSelect value={project.typography.title} onChange={value => setProject(previous => ({ ...previous, typography: { ...previous.typography, title: value } }))} ariaLabel="제목 서체 선택" options={FONT_OPTIONS.map(font => ({ value: font, label: font }))}/>
+                        </div>
+                        <div className="field">
                           <span>Body Typeface</span>
-                          <select value={project.typography.body} onChange={(e) => setProject((previous) => ({ ...previous, typography: { ...previous.typography, body: e.target.value } }))}>
-                            {FONT_OPTIONS.map((font) => <option key={font} value={font}>{font}</option>)}
-                          </select>
-                        </label>
+                          <BramerSelect value={project.typography.body} onChange={value => setProject(previous => ({ ...previous, typography: { ...previous.typography, body: value } }))} ariaLabel="본문 서체 선택" options={FONT_OPTIONS.map(font => ({ value: font, label: font }))}/>
+                        </div>
                       </div>
                     </div>
                   </div>
