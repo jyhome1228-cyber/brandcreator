@@ -1,0 +1,72 @@
+/* BRAMER beta launch — refined hero and concise consent-first trial entry */
+.bramer-landing .bramer-home-hero{
+  position:relative;isolation:isolate;overflow:hidden;background:#0b0a10;
+  min-height:min(750px,calc(100svh - 74px));padding-top:115px;padding-bottom:105px;
+}
+.bramer-landing .bramer-home-hero::before{
+  content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;
+  background:radial-gradient(ellipse 45% 42% at 51% 31%,rgba(104,77,178,.23),transparent 80%),
+             radial-gradient(ellipse 28% 50% at 75% 10%,rgba(59,47,104,.12),transparent 80%),#0b0a10;
+}
+.bramer-landing .bramer-home-hero::after{
+  content:"";position:absolute;z-index:-1;left:50%;bottom:0;transform:translateX(-50%);width:min(830px,88%);
+  height:1px;background:linear-gradient(90deg,transparent,#464056,transparent);opacity:.65;
+}
+.bramer-landing .bramer-home-hero-content{max-width:900px;}
+.bramer-landing .bramer-home-hero h1{font-size:clamp(35px,4.5vw,61px)!important;font-weight:650!important;line-height:1.35!important;letter-spacing:-.058em!important;}
+.bramer-landing .bramer-home-hero h1 span{color:#b7a7f7;}
+.bramer-hero-support{margin:21px 0 0;color:#b1afb7;font-size:14px!important;line-height:1.7!important;}
+.bramer-landing .bramer-audience-roller{margin-top:14px;margin-bottom:18px;}
+.bramer-landing .bramer-roller-frame{height:105px;}
+.bramer-landing .bramer-roller-slide>span{font-size:11px;color:#9f99b4;}
+.bramer-landing .bramer-roller-slide strong{font-size:17px!important;color:#f0eef7;font-weight:560;}
+.bramer-landing .bramer-roller-slide p{font-size:13px!important;color:#a6a1ad;}
+.bramer-landing .bramer-roller-controls button.active::before{background:#bbaaf3;}
+.bramer-landing .bramer-home-hero .bramer-home-primary{border-radius:7px;min-height:48px;font-size:13px!important;padding:0 23px;}
+.bramer-landing .bramer-beta-overlay{z-index:1050;}
+.bramer-landing .bramer-beta-dialog{
+  padding:34px 36px 32px;max-width:495px;border-radius:12px;
+}
+.bramer-landing .bramer-beta-dialog h2{font-size:23px!important;line-height:1.4!important;letter-spacing:-.05em!important;margin:0 30px 10px 0;}
+.bramer-landing .bramer-beta-dialog>p{font-size:13px!important;line-height:1.75!important;color:#6b6b6b;margin:0 0 20px;}
+.bramer-beta-form{display:flex;flex-direction:column;gap:0;}
+.bramer-beta-field-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 12px;}
+.bramer-beta-field-grid label{display:flex;flex-direction:column;gap:7px;min-width:0;}
+.bramer-beta-field-grid label>span{font-size:12px;font-weight:650;color:#333;}
+.bramer-beta-field-grid input,.bramer-beta-field-grid select{
+  width:100%;height:43px;min-width:0;border:1px solid #dcdcd9;border-radius:6px;
+  background:#fff;color:#222;padding:0 12px;font-size:13px!important;font-family:inherit;
+}
+.bramer-beta-field-grid input::placeholder{color:#aaa;}
+.bramer-beta-field-grid :is(input,select):focus-visible{outline:2px solid #252525;outline-offset:2px;}
+.bramer-beta-privacy{margin:22px 0 0;padding:16px 0 13px;border-top:1px solid #e8e8e6;border-bottom:1px solid #e8e8e6;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;}
+.bramer-beta-consent{display:flex;align-items:center;gap:9px;cursor:pointer;flex:1 1 240px;}
+.bramer-beta-consent input{width:16px;height:16px;accent-color:#1b1b1b;flex:0 0 16px;}
+.bramer-beta-consent span{font-size:12px!important;line-height:1.45!important;color:#333;}
+.bramer-beta-privacy-button{border:0;background:transparent;padding:6px 0;color:#666;font-size:11px!important;text-decoration:underline;text-underline-offset:3px;}
+.bramer-beta-privacy-text{width:100%;padding:13px;background:#f6f6f5;border:1px solid #e9e9e6;border-radius:5px;}
+.bramer-beta-privacy-text strong{display:block;font-size:12px;font-weight:650;color:#222;}
+.bramer-beta-privacy-text p{font-size:11px!important;line-height:1.7!important;color:#6b6b6b;margin:8px 0 0;}
+.bramer-beta-local-notice{font-size:11px!important;line-height:1.6!important;color:#8c8c8c;margin:14px 0 17px;}
+.bramer-beta-error{font-size:12px!important;color:#ad3030;margin:0 0 11px;}
+.bramer-beta-form>.bramer-beta-primary{width:100%;min-height:46px;font-size:13px!important;border-radius:6px;}
+.bramer-beta-registered{padding:18px;background:#f6f6f5;border-radius:8px;display:flex;flex-direction:column;gap:14px;}
+.bramer-beta-registered p{font-size:13px!important;line-height:1.75!important;color:#555;margin:0;}
+.bramer-beta-registered button{min-height:44px;border-radius:6px;}
+@media(max-width:760px){
+ .bramer-landing .bramer-home-hero{min-height:650px;padding:90px 18px 90px;}
+ .bramer-landing .bramer-home-hero h1{font-size:clamp(31px,6.3vw,43px)!important;}
+ .bramer-hero-support{font-size:12px!important;}
+ .bramer-landing .bramer-beta-dialog{padding:32px 22px 25px;}
+ .bramer-beta-field-grid{gap:12px;}
+ .bramer-beta-field-grid input,.bramer-beta-field-grid select{font-size:16px!important;}
+}
+@media(max-width:450px){
+ .bramer-beta-field-grid{grid-template-columns:1fr;}
+ .bramer-landing .bramer-beta-dialog h2{font-size:21px!important;}
+ .bramer-landing .bramer-home-hero h1{font-size:31px!important;}
+ .bramer-landing .bramer-home-hero{min-height:610px;}
+}
+@media(prefers-reduced-motion:reduce){
+ .bramer-landing .bramer-home-hero *{animation:none!important;}
+}
