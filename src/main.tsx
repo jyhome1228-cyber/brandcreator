@@ -21,3 +21,5 @@ createRoot(document.getElementById('root')!).render(
 import './dashboard.css';
 import './site-navigation.css';
 import './create-dashboard.css';
+
+import './select.css';
