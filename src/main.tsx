@@ -27,3 +27,5 @@ import './select.css';
 import './editor-refresh.css';
 
 import './industry-rationale-layout.css';
+
+import './brand-alignment.css';
