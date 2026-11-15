@@ -1,0 +1,92 @@
+/* Bramer editor refresh — aligns generated-document screen with the light dashboard */
+.editor-mode {background:#f7f7f5!important;color:#191919;}
+.editor-mode .editor-topbar {background:#fff;border-color:#e6e6e3;height:66px;}
+.editor-mode .editor-header-inner {width:min(1440px,calc(100% - 48px));min-height:66px;height:66px;}
+.editor-mode .editor-product-brand .bramer-brand-home {font-size:22px!important;font-weight:500!important;letter-spacing:-.055em!important;}
+.editor-mode .editor-product-brand .project-name {font-size:11px;color:#888;}
+.editor-mode .header-actions {gap:8px;flex-wrap:wrap;}
+.editor-mode .header-actions .button {font-size:12px!important;min-height:37px;padding:9px 13px;border-radius:7px!important;white-space:nowrap;}
+.editor-mode .header-actions .button.primary {background:#181818;border-color:#181818;color:#fff;}
+.editor-mode .bramer-editor-industry {font-size:11px;color:#777;}
+.bramer-editor-overview {
+ width:min(1440px,calc(100% - 48px));padding:24px 26px 22px;
+ background:#f7f7f5;border:0;border-bottom:1px solid #e0e0dc;
+}
+.bramer-editor-overview h1 {font-size:27px!important;line-height:1.35!important;font-weight:600;}
+.bramer-editor-overview>div:first-child>span {font-size:11px!important;color:#777;}
+.bramer-editor-overview>div:last-child strong {font-size:13px!important;}
+.bramer-editor-overview>div:last-child small {font-size:11px!important;}
+.editor-layout {
+ width:min(1440px,calc(100% - 48px));max-width:1440px;
+ grid-template-columns:205px minmax(0,1fr) 288px;
+ min-height:calc(100vh - 145px);
+ border:1px solid #e4e4e0;border-top:0;background:#fff;
+}
+.editor-mode .page-sidebar {
+ background:#fff!important;
+ border-right:1px solid #e7e7e4!important;
+ padding:24px 11px 40px;
+}
+.editor-mode .sidebar-heading {color:#555;font-size:12px!important;padding:0 10px 16px;}
+.editor-mode .page-group-label {color:#8b8b87!important;font-size:11px!important;margin:14px 9px 8px;}
+.editor-mode .page-group-label i{font-size:10px!important;color:#aaa;}
+.editor-mode .page-row {background:transparent!important;border-radius:6px!important;min-height:40px;}
+.editor-mode .page-row:hover{background:#f6f6f4!important;}
+.editor-mode .page-row.selected {background:#ededeb!important;border-radius:6px!important;}
+.editor-mode .page-row.selected::before {width:2px;background:#191919!important;left:0;top:9px;bottom:9px;}
+.editor-mode .page-select {color:#40403d!important;font-size:12px!important;font-weight:530;min-height:40px;}
+.editor-mode .page-row.selected .page-select{color:#151515!important;font-weight:650;}
+.editor-mode .page-select span:first-child{font-size:10px!important;color:#989893!important;}
+.editor-mode .page-row input[type=checkbox]{accent-color:#1a1a1a;width:14px;height:14px;}
+.editor-mode .preview-area{background:#f0f0ee!important;padding:25px 24px 60px;}
+.editor-mode .creator-preview-toolbar{max-width:930px;min-height:42px;}
+.editor-mode .preview-title-block .metadata-label{font-size:11px!important;color:#888;}
+.editor-mode .preview-title-block strong{font-size:14px!important;line-height:1.5;}
+.editor-mode .preview-toolbar-meta{gap:7px;}
+.editor-mode .preview-toolbar-meta>span{font-size:11px!important;color:#7b7b76;background:#fff;border:1px solid #e2e2df;padding:7px 9px;border-radius:5px;}
+.editor-mode .preview-toolbar-meta .button{font-size:11px!important;border-radius:5px!important;}
+.editor-mode .svg-page{border-radius:2px;box-shadow:0 12px 34px rgba(0,0,0,.08);width:100%;max-width:930px;}
+.editor-mode .settings-panel{background:#fff!important;border-left:1px solid #e7e7e4!important;padding:26px 20px 40px;}
+.editor-mode .settings-heading{margin-bottom:24px;}
+.editor-mode .settings-heading h2{font-size:19px!important;font-weight:620;}
+.editor-mode .settings-heading .eyebrow{font-size:11px!important;color:#888;letter-spacing:0!important;}
+.editor-mode .setting-group{border-bottom:1px solid #e8e8e5;padding-bottom:24px;margin-bottom:24px;}
+.editor-mode .setting-group h3{font-size:13px!important;color:#363636;}
+.editor-mode .field.compact>span{font-size:12px!important;color:#666;}
+.editor-mode .setting-group textarea,.editor-mode .setting-group input{border-radius:6px!important;font-size:13px!important;min-width:0;}
+.editor-mode .spec-row{font-size:12px!important;color:#666;}
+.editor-mode .spec-row strong{color:#222;}
+.bramer-tech-section{max-width:1000px;margin:62px auto 0;padding:45px 0 10px;border-top:1px solid #dededb;text-align:left;}
+.bramer-tech-section h3{font-size:23px!important;font-weight:630;line-height:1.35!important;letter-spacing:-.045em!important;margin:0 0 14px;}
+.bramer-tech-section>p{font-size:13px!important;line-height:1.85!important;color:#6d6d6b;max-width:800px;}
+.bramer-tech-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px;margin-top:23px;}
+.bramer-tech-grid>div{background:#f5f5f3;border:1px solid #e9e9e6;padding:22px;display:flex;flex-direction:column;gap:10px;}
+.bramer-tech-grid strong{font-size:14px;font-weight:630;}
+.bramer-tech-grid span{font-size:12px;line-height:1.75;color:#777;}
+.bramer-tech-section .bramer-tech-note{font-size:12px!important;color:#8a8a87;margin-top:22px;}
+@media(max-width:1120px){
+ .editor-layout{grid-template-columns:185px minmax(0,1fr) 265px;}
+ .editor-mode .preview-area{padding:20px 16px 40px;}
+}
+@media(max-width:1000px){
+ .editor-layout{grid-template-columns:175px minmax(0,1fr);}
+ .editor-mode .settings-panel{grid-column:2;grid-row:2;border-top:1px solid #e7e7e4!important;border-left:0!important;}
+ .editor-mode .page-sidebar{grid-row:1/span 2;}
+ .bramer-tech-grid{grid-template-columns:1fr;}
+}
+@media(max-width:760px){
+ .editor-mode .editor-topbar{height:auto;min-height:64px;}
+ .editor-mode .editor-header-inner{width:calc(100% - 24px);height:auto;min-height:64px;padding:10px 0;}
+ .editor-mode .header-actions{width:100%;gap:6px;}
+ .editor-mode .header-actions .button{font-size:11px!important;min-height:36px;}
+ .bramer-editor-overview{width:calc(100% - 24px);padding:20px 6px 15px;}
+ .bramer-editor-overview h1{font-size:23px!important;}
+ .editor-layout{width:100%;border-left:0;border-right:0;display:flex;flex-direction:column;}
+ .editor-mode .page-sidebar{width:100%;background:#fff!important;border-bottom:1px solid #e5e5e2!important;border-right:0!important;padding:10px 12px;}
+ .editor-mode .page-list{display:flex;gap:12px;overflow-x:auto;padding-bottom:5px;}
+ .editor-mode .page-group{flex:0 0 auto;min-width:150px;}
+ .editor-mode .preview-area{width:100%;padding:20px 12px 35px;}
+ .editor-mode .settings-panel{width:100%;padding:25px 18px 40px;}
+ .bramer-tech-section{margin-top:35px;}
+ .bramer-tech-section h3{font-size:19px!important;}
+}
