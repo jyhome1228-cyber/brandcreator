@@ -29,3 +29,5 @@ import './editor-refresh.css';
 import './industry-rationale-layout.css';
 
 import './brand-alignment.css';
+
+import './wordmark.css';
