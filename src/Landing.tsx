@@ -143,11 +143,11 @@ export default function Landing({ onStart }: LandingProps) {
             <div><strong>업종별 구성</strong><span>초기 추천안을 제공하며 필요한 항목은 직접 추가하거나 제외할 수 있습니다.</span></div>
             <div><strong>문서 생성과 편집</strong><span>페이지별 내용을 수정하고 SVG 또는 PDF로 결과물을 내보낼 수 있습니다.</span></div>
           </div>
-          <p className="bramer-tech-note">로고 여백과 최소 크기는 자동 제안값이며 최종 인쇄·사용 환경에서 확인이 필요합니다. Illustrator AI 원본은 현재 직접 변환하지 않으므로 SVG로 내보내 업로드해 주세요. 자동 생성 항목은 브랜드별 검토가 필요합니다.</p>
+          <p className="bramer-tech-note">로고 여백과 최소 크기는 자동 제안값이며 최종 인쇄·사용 환경에서 확인이 필요합니다. Illustrator AI 원본은 현재 직접 변환하지 않아요. Illustrator에서 파일 → 다른 이름으로 저장 → SVG를 선택해 저장한 파일을 업로드해 주세요. 자동 생성 항목은 브랜드별 검토가 필요합니다.</p>
         </section>
         <div className="bramer-help-faq" id="faq">
           <h3>자주 묻는 질문</h3>
-          <details><summary>어떤 로고 파일을 업로드해야 하나요?</summary><p>Primary Logo를 SVG 형식으로 준비해 주세요. SVG가 없으면 디자인 프로그램에서 벡터 형식으로 저장해야 합니다.</p></details>
+          <details><summary>어떤 로고 파일을 업로드해야 하나요?</summary><p>SVG는 로고의 형태와 크기를 유지하는 벡터 파일이에요. Illustrator AI 원본만 있다면 Illustrator에서 파일 → 다른 이름으로 저장 → 파일 형식 SVG를 선택하세요. 저장한 SVG를 Bramer에 업로드하면 됩니다.</p></details>
           <details><summary>업종별 추천 항목을 수정할 수 있나요?</summary><p>네. 추천 항목은 제작 화면에서 추가하거나 제외할 수 있습니다. 현재의 추천값은 연구 검증 전의 초기 설정입니다.</p></details>
           <details><summary>완성한 가이드라인은 어떻게 저장하나요?</summary><p>페이지별 SVG, 전체 SVG 또는 PDF로 내보낼 수 있습니다. 이후 수정할 계획이라면 프로젝트 JSON도 별도로 저장해 주세요.</p></details>
           <details><summary>모든 가이드라인이 자동으로 완성되나요?</summary><p>로고와 컬러의 기본 규칙은 자동으로 구성할 수 있지만, 사진 스타일·언어·응용 디자인 등은 브랜드별 내용을 직접 확정해야 합니다.</p></details>
