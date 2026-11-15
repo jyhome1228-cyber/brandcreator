@@ -324,6 +324,13 @@ export default function App() {
           </nav>
 
           <section className="setup-main">
+            <div className="bramer-workspace-heading">
+              <div><span className="bramer-workspace-kicker">BRAMER / BRAND WORKSPACE</span>
+                <h1>브랜드 가이드라인 제작</h1>
+                <p>브랜드의 기본 정보를 설정하고, 필요한 규칙을 선택해 하나의 일관된 시스템으로 완성합니다.</p>
+              </div>
+              <div className="bramer-workspace-meta"><span>WORKSPACE</span><strong>{String(setupStep).padStart(2, '0')} / 04</strong></div>
+            </div>
             <div className="setup-module-stack">
               <section className={`setup-module setup-panel ${setupStep === 1 ? 'active' : ''}`}>
                 <div className="module-index">01</div>
@@ -759,6 +766,10 @@ export default function App() {
         </div>
       </header>
 
+      <div className="bramer-editor-overview">
+        <div><span>BRAMER / GUIDELINE EDITOR</span><h1>{project.englishName || project.name}</h1></div>
+        <div><strong>{enabledPages.length} PAGES</strong><small>{industryLabel} · A4 Landscape</small></div>
+      </div>
       <main className="editor-layout">
         <aside className="page-sidebar" aria-label="가이드라인 목차">
           <div className="sidebar-heading">

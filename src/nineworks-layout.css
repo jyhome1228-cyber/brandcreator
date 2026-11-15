@@ -1,0 +1,122 @@
+/* BRAMER / NINEWORKS WORK DESK layout integration — 2026 */
+:root {
+  --nw-bg:#f6f6f4;
+  --nw-ink:#101010;
+  --nw-muted:#767673;
+  --nw-line:#dcdcd8;
+  --nw-panel:#fff;
+}
+.setup-mode,.editor-mode{background:var(--nw-bg);}
+.product-topbar,.editor-topbar{border-bottom:1px solid var(--nw-line);background:#fff;}
+.product-brand .brand-title {font-weight:650!important;letter-spacing:-.07em!important;}
+/* Work desk-style title zone. The workspace is functional rather than a landing page. */
+.bramer-workspace-heading {
+  display:flex;justify-content:space-between;align-items:flex-end;gap:24px;
+  padding:12px 0 25px;margin-bottom:18px;border-bottom:1px solid #cfcfca;
+}
+.bramer-workspace-kicker,.bramer-editor-overview>div:first-child>span{
+  display:block;font-size:10px;color:#777;letter-spacing:.14em!important;font-weight:700;
+}
+.bramer-workspace-heading h1{font-size:clamp(26px,2.5vw,36px);font-weight:570;line-height:1.22;letter-spacing:-.055em!important;margin:11px 0 10px;}
+.bramer-workspace-heading p{margin:0;color:#777;font-size:13px;line-height:1.65;max-width:570px;}
+.bramer-workspace-meta{text-align:right;white-space:nowrap;border-left:1px solid #d5d5d2;padding-left:25px;}
+.bramer-workspace-meta span{display:block;font-size:10px;color:#777;letter-spacing:.1em!important;}
+.bramer-workspace-meta strong{display:block;font-size:26px;font-weight:550;letter-spacing:-.05em!important;margin-top:7px;}
+/* CRM navigation: crisp separators, dark rail, stronger wayfinding */
+.setup-step-nav {
+  padding:26px 17px 22px;background:#0a0a0a!important;color:#f3f3f1;
+  border:1px solid #171717;box-shadow:none;border-radius:0!important;
+}
+.step-nav-head {border-bottom:1px solid #2a2a2a;padding:0 7px 20px;}
+.step-nav-head .metadata-label {color:#81817f!important;}
+.step-nav-head strong {font-size:16px;color:#f0f0ee;line-height:1.3;font-weight:550;}
+.step-nav-head p{font-size:12px;color:#8f8f8b;line-height:1.65;}
+.step-nav-list{gap:0;padding:14px 0;}
+.step-nav-item{
+  min-height:63px;padding:13px 8px!important;border:0!important;
+  border-bottom:1px solid #202020!important;border-radius:0!important;
+  background:transparent!important;color:#a7a7a2!important;
+  transition:background .18s ease,color .18s ease,padding-left .18s ease;
+}
+.step-nav-item:hover{background:#151515!important;color:#f3f3f1!important;padding-left:13px!important;}
+.step-nav-item.active{background:#202020!important;color:#fff!important;border-left:2px solid #fff!important;padding-left:12px!important;}
+.step-nav-number,.step-nav-copy small{color:#777772;font-size:10px;}
+.step-nav-copy strong{font-size:13px;font-weight:570;}
+.step-nav-item.active .step-nav-number,.step-nav-item.active .step-nav-copy small{color:#bcbcb6;}
+.step-nav-item i{border-color:#454545;}
+.step-nav-progress{border-top:1px solid #2a2a2a;padding:20px 8px 0;}
+.step-nav-progress>div:first-child{color:#8f8f8b;font-size:11px;}
+.step-nav-progress strong{color:#fff;font-size:12px;}
+.step-nav-progress .progress-track{background:#353535;}
+.step-nav-progress .progress-track i{background:#f2f2ef;}
+/* CRM uses thin horizontal rules instead of excess pill-like cards. */
+.setup-module {border-radius:0!important;border-color:#dddcd8;box-shadow:none!important;}
+.module-content{padding:34px 35px 36px;}
+.module-index{background:#fafaf9;border-right:1px solid #e8e8e4;color:#9c9c98;}
+.setup-panel .module-heading{border-bottom:1px solid #dfdfda;padding-bottom:23px;}
+.module-heading h2{font-weight:590!important;letter-spacing:-.05em!important;}
+.module-state,.bramer-tier,.bramer-module-card,.bramer-industry-picker,.bramer-selection-summary button{border-radius:0!important;}
+.bramer-module-card.is-selected{background:#f2f2ef;border-color:#151515;}
+.bramer-module-card{transition:background .2s ease,border-color .2s ease;}
+.bramer-module-card:hover{transform:none;box-shadow:none;border-color:#666;}
+.bramer-module-card-top input{accent-color:#161616;}
+.setup-module .field input,.setup-module .field textarea,.setup-module .field select{border-radius:0!important;}
+.creator-upload{border-radius:0!important;background:#fcfcfb;}
+.step-actions{border-radius:0!important;box-shadow:none!important;border:1px solid #dadad7;}
+.step-actions .button,.bramer-save-button,.bramer-import-button{border-radius:0!important;}
+/* Preview column: quiet data rail, no competing decoration */
+.setup-preview-panel .preview-panel-heading{padding:9px 0 13px;border-bottom:1px solid #d8d8d3;}
+.preview-panel-heading strong{font-size:15px;}
+.creator-document-preview{border-radius:0;box-shadow:0 14px 32px rgba(0,0,0,.08);}
+.preview-stat,.preview-progress-card,.bramer-onboarding-note,.page-structure-card{border-radius:0!important;box-shadow:none!important;}
+.preview-stat{border-color:#e2e2dd;}
+.page-structure-heading{border-bottom:1px solid #e2e2dd;}
+.structure-row{border-bottom:1px solid #f0f0ed;}
+.structure-title{font-size:12px;}
+/* Dedicated editor project heading matching Work Desk content headers */
+.bramer-editor-overview{
+  width:min(1440px,100%);margin:0 auto;padding:30px 28px 24px;
+  display:flex;align-items:end;justify-content:space-between;gap:16px;
+  background:#f6f6f4;border-left:1px solid #e3e3df;border-right:1px solid #e3e3df;border-bottom:1px solid #d9d9d5;
+}
+.bramer-editor-overview h1{margin:9px 0 0;font-size:clamp(26px,3vw,39px);font-weight:550;line-height:1.15;letter-spacing:-.06em!important;overflow-wrap:anywhere;}
+.bramer-editor-overview>div:last-child{text-align:right;white-space:nowrap;}
+.bramer-editor-overview>div:last-child strong{display:block;font-size:15px;letter-spacing:.02em!important;}
+.bramer-editor-overview>div:last-child small{display:block;color:#777;font-size:11px;margin-top:6px;}
+.editor-layout{border-color:#e0e0dc;}
+.editor-mode .page-sidebar{background:#0b0b0b!important;border-color:#252525;}
+.editor-mode .sidebar-heading{color:#8a8a85;}
+.editor-mode .page-group-label{color:#888883;}
+.editor-mode .page-select{color:#cacac6;}
+.editor-mode .page-select span:first-child{color:#777772;}
+.editor-mode .page-row.selected{background:#222!important;border-radius:0!important;}
+.editor-mode .page-row.selected .page-select{color:#fff;}
+.editor-mode .page-row.selected::before{background:#fff!important;border-radius:0;}
+.editor-mode .page-row{border-radius:0!important;}
+.editor-mode .page-row input[type=checkbox]{accent-color:#fff;}
+.editor-mode .preview-area{background:#f0f0ed;}
+.editor-mode .settings-panel{background:#fff;}
+.editor-mode .settings-heading{padding-bottom:20px;border-bottom:1px solid #e4e4e0;}
+.editor-mode .settings-heading h2{font-weight:570;}
+.editor-mode .setting-group{border-color:#e5e5e1;}
+.editor-mode .field input,.editor-mode .field textarea{border-radius:0!important;}
+@media (max-width:1020px){
+ .bramer-workspace-heading{padding-top:0;}
+ .bramer-editor-overview{padding:22px 18px;}
+}
+@media (max-width:767px){
+ .bramer-workspace-heading{gap:9px;padding-bottom:17px;}
+ .bramer-workspace-heading h1{font-size:24px;}
+ .bramer-workspace-heading p{font-size:12px;}
+ .bramer-workspace-meta{display:none;}
+ .setup-step-nav{padding:8px;border-radius:0!important;}
+ .step-nav-item{min-height:59px!important;padding:9px 4px!important;border:0!important;border-right:1px solid #292929!important;}
+ .step-nav-item.active{padding:9px 4px!important;border-left:0!important;border-bottom:2px solid #fff!important;}
+ .step-nav-copy strong{font-size:11px;}
+ .module-content{padding:22px 17px;}
+ .bramer-editor-overview{padding:18px 14px;}
+ .bramer-editor-overview h1{font-size:25px;}
+ .bramer-editor-overview>div:last-child strong{font-size:12px;}
+ .editor-mode .page-sidebar{border-bottom-color:#303030;}
+ .editor-mode .page-group{border-right:1px solid #262626;padding-right:7px;}
+}
