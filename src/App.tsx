@@ -1,7 +1,9 @@
-import { useEffect, useMemo, useState, type ChangeEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
 import Dashboard from './Dashboard';
+import ProjectLibrary from './ProjectLibrary';
+import { deleteLocalProject, listSavedProjects, newProjectId, saveLocalProject, type SavedBramerProject } from './engines/projectLibrary';
 import BramerSelect from './components/BramerSelect';
 import { INDUSTRY_RATIONALE } from './engines/industryRationale';
 import { downloadAllSvg, downloadSvg } from './export/download';
@@ -63,7 +65,7 @@ function isHex(value: string): boolean {
 
 export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
-  const [mode, setMode] = useState<'landing' | 'dashboard' | 'guide' | 'setup' | 'editor'>(() => location.hash === '#/create' || location.hash === '#/editor' || location.hash === '#/dashboard' ? 'setup' : location.hash === '#/guide' ? 'guide' : 'landing');
+  const [mode, setMode] = useState<'landing' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects'>(() => location.hash === '#/create' || location.hash === '#/editor' || location.hash === '#/dashboard' ? 'setup' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : 'landing');
   const enterWorkspace = () => {
     setSetupStep(1);
     window.location.hash = '/create';
@@ -99,6 +101,7 @@ export default function App() {
     const syncRoute = () => {
       if (window.location.hash === '#/dashboard') setMode('setup');
       else if (window.location.hash === '#/guide') setMode('guide');
+      else if (window.location.hash === '#/projects') setMode('projects');
       else if (window.location.hash === '#/create') setMode('setup');
       else if (window.location.hash === '#/editor') setMode(previous => previous === 'editor' ? 'editor' : 'setup');
       else setMode('landing');
@@ -112,6 +115,80 @@ export default function App() {
   const [error, setError] = useState('');
   const [industry, setIndustry] = useState<IndustryId>('service');
   const [selectedCategories, setSelectedCategories] = useState<GuidelineCategory[]>(getDefaultSelection('service'));
+  const [projectId, setProjectId] = useState(() => newProjectId());
+  const [savedProjects, setSavedProjects] = useState<SavedBramerProject[]>([]);
+  const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
+  const [libraryError, setLibraryError] = useState('');
+  const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const currentSnapshot = (): SavedBramerProject => ({
+    id: projectId, updatedAt: Date.now(), project, industry, selectedCategories, enabled, step: setupStep,
+  });
+  const refreshProjects = async () => {
+    try { setSavedProjects(await listSavedProjects()); setLibraryError(''); }
+    catch (e) { setLibraryError(e instanceof Error ? e.message : '저장된 프로젝트를 불러오지 못했습니다.'); }
+  };
+  const saveToBrowser = async (): Promise<boolean> => {
+    if (!project.name.trim() && !project.englishName.trim()) return false;
+    setSaveStatus('saving');
+    try {
+      await saveLocalProject(currentSnapshot());
+      setSaveStatus('saved');
+      await refreshProjects();
+      return true;
+    } catch (e) {
+      setSaveStatus('error');
+      setLibraryError(e instanceof Error ? e.message : '브라우저 저장에 실패했습니다. JSON 파일로 백업해 주세요.');
+      return false;
+    }
+  };
+  useEffect(() => { void refreshProjects(); }, []);
+  useEffect(() => {
+    if (!project.name.trim() && !project.englishName.trim()) return;
+    setSaveStatus('saving');
+    autosaveTimer.current = setTimeout(() => { void saveToBrowser(); }, 550);
+    return () => { if (autosaveTimer.current) clearTimeout(autosaveTimer.current); };
+  }, [project, projectId, industry, selectedCategories, enabled, setupStep]);
+  const openProjectLibrary = async () => {
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    if (project.name.trim() || project.englishName.trim()) await saveToBrowser();
+    await refreshProjects();
+    window.location.hash = '/projects';
+    setMode('projects');
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  };
+  const createNewProject = async () => {
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    if (project.name.trim() || project.englishName.trim()) await saveToBrowser();
+    setProject({ ...initialProject, year: String(new Date().getFullYear()), colors:{...initialProject.colors}, typography:{...initialProject.typography}, rules:{...initialProject.rules} });
+    setProjectId(newProjectId()); setIndustry('service'); setSelectedCategories(getDefaultSelection('service'));
+    setEnabled({}); setCurrentId('01-cover'); setSetupStep(1); setError(''); setSaveStatus('idle');
+    window.location.hash='/create'; setMode('setup');
+    window.scrollTo({ top:0, behavior:'instant' });
+  };
+  const resumeSavedProject = async (id: string) => {
+    try {
+      const entries = await listSavedProjects();
+      const item = entries.find(entry => entry.id === id);
+      if (!item) throw new Error('선택한 프로젝트를 찾을 수 없습니다.');
+      const restoredLogo = item.project.logo?.raw && item.project.logo.fileName ?
+        parseLogoSvg(item.project.logo.raw,item.project.logo.fileName) : null;
+      setProjectId(item.id);
+      setProject({...item.project,logo:restoredLogo});
+      setIndustry(item.industry);
+      setSelectedCategories(item.selectedCategories);
+      setEnabled(item.enabled ?? {});
+      setSetupStep(Math.min(5,Math.max(1,item.step)) as 1|2|3|4|5);
+      setError('');setSaveStatus('saved');
+      window.location.hash='/create';setMode('setup');
+      window.scrollTo({top:0,behavior:'instant'});
+    } catch(e) {setLibraryError(e instanceof Error ? e.message : '프로젝트를 열지 못했습니다.');}
+  };
+  const removeSavedProject = async (id: string) => {
+    if (!window.confirm('이 프로젝트를 브라우저에서 삭제할까요? 복구할 수 없습니다.')) return;
+    try { await deleteLocalProject(id); await refreshProjects(); }
+    catch(e) {setLibraryError(e instanceof Error ? e.message : '프로젝트를 삭제하지 못했습니다.');}
+  };
+
   const recommendations = useMemo(() => getRecommendations(industry), [industry]);
   const pages = useMemo(() => {
     const originals = postProcessGuidelinePages(generateGuidelinePages(project), project);
@@ -257,6 +334,7 @@ export default function App() {
         : null;
       setIndustry(restoredIndustry);
       setSelectedCategories(restoredModules);
+      setProjectId(newProjectId());
       setProject({ ...saved, logo: safeLogo });
       setEnabled(snapshot.enabled || {});
       setCurrentId('01-cover');
@@ -297,6 +375,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
+  if (mode === 'projects') return <ProjectLibrary projects={savedProjects} onOpen={id => void resumeSavedProject(id)} onRemove={id => void removeSavedProject(id)} onNew={() => void createNewProject()} onBack={() => {window.location.hash='/create';setMode('setup');}} error={libraryError}/>;
   if (mode === 'landing') return <Landing onStart={enterWorkspace} />;
   if (mode === 'dashboard' || mode === 'guide') return <Dashboard
     view={mode}
@@ -314,18 +393,20 @@ export default function App() {
       <div className="bramer-dash bramer-create-shell setup-mode">
         <header className="bramer-dash-header">
           <button type="button" className="bramer-dash-logo" onClick={goHome} aria-label="Bramer 서비스 소개로 이동">BRAMER.</button>
-          <span className="bramer-dash-product">브랜드 가이드라인 제작</span>
+          <span className="bramer-dash-product">브랜드 가이드라인 제작 <span className="bramer-save-state">{saveStatus === 'saving' ? '· 저장 중' : saveStatus === 'saved' ? '· 브라우저에 저장됨' : saveStatus === 'error' ? '· 저장 실패' : ''}</span></span>
           <div className="bramer-create-header-actions">
             <label className="bramer-create-import">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={event => void restoreProject(event)} /></label>
-            <button type="button" className="bramer-dash-header-start" onClick={saveProject}>프로젝트 저장</button>
+            <button type="button" className="bramer-dash-header-start" onClick={() => void saveToBrowser()}>브라우저 저장</button>
+            <button type="button" className="bramer-create-import" onClick={saveProject}>JSON 백업</button>
           </div>
         </header>
         <div className="bramer-dash-layout">
           <aside className="bramer-dash-sidebar" aria-label="서비스 메뉴">
             <div className="bramer-dash-nav">
               <button type="button" onClick={() => navigateWorkspace('dashboard')}>홈</button>
+              <button type="button" onClick={() => void openProjectLibrary()}>내 프로젝트</button>
               <button type="button" onClick={() => navigateWorkspace('guide')}>업종별 가이드</button>
-              <button type="button" className="active" aria-current="page" onClick={() => setSetupStep(1)}>새로 만들기</button>
+              <button type="button" className="active" aria-current="page" onClick={() => void createNewProject()}>새로 만들기</button>
             </div>
             <div className="bramer-dash-sidebar-bottom">
               <p>브랜드 정보와 로고를 등록하고, 필요한 규칙을 선택하여 가이드라인을 만들어보세요.</p>
@@ -375,7 +456,7 @@ export default function App() {
           <section className="setup-main">
             <div className="bramer-workspace-heading">
               <div><span className="bramer-workspace-kicker">가이드라인 제작</span>
-                <h1>새 브랜드 가이드라인 만들기</h1>
+                <h1>{project.name.trim() ? `${project.name.trim()} 브랜드 가이드라인 만들기` : '새 브랜드 가이드라인 만들기'}</h1>
                 <p>브랜드 정보를 입력하고 필요한 규칙을 선택해 주세요. 단계별로 가이드라인을 완성할 수 있어요.</p>
               </div>
               <div className="bramer-workspace-meta"><span>WORKSPACE</span><strong>{String(setupStep).padStart(2, '0')} / 05</strong></div>
@@ -749,7 +830,7 @@ export default function App() {
             </div>
           </section>
 
-          <aside className={`setup-preview-panel ${setupStep < 3 ? 'bramer-preview-hidden' : ''}`}>
+          <aside className={`setup-preview-panel ${setupStep !== 5 ? 'bramer-preview-hidden' : ''}`}>
             <div className="preview-sticky">
               <div className="preview-panel-heading">
                 <div>
@@ -840,7 +921,9 @@ export default function App() {
             </div>
           </div>
           <div className="header-actions"><button className="button ghost" onClick={() => navigateWorkspace('dashboard')}>대시보드</button><span className="bramer-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
-            <button className="button ghost" onClick={saveProject}>프로젝트 저장</button>
+            <button className="button ghost" onClick={() => void saveToBrowser()}>브라우저 저장</button>
+            <button className="button ghost" onClick={() => void openProjectLibrary()}>내 프로젝트</button>
+            <button className="button ghost" onClick={saveProject}>JSON 백업</button>
             <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); window.location.hash = '/create'; }}>구성 변경</button>
             <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
             <button className="button primary" onClick={() => window.print()}>PDF로 내보내기</button>
