@@ -43,3 +43,5 @@ import './direct-create.css';
 import './beta-launch-v2.css';
 
 import './hero-full-rotation.css';
+
+import './project-library.css';
