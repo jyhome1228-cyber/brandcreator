@@ -1,0 +1,29 @@
+/* Bramer project library and focused creation workflow */
+.bramer-save-state{color:#888;font-size:11px;font-weight:450;}
+.bramer-create-header-actions{flex-wrap:wrap;justify-content:flex-end;}
+.bramer-projects-content{padding-top:45px;}
+.bramer-project-notice{padding:15px 17px;margin-bottom:22px;background:#f1f1ef;border:1px solid #e2e2de;border-radius:8px;font-size:12px;line-height:1.7;color:#6b6b67;}
+.bramer-project-list{display:grid;gap:10px;}
+.bramer-project-card{display:flex;justify-content:space-between;align-items:center;gap:20px;padding:21px 23px;border:1px solid #e2e2df;background:#fff;border-radius:10px;}
+.bramer-project-card>div:first-child{display:flex;flex-direction:column;gap:7px;min-width:0;}
+.bramer-project-card strong{font-size:15px!important;color:#191919;font-weight:650;overflow-wrap:anywhere;}
+.bramer-project-card span{font-size:11px;color:#8c8c87;line-height:1.6;}
+.bramer-project-controls{display:flex;flex:0 0 auto;gap:7px;}
+.bramer-project-controls button{padding:10px 15px;border-radius:6px;min-height:38px;font-size:12px!important;font-weight:600;}
+.bramer-project-open{border:1px solid #1b1b1b;color:#fff;background:#1b1b1b;}
+.bramer-project-open:hover{background:#444;}
+.bramer-project-delete{border:1px solid #dededb;color:#777;background:#fff;}
+.bramer-project-delete:hover{border-color:#888;color:#222;}
+.bramer-project-empty{padding:70px 25px;background:#fff;border:1px solid #e6e6e2;border-radius:10px;display:flex;flex-direction:column;align-items:center;text-align:center;gap:12px;}
+.bramer-project-empty strong{font-size:17px;font-weight:600;}
+.bramer-project-empty p{font-size:13px;color:#777;margin:0 0 8px;}
+.bramer-project-error{padding:14px 17px;border:1px solid #e7b8b8;background:#fff6f6;color:#9c3030;border-radius:8px;font-size:13px;}
+.bramer-create-shell .setup-preview-panel.bramer-preview-hidden{display:none!important;}
+.bramer-create-shell .setup-preview-panel:not(.bramer-preview-hidden){margin-top:25px!important;}
+@media(max-width:760px){
+ .bramer-projects-content{padding:24px 16px 55px;}
+ .bramer-project-card{padding:18px;flex-direction:column;align-items:stretch;gap:15px;}
+ .bramer-project-controls button{flex:1;}
+ .bramer-create-header-actions{gap:5px;}
+ .bramer-create-shell .bramer-dash-product{display:none;}
+}
