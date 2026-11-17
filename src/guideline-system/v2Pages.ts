@@ -54,9 +54,9 @@ const baseCard=(project:BrandProject,reverse=false):string=>{
 };
 export function generateBusinessCardSvg(project:BrandProject,reverse=false):string {
   const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' },bg=reverse?'#FFFFFF':hex(project.colors.primary),fg=reverse?'#111111':inkOn(bg);
-  const label=(v:string,y:number,size=18)=>`<text x="7" y="${y}" font-size="${size}" fill="${fg}" font-family="Arial,sans-serif">${esc(v)}</text>`;
+  const label=(v:string,y:number,size=26)=>`<text x="70" y="${y}" font-size="${size}" fill="${fg}" font-family="Arial,sans-serif">${esc(v)}</text>`;
   const front=logo(project,55,95,790,310,fg);
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 900 500"><rect width="900" height="500" fill="${bg}"/>${reverse?`${label(c.personName||'이름 미입력',120,40)}${label(c.position||'',165,25)}${label(c.phone||'',325)}${label(c.email||'',365)}${label(c.website||'',405)}`:front}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 900 500"><rect width="900" height="500" fill="${bg}"/>${reverse?`${label(c.personName||'이름 미입력',120,40)}${label(c.position||'',165,25)}${label(c.phone||'',325,26)}${label(c.email||'',365,26)}${label(c.website||'',405,26)}`:front}</svg>`;
 }
 export function generateStickerSvg(project:BrandProject,shape:'circle'|'square'):string {
   const primary=hex(project.colors.primary),fg=inkOn(primary);
