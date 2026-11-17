@@ -7,10 +7,8 @@ import { deleteLocalProject, listSavedProjects, newProjectId, saveLocalProject, 
 import BramerSelect from './components/BramerSelect';
 import { INDUSTRY_RATIONALE } from './engines/industryRationale';
 import { downloadAllSvg, downloadSvg } from './export/download';
-import { generateGuidelinePages } from './guideline-system/generatePages';
-import { generateExtensionPages } from './guideline-system/extensionPages';
-import { CATEGORIES, INDUSTRIES, INDUSTRY_GUIDANCE, getDefaultSelection, getRecommendations, type GuidelineCategory, type IndustryId } from './engines/industryRecommendations';
-import { postProcessGuidelinePages } from './guideline-system/postProcess';
+import { CORE_ITEMS, generateV2Pages, generateBusinessCardSvg, generateStickerSvg, generateLetterheadSvg, generateEnvelopeSvg } from './guideline-system/v2Pages';
+import { CATEGORIES, INDUSTRIES, INDUSTRY_GUIDANCE, getDefaultSelection, type GuidelineCategory, type IndustryId } from './engines/industryRecommendations';
 import type { BrandProject, GuidelinePage } from './types/guideline';
 
 const FONT_OPTIONS = [
@@ -43,6 +41,7 @@ const initialProject: BrandProject = {
   slogan: '',
   year: String(new Date().getFullYear()),
   logo: null,
+  contact: { personName: '', position: '', phone: '', email: '', website: '', company: '', address: '' },
   colors: {
     primary: '#111111',
     secondary: '#EAEAEA',
@@ -189,33 +188,17 @@ export default function App() {
     catch(e) {setLibraryError(e instanceof Error ? e.message : '프로젝트를 삭제하지 못했습니다.');}
   };
 
-  const recommendations = useMemo(() => getRecommendations(industry), [industry]);
-  const pages = useMemo(() => {
-    const originals = postProcessGuidelinePages(generateGuidelinePages(project), project);
-    const basics = originals.filter(page =>
-      page.section === 'end' ||
-      (page.section === 'intro' ? (selectedCategories.includes('overview') || page.id === '01-cover' || page.id === '02-index') :
-      selectedCategories.includes(page.section as GuidelineCategory))
-    );
-    const extensions = generateExtensionPages(project, selectedCategories);
-    const endPosition = basics.findIndex(page => page.section === 'end');
-    if (endPosition < 0) return [...basics, ...extensions];
-    return [...basics.slice(0, endPosition), ...extensions, ...basics.slice(endPosition)];
-  }, [project, selectedCategories]);
+  const pages = useMemo(() => generateV2Pages(project), [project]);
   const changeIndustry = (value: IndustryId) => {
     setIndustry(value);
     setSelectedCategories(getDefaultSelection(value));
   };
-  const toggleCategory = (value: GuidelineCategory) => {
-    setSelectedCategories(previous => previous.includes(value)
-      ? previous.filter(item => item !== value)
-      : CATEGORIES.filter(item => item.id === value || previous.includes(item.id)).map(item => item.id));
-  };
+
   const currentPage = pages.find((page) => page.id === currentId) ?? pages[0];
   const currentPageNumber = Math.max(1, pages.findIndex(page => page.id === currentPage?.id) + 1);
   const enabledPages = pages.filter((page) => enabled[page.id] !== false);
   const industryLabel = INDUSTRIES.find(item => item.id === industry)?.label ?? '브랜드';
-  const selectedCount = selectedCategories.length;
+  const selectedCount = CORE_ITEMS.length;
   const setupChecks = [
     Boolean(project.name.trim()),
     Boolean(project.englishName.trim()),
@@ -362,11 +345,6 @@ export default function App() {
       setError('SVG 형식의 로고 파일을 업로드해 주세요. AI 파일은 Illustrator에서 SVG로 저장하면 됩니다.');
       return;
     }
-    if (selectedCategories.length === 0) {
-      setError('가이드라인에 포함할 구성요소를 하나 이상 선택해주세요.');
-      setSetupStep(2);
-      return;
-    }
     setError('');
     setEnabled(Object.fromEntries(pages.map((page) => [page.id, true])));
     setCurrentId(pages[0].id);
@@ -424,10 +402,10 @@ export default function App() {
             <div className="step-nav-list">
               {([
                 [1, '브랜드 정보', '브랜드 입력'],
-                [2, '업종별 구성', '항목 추천'],
+                [2, '기본 구성', '17개 항목'],
                 [3, '로고 업로드', 'SVG 분석'],
                 [4, '컬러 · 서체', '스타일 설정'],
-                [5, '사용 규정', '가이드라인 제작'],
+                [5, '응용 정보 · 검토', '명함·스티커 등'],
               ] as const).map(([step, label, detail]) => (
                 <button
                   key={step}
@@ -506,35 +484,33 @@ export default function App() {
                   <div className="module-heading">
                     <div>
                       <span className="module-kicker">INDUSTRY GUIDELINES</span>
-                      <h2>우리 브랜드에 필요한 항목을 골라보세요.</h2>
-                      <p className="module-description">업종을 선택하면 가이드라인 구성요소를 추천해 드려요. 필요한 항목은 자유롭게 조정할 수 있어요.</p>
+                      <h2>17개 브랜드 가이드라인 항목</h2>
+                      <p className="module-description">로고·컬러·서체·브랜드 정보·응용 디자인을 기본 구성으로 제작합니다.</p>
                     </div>
                     <span className="module-state">선택 가능</span>
                   </div>
                   <div className="field bramer-industry-picker">
                     <span>어떤 업종의 브랜드인가요?</span>
                     <BramerSelect value={industry} onChange={value => changeIndustry(value as IndustryId)} ariaLabel="브랜드 업종 선택" options={INDUSTRIES.map(item => ({ value: item.id, label: item.label }))}/>
-                    <p className="module-description bramer-research-note">선택한 업종에 따라 추천 항목이 달라집니다. 원하는 항목은 직접 추가하거나 제외할 수 있어요.</p>
+                    <p className="module-description bramer-research-note">업종 정보는 가이드 참고 자료로 사용됩니다. 기본 17개 항목은 동일하게 제작됩니다.</p>
                   <div className="bramer-industry-focus">
                     <strong>이 업종에서는 이런 기준이 중요해요.</strong>
                     <p>{INDUSTRY_RATIONALE[industry].why}</p>
                     <div>{INDUSTRY_GUIDANCE[industry].touchpoints.map(point => <span key={point}>{point}</span>)}</div>
                   </div>
-                    <div className="bramer-module-grid">
-                      {CATEGORIES.map(item => (
-                        <label key={item.id} className={`bramer-module-card ${selectedCategories.includes(item.id) ? 'is-selected' : ''}`}>
-                          <span className="bramer-module-card-top">
-                            <input type="checkbox" checked={selectedCategories.includes(item.id)} onChange={() => toggleCategory(item.id)} aria-label={item.label + ' 선택'} />
-                            <small className={`bramer-tier bramer-tier-${recommendations[item.id].toLowerCase()}`}>{recommendations[item.id]}</small>
-                          </span>
-                          <strong className="bramer-module-title">{item.label}</strong>
-                          <small className="bramer-module-description">{item.description}</small>
-                        </label>
+                    <div className="bramer-v2-guideline-head"><strong>17개 기본 제작 항목</strong><span>총 5개 시스템 · 디자인 응용 4종 포함</span></div>
+                    <div className="bramer-v2-guideline-grid">
+                      {CORE_ITEMS.map(([name, description], index) => (
+                        <div className="bramer-v2-guideline-item" key={name}>
+                          <span>{String(index+1).padStart(2,'0')}</span>
+                          <div><strong>{name}</strong><small>{description}</small></div>
+                          <span className="bramer-v2-check">✓</span>
+                        </div>
                       ))}
                     </div>
-                    <div className="bramer-selection-summary"><strong>{selectedCount} / 8개 항목 선택</strong><span>선택 결과는 실제 생성 페이지와 SVG·PDF 출력에 반영됩니다.</span><button type="button" onClick={() => setSelectedCategories(getDefaultSelection(industry))}>추천 항목으로 초기화</button></div>
+                    <p className="module-description">기본 17개 항목은 모두 제작 문서에 포함됩니다. 명함·봉투 등에 필요한 연락처 정보는 마지막 단계에서 입력해 주세요. 로고 최소 크기와 인쇄 규격은 제작 전 검토가 필요합니다.</p>
                   </div>
-                  <p className="bramer-research-note">업종별 추천 기준은 연구 검증 전의 초기 설정값입니다. 22개 브랜드 분석 결과에 따라 보완할 예정입니다.</p>
+                  <p className="bramer-research-note">업종별 안내는 참고용이며 17개 기본 제작 항목은 모든 업종에서 동일합니다. 연구로 검증된 업종별 표준은 아닙니다.</p>
                 </div>
               </section>
 
@@ -778,8 +754,8 @@ export default function App() {
                   <div className="module-heading">
                     <div>
                       <span className="module-kicker">LOGO RULES</span>
-                      <h2>기본 사용 규정</h2>
-                      <p className="module-description">로고 보호공간과 최소 사용 크기를 최종 규칙으로 설정합니다.</p>
+                      <h2>사용 규정과 응용 디자인 정보</h2>
+                      <p className="module-description">로고 사용 규칙과 명함·레터헤드·봉투에 들어갈 내용을 확인하세요. 스티커에는 등록한 로고와 브랜드 컬러가 사용됩니다.</p>
                     </div>
                     <span className="module-state">Editable</span>
                   </div>
@@ -797,6 +773,35 @@ export default function App() {
                       <div className="suffix-input"><input type="number" min="8" value={project.rules.minimumDigitalPx} onChange={(e) => setProject((previous) => ({ ...previous, rules: { ...previous.rules, minimumDigitalPx: Number(e.target.value) } }))} /><span>px</span></div>
                     </label>
                   </div>
+                  <div className="bramer-v2-contact">
+                    <div className="module-heading"><div><span className="module-kicker">APPLICATION INFORMATION</span><h3>명함 · 공식 서식에 들어갈 정보</h3><p className="module-description">입력한 내용은 자동저장되고 문서와 명함 시안에 반영됩니다. 미입력 항목은 완성된 정보처럼 임의 생성하지 않습니다.</p></div></div>
+                    <div className="field-grid two-column">
+                      {([
+                        ['personName','성함','홍길동'],['position','직책','대표 / Designer'],
+                        ['phone','연락처','010-0000-0000'],['email','이메일','name@example.com'],
+                        ['company','회사명','브랜드명과 다를 경우'],['website','웹사이트','www.example.com'],
+                        ['address','회사 주소','인쇄물에 표기할 주소'],
+                      ] as const).map(([key,label,placeholder])=>(
+                        <label className="field" key={key}><span>{label}</span>
+                          <input placeholder={placeholder} value={project.contact?.[key] ?? ''}
+                            onChange={event=>setProject(prev=>({...prev,contact:{personName:'',position:'',phone:'',email:'',website:'',company:'',address:'',...prev.contact,[key]:event.target.value}}))}/>
+                        </label>
+                      ))}
+                    </div>
+                    <div className="bramer-v2-export">
+                      <strong>응용 디자인 SVG 원본</strong>
+                      <p className="module-description">명함 90×50mm, 스티커 50mm, A4 레터헤드, 소·대봉투 SVG를 개별 다운로드할 수 있습니다. 인쇄 전 도련·폰트·재단·봉투 전개도 등 실측 규격을 반드시 확인하세요.</p>
+                      {project.logo && <div className="bramer-v2-export-buttons">
+                        <button type="button" onClick={()=>downloadSvg({id:'business-card-front',section:'application',title:'Business Card Front',subtitle:'',svg:generateBusinessCardSvg(project)},project.englishName||project.name)}>명함 앞면 SVG</button>
+                        <button type="button" onClick={()=>downloadSvg({id:'business-card-back',section:'application',title:'Business Card Back',subtitle:'',svg:generateBusinessCardSvg(project,true)},project.englishName||project.name)}>명함 뒷면 SVG</button>
+                        <button type="button" onClick={()=>downloadSvg({id:'sticker-round',section:'application',title:'Round Sticker',subtitle:'',svg:generateStickerSvg(project,'circle')},project.englishName||project.name)}>원형 스티커 SVG</button>
+                        <button type="button" onClick={()=>downloadSvg({id:'sticker-square',section:'application',title:'Square Sticker',subtitle:'',svg:generateStickerSvg(project,'square')},project.englishName||project.name)}>사각 스티커 SVG</button>
+                        <button type="button" onClick={()=>downloadSvg({id:'letterhead-a4',section:'application',title:'A4 Letterhead',subtitle:'',svg:generateLetterheadSvg(project)},project.englishName||project.name)}>A4 레터헤드 SVG</button>
+                        <button type="button" onClick={()=>downloadSvg({id:'envelope-small',section:'application',title:'Small Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'small')},project.englishName||project.name)}>소봉투 SVG</button>
+                        <button type="button" onClick={()=>downloadSvg({id:'envelope-large',section:'application',title:'Large Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'large')},project.englishName||project.name)}>대봉투 SVG</button>
+                      </div>}
+                    </div>
+                  </div>
                 </div>
               </section>
             </div>
@@ -806,7 +811,7 @@ export default function App() {
             <div className="setup-actions creator-actions step-actions">
               <div className="action-copy">
                 <span className="action-step">STEP {String(setupStep).padStart(2, '0')} / 05</span>
-                <strong>{setupStep === 1 ? '브랜드의 기본 정보를 입력하세요.' : setupStep === 2 ? `${industryLabel} · ${selectedCount}개 항목 선택` : setupStep === 3 ? '로고를 업로드하고 권장 규칙을 확인하세요.' : setupStep === 4 ? '컬러와 서체를 설정하세요.' : '최종 사용 규칙을 확인하고 문서를 생성하세요.'}</strong>
+                <strong>{setupStep === 1 ? '브랜드의 기본 정보를 입력하세요.' : setupStep === 2 ? `${industryLabel} · 기본 ${selectedCount}개 항목` : setupStep === 3 ? '로고를 업로드하고 권장 규칙을 확인하세요.' : setupStep === 4 ? '컬러와 서체를 설정하세요.' : '최종 사용 규칙을 확인하고 문서를 생성하세요.'}</strong>
                 <span>{pages.length} pages · A4 Landscape · Editable SVG · PDF Export</span>
               </div>
               <div className="step-action-buttons">
@@ -1023,37 +1028,9 @@ export default function App() {
             </div>
           </div>
 
-          {(['graphic', 'photography', 'verbal', 'application'] as GuidelineCategory[]).includes(currentPage.section as GuidelineCategory) ? (
-            <div className="setting-group bramer-extension-settings">
-              <h3>브랜드별 가이드라인 작성</h3>
-              <p className="bramer-setting-note">각 항목의 실제 브랜드 기준을 작성하세요. 변경 사항은 SVG 미리보기와 출력에 즉시 반영됩니다.</p>
-              {({
-                graphic: ['그래픽 모티프 및 반복 규칙', '아이콘·일러스트레이션 스타일', '모션 사용 환경과 속도 기준'],
-                photography: ['조명·색감·톤앤매너', '구도·배경·피사체 처리', '권장 / 비권장 사진 사례'],
-                verbal: ['브랜드 보이스와 문장 어조', '핵심 메시지 및 용어', '금지 표현·문구 사용 예시'],
-                application: ['주요 고객 접점과 채널', '디지털·인쇄 매체 적용', '운영 상황별 적용 예시'],
-              } as Record<string, string[]>)[currentPage.section].map((question, index) => (
-                <label className="field compact" key={question}>
-                  <span>{question}</span>
-                  <textarea
-                    maxLength={315}
-                    placeholder="브랜드 기준을 구체적으로 작성해주세요."
-                    value={project.extensionContent?.[currentPage.section as 'graphic' | 'photography' | 'verbal' | 'application']?.[index] ?? ''}
-                    onChange={(event) => {
-                      const group = currentPage.section as 'graphic' | 'photography' | 'verbal' | 'application';
-                      setProject(previous => {
-                        const lines = [...(previous.extensionContent?.[group] ?? ['', '', ''])];
-                        lines[index] = event.target.value;
-                        return { ...previous, extensionContent: { ...previous.extensionContent, [group]: lines } };
-                      });
-                    }}
-                  />
-                </label>
-              ))}
-            </div>
-          ) : null}
 
           <div className="setting-group">
+            <label className="field compact"><span>슬로건 · 브랜드 메시지</span><textarea value={project.slogan} onChange={e=>updateProject('slogan',e.target.value)} /></label>
             <h3>문서 정보</h3>
             <div className="spec-row"><span>Artboard</span><strong>A4 Landscape</strong></div>
             <div className="spec-row"><span>Size</span><strong>297 × 210 mm</strong></div>

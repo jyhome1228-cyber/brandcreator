@@ -18,25 +18,23 @@ export const CATEGORIES: Array<{ id: GuidelineCategory; label: string; descripti
   { id: 'logo', label: 'Logo', description: '로고 활용·여백·최소 크기' },
   { id: 'color', label: 'Color', description: '브랜드 컬러와 조합 규칙' },
   { id: 'typography', label: 'Typography', description: '서체와 정보 위계' },
-  { id: 'graphic', label: 'Graphic / Motion', description: '그래픽 언어·모션 원칙' },
-  { id: 'photography', label: 'Photography', description: '사진 톤앤매너·구도' },
   { id: 'verbal', label: 'Verbal Identity', description: '브랜드 언어·표현 규칙' },
   { id: 'application', label: 'Application', description: '매체·접점별 적용 사례' },
 ];
 
-const ALWAYS_CORE: GuidelineCategory[] = ['overview', 'logo', 'color'];
+const ALWAYS_CORE: GuidelineCategory[] = ['overview', 'logo', 'color', 'typography', 'verbal', 'application'];
 const SELECTIVE_BY_INDUSTRY: Record<IndustryId, GuidelineCategory[]> = {
   fintech: ['typography', 'verbal', 'application'],
-  commerce: ['typography', 'photography', 'application'],
-  beauty: ['typography', 'photography', 'verbal', 'application'],
-  content: ['typography', 'graphic', 'photography', 'application'],
-  mobility: ['typography', 'graphic', 'application'],
+  commerce: ['typography', 'verbal', 'application'],
+  beauty: ['typography', 'verbal', 'application'],
+  content: ['typography', 'verbal', 'application'],
+  mobility: ['typography', 'verbal', 'application'],
   service: ['typography', 'verbal', 'application'],
-  technology: ['typography', 'graphic', 'verbal', 'application'],
-  corporate: ['typography', 'photography', 'application'],
+  technology: ['typography', 'verbal', 'application'],
+  corporate: ['typography', 'verbal', 'application'],
 };
 
-/** Preliminary workshop presets, NOT empirical findings from the 22-brand sample. */
+/** The six category headings group the 17 base items; industry differences are contextual suggestions, not empirical findings. */
 export function getRecommendations(industry: IndustryId): Record<GuidelineCategory, RecommendationTier> {
   const selected = SELECTIVE_BY_INDUSTRY[industry];
   return Object.fromEntries(CATEGORIES.map(({ id }) => [

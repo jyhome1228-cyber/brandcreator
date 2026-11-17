@@ -1,0 +1,19 @@
+/* BRAMER V2 — 17-item system and contact-driven application */
+.bramer-v2-guideline-head{display:flex;align-items:center;justify-content:space-between;gap:15px;margin:22px 0 13px;}
+.bramer-v2-guideline-head strong{font-size:14px;font-weight:650;color:#202020;}
+.bramer-v2-guideline-head span{font-size:12px;color:#888;}
+.bramer-v2-guideline-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:18px;}
+.bramer-v2-guideline-item{min-width:0;display:flex;align-items:flex-start;gap:12px;padding:15px 16px;border:1px solid #e8e8e7;border-radius:7px;background:#fff;}
+.bramer-v2-guideline-item>span:first-child{color:#aaa;font-size:11px;font-weight:600;min-width:22px;padding-top:3px;}
+.bramer-v2-guideline-item>div{min-width:0;display:flex;flex-direction:column;gap:5px;flex:1;}
+.bramer-v2-guideline-item strong{font-size:13px;font-weight:600;color:#222;}
+.bramer-v2-guideline-item small{font-size:11px;color:#858585;line-height:1.6;word-break:keep-all;}
+.bramer-v2-guideline-item .bramer-v2-check{color:#7863bc;font-size:13px;}
+.bramer-v2-contact{margin-top:28px;padding-top:26px;border-top:1px solid #e8e8e6;}
+.bramer-v2-contact .module-heading h3{font-size:19px!important;letter-spacing:-.035em;}
+.bramer-v2-export{margin-top:25px;border:1px solid #e7e7e5;border-radius:8px;padding:19px;background:#fafafa;}
+.bramer-v2-export>strong{font-size:13px;}
+.bramer-v2-export-buttons{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px;}
+.bramer-v2-export-buttons button{border:1px solid #d7d7d7;border-radius:6px;background:#fff;padding:11px 13px;font-size:12px!important;font-weight:600;color:#222;cursor:pointer;}
+.bramer-v2-export-buttons button:hover{background:#efedf6;border-color:#a99bdd;}
+@media(max-width:730px){.bramer-v2-guideline-grid{grid-template-columns:1fr;}.bramer-v2-guideline-head{flex-direction:column;align-items:flex-start;gap:6px;}}

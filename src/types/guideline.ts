@@ -63,6 +63,15 @@ export interface LogoAsset {
 }
 
 export interface BrandProject {
+  contact?: {
+    personName: string;
+    position: string;
+    phone: string;
+    email: string;
+    website: string;
+    company: string;
+    address: string;
+  };
   extensionContent?: Partial<Record<'graphic' | 'photography' | 'verbal' | 'application', string[]>>;
   name: string;
   englishName: string;

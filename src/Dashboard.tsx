@@ -14,20 +14,12 @@ type DashboardProps = {
   currentIndustry?: IndustryId;
 };
 
-const documents: Record<IndustryId, string[]> = {
-  fintech: ['브랜드 로고 SVG', '브랜드 컬러 정보', '주요 서비스 화면', '앱 아이콘', '고객 안내 문구'],
-  commerce: ['브랜드 로고 SVG', '상품 이미지', '온라인 스토어 화면', '홍보 배너', '패키지 이미지'],
-  beauty: ['브랜드 로고 SVG', '브랜드 컬러 정보', '제품 이미지 및 패키지 도면', '대표 촬영 이미지', '브랜드 소개 문구'],
-  content: ['브랜드 로고 SVG', '대표 콘텐츠 이미지', '콘텐츠 썸네일', '모션 자료', '그래픽 자산'],
-  mobility: ['브랜드 로고 SVG', '차량 이미지', '서비스 화면', '안내 사인', '고객 안내 문구'],
-  service: ['브랜드 로고 SVG', '웹·앱 화면', '서비스 이미지', '고객 안내 문구', '서비스 아이콘'],
-  technology: ['브랜드 로고 SVG', 'UI 화면', '서비스 아이콘', '기술 소개 자료', '제품 이미지'],
-  corporate: ['브랜드 로고 SVG', '회사소개서', '명함 및 서식', '사인·간판 이미지', '제품 이미지'],
-};
+const commonDocuments = ['브랜드명 · 영문명', 'SVG 로고 파일', '브랜드 소개 및 슬로건', '브랜드 컬러', '제목·본문 서체', '담당자 연락처(명함)', '회사 정보·주소(서식·봉투)'];
+const documents: Record<IndustryId, string[]> = Object.fromEntries(INDUSTRIES.map(item=>[item.id, commonDocuments])) as Record<IndustryId,string[]>;
 
 const names: Record<string,string> = {
   overview:'브랜드 소개',logo:'로고 사용 규칙',color:'컬러 규칙',typography:'서체와 텍스트',
-  graphic:'그래픽·모션',photography:'사진 스타일',verbal:'브랜드 언어',application:'응용 디자인',
+  verbal:'브랜드 메시지',application:'명함·스티커·문서 응용',
 };
 
 export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,onImport,currentProject,currentIndustry}:DashboardProps) {
@@ -78,7 +70,7 @@ export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,on
           <div className="bramer-dash-page-title">
             <p className="bramer-dash-eyebrow">업종별 브랜드 가이드</p>
             <h1>우리 브랜드에는 어떤 기준이 필요할까요?</h1>
-            <p>업종에 따라 추천되는 구성요소와 준비할 자료를 확인해보세요. 원하는 항목은 제작 과정에서 직접 조정할 수 있습니다.</p>
+            <p>모든 업종에서 제공되는 17개 제작 항목과 필요한 입력 정보를 확인해보세요. 업종 정보는 참고용으로 활용됩니다.</p>
           </div>
           <section className="bramer-dash-section bramer-guide-content">
             <div className="bramer-guide-select"><span>브랜드 업종</span>
@@ -86,11 +78,11 @@ export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,on
             </div>
             <div className="bramer-guide-overview"><h2>{industryLabel}</h2><p>{INDUSTRY_RATIONALE[industry].why}</p><div>{INDUSTRY_GUIDANCE[industry].touchpoints.map(x=><span key={x}>{x}</span>)}</div></div>
             <div className="bramer-guide-columns">
-              <div><h3>권장 가이드라인 구성</h3><div className="bramer-guide-items">{recommended.map(item=><div key={item.id}><div><strong>{names[item.id]}</strong><small>{INDUSTRY_RATIONALE[industry].components[item.id] ?? item.description}</small></div><span>{recommendation[item.id]==='Core'?'기본':'추천'}</span></div>)}</div><p className="bramer-guide-footnote">추천 항목은 초기 실무 가이드이며, 브랜드 환경에 따라 조정할 수 있습니다.</p></div>
+              <div><h3>17개 기본 구성 · 6개 분류</h3><div className="bramer-guide-items">{recommended.map(item=><div key={item.id}><div><strong>{names[item.id]}</strong><small>{INDUSTRY_RATIONALE[industry].components[item.id] ?? item.description}</small></div><span>기본</span></div>)}</div><p className="bramer-guide-footnote">기본 항목 17개는 모든 업종에서 동일하게 생성됩니다. 실제 규격과 정보는 검토 후 사용하세요.</p></div>
               <div><div className="bramer-guide-doc-head"><h3>준비할 자료</h3><span>{documents[industry].filter(item=>checked[item]).length}/{documents[industry].length}</span></div>
                 <input className="bramer-guide-search" type="search" value={search} onChange={e=>setSearch(e.target.value)} placeholder="자료 검색" aria-label="준비할 자료 검색"/>
                 <div className="bramer-guide-checklist">{selectedDocs.map(item=><label key={item}><input type="checkbox" checked={Boolean(checked[item])} onChange={e=>setChecked(p=>({...p,[item]:e.target.checked}))}/><span><strong>{item}</strong><small>{INDUSTRY_RATIONALE[industry].files[item]}</small></span></label>)}</div>
-                <p className="bramer-guide-footnote">로고 SVG 외의 자료는 선택한 항목에 따라 준비하면 돼요.</p>
+                <p className="bramer-guide-footnote">로고 SVG와 텍스트·연락처 정보로 제작합니다. 사진·모션·별도 패키지 원본은 요구하지 않습니다.</p>
               </div>
             </div>
             <div className="bramer-guide-bottom"><button className="bramer-dash-primary" type="button" onClick={()=>onCreate(industry)}>이 업종으로 만들기</button></div>
