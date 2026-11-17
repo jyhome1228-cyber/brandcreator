@@ -44,7 +44,7 @@ const note = (text:string,y=1700):string=>`<text x="110" y="${y}" fill="#777" fo
 const missing = (text:string)=>`<text x="110" y="1770" fill="#B45A2A" font-size="28" font-family="Arial,sans-serif">추가 입력 필요: ${esc(text)}</text>`;
 const appPage=(id:string,name:string,subtitle:string,project:BrandProject,markup:string):GuidelinePage=>({id,section:'application',title:name,subtitle,svg:guide(project,name,subtitle,markup)});
 const baseCard=(project:BrandProject,reverse=false):string=>{
-  const c=project.contact||{};
+  const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' };
   const bg=reverse?'#FFFFFF':hex(project.colors.primary);
   const fg=reverse?'#141414':inkOn(bg);
   return `<rect width="900" height="500" rx="3" fill="${bg}" stroke="${reverse?'#ddd':'none'}"/>${reverse?
@@ -53,7 +53,7 @@ const baseCard=(project:BrandProject,reverse=false):string=>{
   }`;
 };
 export function generateBusinessCardSvg(project:BrandProject,reverse=false):string {
-  const c=project.contact||{},bg=reverse?'#FFFFFF':hex(project.colors.primary),fg=reverse?'#111111':inkOn(bg);
+  const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' },bg=reverse?'#FFFFFF':hex(project.colors.primary),fg=reverse?'#111111':inkOn(bg);
   const label=(v:string,y:number,size=18)=>`<text x="7" y="${y}" font-size="${size}" fill="${fg}" font-family="Arial,sans-serif">${esc(v)}</text>`;
   const front=logo(project,55,95,790,310,fg);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 900 500"><rect width="900" height="500" fill="${bg}"/>${reverse?`${label(c.personName||'이름 미입력',120,40)}${label(c.position||'',165,25)}${label(c.phone||'',325)}${label(c.email||'',365)}${label(c.website||'',405)}`:front}</svg>`;
@@ -63,7 +63,7 @@ export function generateStickerSvg(project:BrandProject,shape:'circle'|'square')
   return `<svg xmlns="http://www.w3.org/2000/svg" width="50mm" height="50mm" viewBox="0 0 500 500">${shape==='circle'?`<circle cx="250" cy="250" r="246" fill="${primary}"/>`:`<rect x="0" y="0" width="500" height="500" fill="${primary}"/>`}${logo(project,85,165,330,170,fg)}</svg>`;
 }
 export function generateApplicationPages(project:BrandProject):GuidelinePage[] {
-  const c=project.contact||{};
+  const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' };
   const p=hex(project.colors.primary), fg=inkOn(p);
   return [
     appPage('v2-14-business-card','Business Card','명함 앞면 / 뒷면',project,
