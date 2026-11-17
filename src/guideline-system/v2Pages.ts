@@ -62,6 +62,31 @@ export function generateStickerSvg(project:BrandProject,shape:'circle'|'square')
   const primary=hex(project.colors.primary),fg=inkOn(primary);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="50mm" height="50mm" viewBox="0 0 500 500">${shape==='circle'?`<circle cx="250" cy="250" r="246" fill="${primary}"/>`:`<rect x="0" y="0" width="500" height="500" fill="${primary}"/>`}${logo(project,85,165,330,170,fg)}</svg>`;
 }
+export function generateLetterheadSvg(project:BrandProject):string {
+  const c=project.contact, primary=hex(project.colors.primary);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 2100 2970">
+    <rect width="2100" height="2970" fill="#FFFFFF"/>
+    ${logo(project,170,145,650,210)}
+    <path d="M170 445H1930" stroke="${primary}" stroke-width="6"/>
+    <text x="170" y="605" font-size="57" font-family="Arial,sans-serif" font-weight="600" fill="#171717">${esc(project.name.slice(0,45))}</text>
+    <path d="M170 2540H1930" stroke="#DDDDDD" stroke-width="3"/>
+    <text x="170" y="2600" font-size="29" font-family="Arial,sans-serif" fill="#555">${esc((c?.company||project.name).slice(0,75))}</text>
+    <text x="170" y="2650" font-size="26" font-family="Arial,sans-serif" fill="#777">${esc((c?.address||'').slice(0,95))}</text>
+    <text x="170" y="2700" font-size="25" font-family="Arial,sans-serif" fill="#777">${esc([c?.phone,c?.email,c?.website].filter(Boolean).join('   ·   ').slice(0,115))}</text>
+  </svg>`;
+}
+export function generateEnvelopeSvg(project:BrandProject, size:'small'|'large'):string {
+  const w=size==='small'?2200:3300, h=size==='small'?1100:2450;
+  const c=project.contact, p=hex(project.colors.primary);
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w/10}mm" height="${h/10}mm" viewBox="0 0 ${w} ${h}">
+    <rect width="${w}" height="${h}" fill="#FFFFFF"/>
+    <path d="M120 120H${w-120}" stroke="${p}" stroke-width="12"/>
+    ${logo(project,150,200,Math.min(750,w*.4),240)}
+    <text x="150" y="${h-245}" font-family="Arial,sans-serif" font-size="37" fill="#222" font-weight="600">${esc((c?.company||project.name).slice(0,50))}</text>
+    <text x="150" y="${h-180}" font-family="Arial,sans-serif" font-size="29" fill="#555">${esc((c?.address||'').slice(0,80))}</text>
+    <text x="150" y="${h-120}" font-family="Arial,sans-serif" font-size="26" fill="#777">${esc([c?.phone,c?.website].filter(Boolean).join(' · ').slice(0,80))}</text>
+  </svg>`;
+}
 export function generateApplicationPages(project:BrandProject):GuidelinePage[] {
   const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' };
   const p=hex(project.colors.primary), fg=inkOn(p);
@@ -99,7 +124,12 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
   const main:GuidelinePage[]=[
     ...withTitle('01-cover','Cover','표지','intro'),
     ...withTitle('02-index','Index','목차 · 17개 제작 항목','intro'),
-    ...withTitle('02-brand-overview','Brand Overview','브랜드 소개','intro'),
+    reviewPage(project,'Brand Overview','브랜드 소개',
+      `<text x="130" y="450" fill="#777" font-size="32" font-family="Arial,sans-serif">BRAND PROFILE</text>
+      <text x="130" y="600" fill="${hex(project.colors.primary)}" font-size="82" font-family="Arial,sans-serif" font-weight="700">${esc((project.name||project.englishName).slice(0,35))}</text>
+      <text x="130" y="750" fill="#555" font-size="33" font-family="Arial,sans-serif">${esc((project.englishName||'').slice(0,60))}</text>
+      ${(project.description?.trim()||'브랜드 설명을 입력해 주세요.').match(/.{1,54}/gu)?.slice(0,7).map((line,i)=>`<text x="130" y="${980+i*83}" font-size="37" font-family="Arial,sans-serif" fill="#222">${esc(line)}</text>`).join('')||''}
+      ${project.description?.trim()?'':missing('브랜드 소개')}`, 'intro','v2-12-brand-overview'),
     message,
     ...withTitle('03-logo-section','Logo System','로고 사용 규칙','logo'),
     ...withTitle('04-signature-logo','Primary Logo','기본 로고','logo'),
