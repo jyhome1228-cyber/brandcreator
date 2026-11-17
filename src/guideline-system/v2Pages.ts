@@ -124,20 +124,16 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
   const main:GuidelinePage[]=[
     ...withTitle('01-cover','Cover','표지','intro'),
     ...withTitle('02-index','Index','목차 · 17개 제작 항목','intro'),
-    reviewPage(project,'Brand Overview','브랜드 소개',
-      `<text x="130" y="450" fill="#777" font-size="32" font-family="Arial,sans-serif">BRAND PROFILE</text>
-      <text x="130" y="600" fill="${hex(project.colors.primary)}" font-size="82" font-family="Arial,sans-serif" font-weight="700">${esc((project.name||project.englishName).slice(0,35))}</text>
-      <text x="130" y="750" fill="#555" font-size="33" font-family="Arial,sans-serif">${esc((project.englishName||'').slice(0,60))}</text>
-      ${(project.description?.trim()||'브랜드 설명을 입력해 주세요.').match(/.{1,54}/gu)?.slice(0,7).map((line,i)=>`<text x="130" y="${980+i*83}" font-size="37" font-family="Arial,sans-serif" fill="#222">${esc(line)}</text>`).join('')||''}
-      ${project.description?.trim()?'':missing('브랜드 소개')}`, 'intro','v2-12-brand-overview'),
-    message,
+    ...withTitle('03-brand-asset-notice','Brand Asset Notice','사용 전 확인 사항','intro'),
     ...withTitle('03-logo-section','Logo System','로고 사용 규칙','logo'),
     ...withTitle('04-signature-logo','Primary Logo','기본 로고','logo'),
     ...withTitle('05-grid-system-1','Logo Grid System','로고 구조 그리드','logo'),
+    ...withTitle('06-grid-system-2','Logo Grid Detail','비율 검토용 보조 페이지','logo'),
     ...withTitle('07-clear-space-1','Clear Space','로고 보호 공간','logo'),
+    ...withTitle('08-clear-space-2','Clear Space Detail','보호 공간 검토용 보조 페이지','logo'),
     ...withTitle('09-minimum-size','Minimum Size','최소 사용 크기','logo'),
     incorrect,
-    ...withTitle('11-monochromatic','Monochromatic','단색·흑백 로고','color'),
+    ...withTitle('11-monochromatic','Monochromatic','단색·흑백 로고','logo'),
     ...withTitle('10-color-section','Color System','컬러 규칙','color'),
     ...withTitle('12-brand-color','Brand Colors','브랜드 지정 색상','color'),
     ...withTitle('13-color-combination','Color Combinations','컬러 조합','color'),
@@ -145,6 +141,13 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
     ...withTitle('15-typography-section','Typography','서체 규칙','typography'),
     ...withTitle('16-title-typeface','Title Typography','제목 서체','typography'),
     ...withTitle('17-body-typeface','Body Typography','본문 서체','typography'),
+    reviewPage(project,'Brand Overview','브랜드 소개',
+      `<text x="130" y="450" fill="#777" font-size="32" font-family="Arial,sans-serif">BRAND PROFILE</text>
+      <text x="130" y="600" fill="${hex(project.colors.primary)}" font-size="82" font-family="Arial,sans-serif" font-weight="700">${esc((project.name||project.englishName).slice(0,35))}</text>
+      <text x="130" y="750" fill="#555" font-size="33" font-family="Arial,sans-serif">${esc((project.englishName||'').slice(0,60))}</text>
+      ${(project.description?.trim()||'브랜드 설명을 입력해 주세요.').match(/.{1,54}/gu)?.slice(0,7).map((line,i)=>`<text x="130" y="${980+i*83}" font-size="37" font-family="Arial,sans-serif" fill="#222">${esc(line)}</text>`).join('')||''}
+      ${project.description?.trim()?'':missing('브랜드 소개')}`, 'intro','v2-12-brand-overview'),
+    message,
     ...generateApplicationPages(project),
     ...withTitle('18-back-cover','Back Cover','뒷표지','end')
   ];
