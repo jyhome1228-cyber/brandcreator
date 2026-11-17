@@ -7,7 +7,7 @@ import { deleteLocalProject, listSavedProjects, newProjectId, saveLocalProject, 
 import BramerSelect from './components/BramerSelect';
 import { INDUSTRY_RATIONALE } from './engines/industryRationale';
 import { downloadAllSvg, downloadSvg } from './export/download';
-import { CORE_ITEMS, generateV2Pages, generateBusinessCardSvg, generateStickerSvg } from './guideline-system/v2Pages';
+import { CORE_ITEMS, generateV2Pages, generateBusinessCardSvg, generateStickerSvg, generateLetterheadSvg, generateEnvelopeSvg } from './guideline-system/v2Pages';
 import { CATEGORIES, INDUSTRIES, INDUSTRY_GUIDANCE, getDefaultSelection, type GuidelineCategory, type IndustryId } from './engines/industryRecommendations';
 import type { BrandProject, GuidelinePage } from './types/guideline';
 
@@ -790,12 +790,15 @@ export default function App() {
                     </div>
                     <div className="bramer-v2-export">
                       <strong>응용 디자인 SVG 원본</strong>
-                      <p className="module-description">명함 90×50mm 앞뒤면, 원형·사각형 50mm 스티커를 개별 다운로드할 수 있습니다. 인쇄 전 도련·폰트·실측 규격을 반드시 확인하세요.</p>
+                      <p className="module-description">명함 90×50mm, 스티커 50mm, A4 레터헤드, 소·대봉투 SVG를 개별 다운로드할 수 있습니다. 인쇄 전 도련·폰트·재단·봉투 전개도 등 실측 규격을 반드시 확인하세요.</p>
                       {project.logo && <div className="bramer-v2-export-buttons">
                         <button type="button" onClick={()=>downloadSvg({id:'business-card-front',section:'application',title:'Business Card Front',subtitle:'',svg:generateBusinessCardSvg(project)},project.englishName||project.name)}>명함 앞면 SVG</button>
                         <button type="button" onClick={()=>downloadSvg({id:'business-card-back',section:'application',title:'Business Card Back',subtitle:'',svg:generateBusinessCardSvg(project,true)},project.englishName||project.name)}>명함 뒷면 SVG</button>
                         <button type="button" onClick={()=>downloadSvg({id:'sticker-round',section:'application',title:'Round Sticker',subtitle:'',svg:generateStickerSvg(project,'circle')},project.englishName||project.name)}>원형 스티커 SVG</button>
                         <button type="button" onClick={()=>downloadSvg({id:'sticker-square',section:'application',title:'Square Sticker',subtitle:'',svg:generateStickerSvg(project,'square')},project.englishName||project.name)}>사각 스티커 SVG</button>
+                        <button type="button" onClick={()=>downloadSvg({id:'letterhead-a4',section:'application',title:'A4 Letterhead',subtitle:'',svg:generateLetterheadSvg(project)},project.englishName||project.name)}>A4 레터헤드 SVG</button>
+                        <button type="button" onClick={()=>downloadSvg({id:'envelope-small',section:'application',title:'Small Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'small')},project.englishName||project.name)}>소봉투 SVG</button>
+                        <button type="button" onClick={()=>downloadSvg({id:'envelope-large',section:'application',title:'Large Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'large')},project.englishName||project.name)}>대봉투 SVG</button>
                       </div>}
                     </div>
                   </div>
