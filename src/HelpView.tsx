@@ -37,11 +37,11 @@ export default function HelpView({onHome,onProjects,onGuide,onNew,onHelp}:Props)
         <WorkspaceNav active="help" onHome={onHome} onProjects={onProjects} onGuide={onGuide} onHelp={onHelp} onNew={onNew}/>
         <nav className="bramer-help-local-nav" aria-label="사용 방법 목차">
           <span>문서 목차</span>
-          <a href="#help-overview">시작하기</a>
-          <a href="#help-steps">제작 과정</a>
-          <a href="#help-files">준비할 자료</a>
-          <a href="#help-output">결과물과 저장</a>
-          <a href="#help-faq">자주 묻는 질문</a>
+          <button type="button" onClick={()=>document.getElementById('help-overview')?.scrollIntoView({behavior:'smooth',block:'start'})}>시작하기</button>
+          <button type="button" onClick={()=>document.getElementById('help-steps')?.scrollIntoView({behavior:'smooth',block:'start'})}>제작 과정</button>
+          <button type="button" onClick={()=>document.getElementById('help-files')?.scrollIntoView({behavior:'smooth',block:'start'})}>준비할 자료</button>
+          <button type="button" onClick={()=>document.getElementById('help-output')?.scrollIntoView({behavior:'smooth',block:'start'})}>결과물과 저장</button>
+          <button type="button" onClick={()=>document.getElementById('help-faq')?.scrollIntoView({behavior:'smooth',block:'start'})}>자주 묻는 질문</button>
         </nav>
       </div>
       <div className="bramer-dash-sidebar-bottom"><p>브랜드 가이드라인 제작을 위한 BRAMER 사용 안내입니다.</p></div>
