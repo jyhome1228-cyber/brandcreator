@@ -3,14 +3,14 @@
 .bramer-dash .bramer-dash-nav button:not(.active){background:transparent!important;color:#62625f!important;font-weight:550!important}
 .bramer-dash .bramer-dash-nav button.active{background:#ececea!important;color:#191919!important;font-weight:700!important}
 .bramer-dash .bramer-dash-nav button:hover:not(.active){background:#f5f5f3!important;color:#222!important}
-.bramer-industry-research-disclaimer{border-left:3px solid #b7a7f7;background:#f7f6fa;color:#696575;font-size:12px;line-height:1.75;padding:14px 18px;margin:0 0 29px;word-break:keep-all}
+.bramer-industry-research-disclaimer{border-left:3px solid #bdbdbd;background:#f7f7f7;color:#696969;font-size:12px;line-height:1.75;padding:14px 18px;margin:0 0 29px;word-break:keep-all}
 .bramer-industry-section-heading{margin-bottom:16px}
 .bramer-industry-section-heading h3,.bramer-industry-guidance-panel h3,.bramer-industry-final-check h3{font-size:16px!important;font-weight:650;letter-spacing:-.03em!important;margin:0 0 8px}
 .bramer-industry-section-heading p,.bramer-industry-guidance-intro{font-size:12px;color:#777;line-height:1.7;margin:0}
 .bramer-industry-priorities{margin-bottom:30px}
 .bramer-industry-priority-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
 .bramer-industry-priority-grid article{border:1px solid #e6e6e3;background:#fff;border-radius:8px;padding:20px;min-width:0}
-.bramer-industry-priority-grid article>span{display:block;color:#a59cc5;font-size:11px;font-weight:650;margin-bottom:13px}
+.bramer-industry-priority-grid article>span{display:block;color:#8c8c8c;font-size:11px;font-weight:650;margin-bottom:13px}
 .bramer-industry-priority-grid article h4{font-size:14px!important;font-weight:650;margin:0 0 9px}
 .bramer-industry-priority-grid article p{font-size:12px;line-height:1.75;color:#686864;word-break:keep-all;margin:0 0 14px}
 .bramer-industry-priority-grid article small{display:block;border-top:1px solid #eee;padding-top:12px;color:#85827e;font-size:11px;line-height:1.6}
