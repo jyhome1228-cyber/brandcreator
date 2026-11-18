@@ -184,7 +184,7 @@ try{
     assert.ok(brandColors.svg.includes('RGB'));
     assert.ok(brandColors.svg.includes('CMYK'));
     assert.ok(brandColors.svg.includes('#473A88'));
-    assert.ok(pages.find(x=>x.title==='Color Distribution').svg.includes('60%'));
+    assert.ok(!pages.some(x=>x.title==='Color Distribution'), 'Unapproved 60/30/10 ratio should not appear as an official rule');
     assert.ok(!page('03-logo-section').svg.includes('Logo variations'));
     assert.ok(pages.filter(x=>x.title==='Brand Colors').length===1);
   });
