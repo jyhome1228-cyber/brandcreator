@@ -79,12 +79,22 @@ try{
  assert.ok((await sampleImg.getAttribute('alt'))?.length,'Sample page navigation changes the generated SVG');
  pass('live BRAMER 17-item guideline engine produces 26 visible sample pages');
  await page.screenshot({path:path.join(output,'01-landing-desktop.png')});
+ await page.locator('.bramer-site-start').click();
+ await page.getByRole('dialog',{name:'브레이머를 시작해 볼까요?'}).waitFor();
+ assert.equal(await page.getByRole('button',{name:/새로 시작하기/}).count(),1);
+ assert.equal(await page.getByRole('button',{name:/베타테스트 로그인/}).count(),1);
+ await page.getByRole('button',{name:/베타테스트 로그인/}).click();
+ await page.getByRole('heading',{name:'베타테스트 로그인'}).waitFor();
+ await page.getByRole('button',{name:'이전으로'}).click();
+ await page.getByRole('button',{name:'닫기'}).click();
+ pass('two-path header entry shows new registration and beta login');
  const trial=page.locator('.bramer-home-primary').first();
  await trial.click();
  await page.getByRole('dialog').waitFor();
  await page.locator('.bramer-beta-form input[autocomplete="name"]').fill('테스트 담당자');
  await page.locator('.bramer-beta-form input[type="tel"]').fill('010-1234-5678');
- await page.locator('.bramer-beta-form select').selectOption('디자이너');
+ await page.getByRole('button',{name:'선택해 주세요'}).click();
+ await page.getByRole('option',{name:'디자이너'}).click();
  await page.locator('.bramer-beta-consent input').check();
  await page.locator('.bramer-beta-primary[type="submit"]').click();
  await page.waitForURL('**/#/welcome');
@@ -98,6 +108,10 @@ try{
  await page.waitForURL('**/#/create');
  await page.getByRole('heading',{name:'새 브랜드 가이드라인 만들기'}).waitFor();
  pass('landing → beta registration → welcome → logo reveal → dashboard coach → create');
+ // Registration must have been stored without retaining raw name or phone in localStorage.
+ assert.ok(await page.evaluate(()=>Boolean(localStorage.getItem('bramer-local-beta-proof-v1'))));
+ assert.ok(await page.evaluate(()=>!localStorage.getItem('bramer-local-beta-proof-v1')?.includes('010-1234-5678')));
+
  await page.locator('input[placeholder="브랜드명"]').fill('건강미 테스트');
  await page.locator('input[placeholder="Brand name"]').fill('Healthy Me QA');
  await page.locator('.step-nav-item').nth(2).click();
