@@ -1,3 +1,4 @@
+import WorkspaceNav from './components/WorkspaceNav';
 import type { SavedBramerProject } from './engines/projectLibrary';
 
 type Props = {
@@ -6,10 +7,12 @@ type Props = {
   onRemove: (id: string) => void;
   onNew: () => void;
   onBack: () => void;
+  onGuide: () => void;
+  onHelp: () => void;
   error: string;
 };
 
-export default function ProjectLibrary({projects,onOpen,onRemove,onNew,onBack,error}:Props) {
+export default function ProjectLibrary({projects,onOpen,onRemove,onNew,onBack,onGuide,onHelp,error}:Props) {
   return <div className="bramer-dash bramer-projects-page">
     <header className="bramer-dash-header">
       <button type="button" className="bramer-dash-logo" onClick={onBack}>BRAMER.</button>
@@ -18,11 +21,7 @@ export default function ProjectLibrary({projects,onOpen,onRemove,onNew,onBack,er
     </header>
     <div className="bramer-dash-layout">
       <aside className="bramer-dash-sidebar" aria-label="서비스 메뉴">
-        <div className="bramer-dash-nav">
-          <button type="button" onClick={onBack}>홈</button>
-          <button type="button" className="active" aria-current="page">내 프로젝트</button>
-          <button type="button" onClick={onNew}>새로 만들기</button>
-        </div>
+        <WorkspaceNav active="projects" onHome={onBack} onProjects={()=>{}} onGuide={onGuide} onHelp={onHelp} onNew={onNew}/>
         <div className="bramer-dash-sidebar-bottom"><p>이 브라우저에 저장된 프로젝트예요. 다른 기기에서도 사용하려면 JSON 파일을 별도로 백업해 주세요.</p></div>
       </aside>
       <main className="bramer-dash-content bramer-projects-content">
