@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, type FormEvent, type MouseEvent } from 'react';
 
 type LandingProps = { onStart: () => void };
-type BetaForm = { name: string; userId: string; phone: string; occupation: string };
+type BetaForm = { name: string; phone: string; occupation: string };
 const REGISTRATION_KEY = 'bramer-beta-session-v1';
 const BETA_END = '2026년 12월 31일';
-const initialBetaForm: BetaForm = { name: '', userId: '', phone: '', occupation: '' };
+const initialBetaForm: BetaForm = { name: '', phone: '', occupation: '' };
 
 const audiences = [
   {
@@ -96,9 +96,8 @@ export default function Landing({ onStart }: LandingProps) {
   };
   const tryBeta = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!betaForm.name.trim() || !/^[a-zA-Z0-9_-]{4,24}$/.test(betaForm.userId.trim()) ||
-        !/^[0-9+() -]{8,20}$/.test(betaForm.phone.trim()) || !betaForm.occupation) {
-      setBetaError('이름, 아이디(영문·숫자 4~24자), 연락처, 직업을 확인해 주세요.');
+    if (!betaForm.name.trim() || !/^[0-9+() -]{8,20}$/.test(betaForm.phone.trim()) || !betaForm.occupation) {
+      setBetaError(tr('성함, 연락처, 직업을 확인해 주세요.','Check your name, phone number, and occupation.'));
       return;
     }
     if (!agreed) { setBetaError('개인정보 이용 안내에 동의해야 진행할 수 있습니다.'); return; }
@@ -292,7 +291,7 @@ export default function Landing({ onStart }: LandingProps) {
         </div> : <form className="bramer-beta-form" onSubmit={tryBeta}>
           <div className="bramer-beta-field-grid">
             <label><span>{tr('성함','Name')}</span><input autoComplete="name" maxLength={40} value={betaForm.name} onChange={event => setBetaForm(previous => ({ ...previous, name: event.target.value }))} placeholder={tr('성함을 입력해 주세요','Enter your name')} required /></label>
-            <label><span>{tr('아이디','User ID')}</span><input autoComplete="off" maxLength={24} value={betaForm.userId} onChange={event => setBetaForm(previous => ({ ...previous, userId: event.target.value }))} placeholder={tr('영문·숫자 4~24자','4–24 letters or numbers')} pattern="[a-zA-Z0-9_-]{4,24}" required /></label>
+            
             <label><span>{tr('연락처','Phone number')}</span><input autoComplete="tel" type="tel" maxLength={20} value={betaForm.phone} onChange={event => setBetaForm(previous => ({ ...previous, phone: event.target.value }))} placeholder={tr('연락처를 입력해 주세요','Enter your phone number')} required /></label>
             <label><span>{tr('직업','Occupation')}</span><select value={betaForm.occupation} onChange={event => setBetaForm(previous => ({ ...previous, occupation: event.target.value }))} required><option value="">{tr('선택해 주세요','Select')}</option><option value="디자이너">{tr('디자이너','Designer')}</option><option value="기업 담당자">{tr('기업 담당자','Company representative')}</option><option value="브랜드 운영자">{tr('브랜드 운영자','Brand manager')}</option><option value="학생·연구자">{tr('학생·연구자','Student / researcher')}</option><option value="기타">{tr('기타','Other')}</option></select></label>
           </div>
@@ -301,7 +300,7 @@ export default function Landing({ onStart }: LandingProps) {
             <button type="button" className="bramer-beta-privacy-button" aria-expanded={privacyOpen} onClick={() => setPrivacyOpen(previous => !previous)}>{tr('개인정보처리방침','Privacy notice')} {privacyOpen ? tr('접기','Hide') : tr('보기','View')}</button>
             {privacyOpen ? <div className="bramer-beta-privacy-text">
               <strong>{tr('베타 체험 개인정보처리방침','Beta privacy notice')}</strong>
-              <p>{tr('입력 항목: 성함, 아이디, 연락처, 직업. 목적: 베타 체험 등록 화면 확인 및 이용 의사 표시.','Fields: name, user ID, phone number, occupation. Used only for this beta registration interface.')}</p>
+              <p>{tr('입력 항목: 성함, 연락처, 직업. 목적: 베타 체험 등록 화면 확인 및 이용 의사 표시.','Fields: name, phone number, occupation. Used only for this beta registration interface.')}</p>
               <p>{tr('현재 중앙 등록 서버는 연결되어 있지 않습니다. 입력한 개인정보는 서버로 전송·저장되지 않으며, 화면을 떠나면 입력값이 사라집니다. 브라우저 세션에는 체험 여부만 저장합니다. 연락처로 별도 연락하거나 사용자 계정을 생성하지 않습니다.','No central registration server is connected. Your personal details are not transmitted or stored; only a beta participation flag is saved in this browser session. No user account is created.')}</p>
               <p>{tr('브라우저 세션의 체험 표시를 없애려면 브라우저의 해당 사이트 세션 데이터를 삭제하면 됩니다. 정식 회원 관리 및 개인정보처리방침은 서버 구축 후 별도 공지해야 합니다.','Clear the site session data to reset the beta participation flag. Formal account management and privacy policies will be published when the backend becomes available.')}</p>
             </div> : null}
