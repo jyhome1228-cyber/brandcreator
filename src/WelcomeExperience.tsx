@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, type PointerEvent } from 'react';
+import BramerLogo from './components/BramerLogo';
 
 type WelcomeExperienceProps = { onFinish: () => void; english: boolean };
 const steps = [
@@ -45,9 +46,9 @@ export default function WelcomeExperience({onFinish,english}:WelcomeExperiencePr
  },[logoStage,onFinish]);
  const next=()=>{if(step===0)setStep(1);else setLogoStage(true);};
  return <main className="bramer-welcome" ref={surfaceRef} onPointerMove={onSurfaceMove} onPointerLeave={resetSurface} aria-label={english?'BRAMER introduction':'BRAMER 시작 안내'}>
-   <header className="bramer-welcome-header"><strong>BRAMER.</strong><button type="button" onClick={onFinish}>{english?'Skip introduction':'건너뛰기'}</button></header>
+   <header className="bramer-welcome-header"><BramerLogo /><button type="button" onClick={onFinish}>{english?'Skip introduction':'건너뛰기'}</button></header>
    {logoStage?<section className="bramer-welcome-mark" aria-live="polite">
-     <img src={window.location.pathname.startsWith("/brandcreator/") ? "/brandcreator/bramer-sample-logo.svg" : "/bramer-sample-logo.svg"} alt="BRAMER" />
+     <BramerLogo className="bramer-intro-logo" />
      <p>{english?'Your brand standards begin here.':'브랜드의 기준을 만드는 새로운 시작.'}</p>
    </section>:<section className={'bramer-welcome-body bramer-welcome-step-'+step} key={step}>
      <p className="bramer-welcome-eyebrow">{step===0?'WELCOME TO BRAMER':'HOW BRAMER WORKS'}</p>
