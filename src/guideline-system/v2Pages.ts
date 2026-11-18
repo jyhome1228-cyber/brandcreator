@@ -282,7 +282,6 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
     monochromePage(project),
     sectionIntroV2(project,'Color','02',['Brand Colors','Color Combinations','Color Contrast'],'10-color-section','color'),
     ...withTitle('11-monochromatic','Brand Colors','브랜드 지정 색상 · HEX/RGB/CMYK','color').map(page=>({...page,id:'v2-07-brand-colors'})),
-    ...withTitle('12-brand-color','Color Distribution','컬러 비율 참고 예시','color'),
     ...withTitle('13-color-combination','Color Combinations','컬러 조합','color'),
     contrastPage,
     sectionIntroV2(project,'Typography','03',['Title Typography','Body Typography'],'15-typography-section','typography'),
