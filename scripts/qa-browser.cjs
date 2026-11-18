@@ -82,6 +82,8 @@ try{
  pass('saved project appears in My Projects');
  await page.getByRole('button',{name:'이어서 작업'}).first().click();
  await page.waitForURL('**/#/create');
+ // Resuming a saved project returns to its last wizard step (step 5).
+ await page.locator('.step-nav-item').first().click();
  await page.locator('input[placeholder="브랜드명"]').waitFor();
  assert.equal(await page.locator('input[placeholder="브랜드명"]').inputValue(),'건강미 테스트');
  await page.reload();
