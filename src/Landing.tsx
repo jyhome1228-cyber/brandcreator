@@ -199,6 +199,7 @@ export default function Landing({ onStart }: LandingProps) {
           <a href="#help">{tr("도움말","Help")}</a>
         </nav>
         <div className="bramer-site-actions"><div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div><button type="button" className="bramer-site-start" onClick={openBeta}>{tr("시작하기","Get started")}</button>
+        </div>
       </div>
     </header>
 
