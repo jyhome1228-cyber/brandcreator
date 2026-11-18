@@ -4,15 +4,13 @@ import BramerLogo from './components/BramerLogo';
 type Props={onHome:()=>void;onBeta:()=>void; english?:boolean};
 const chapters=[
  {id:'overview',label:'BRAMER 소개'},
- {id:'problem',label:'문제 정의'},
  {id:'principles',label:'설계 원칙'},
  {id:'architecture',label:'기술 구조'},
  {id:'workflow',label:'제작 프로세스'},
  {id:'outputs',label:'17개 제작 항목'},
  {id:'verification',label:'검증과 한계'},
  {id:'privacy',label:'데이터와 베타 운영'},
- {id:'research',label:'연구 및 향후 방향'},
- {id:'credits',label:'제작 및 운영'},
+ {id:'credits',label:'운영 정보'},
 ] as const;
 const core=[['Logo System','기본 로고, 그리드, 보호 공간, 최소 크기, 사용 금지, 흑백 버전'],
  ['Color System','브랜드 지정 컬러, 컬러 조합, 대비 및 적용 검토'],
@@ -46,11 +44,6 @@ export default function TechnicalManifesto({onHome,onBeta}:Props){
          <p className="bramer-docs-lead">하나의 로고에서 일관된 브랜드 경험까지. BRAMER는 브랜드가 만들어진 이후의 운영 기준을 정리하는 디자인 도구입니다.</p>
          <p>원본 SVG에서 브랜드의 사용 규칙을 구성하고, 명함과 서식까지 하나의 시스템으로 연결합니다. 설계의 기준은 분명하게, 제작 과정은 단순하게.</p>
          <div className="bramer-docs-metrics"><div><strong>17</strong><span>기본 제작 항목</span></div><div><strong>26</strong><span>현재 구성 페이지</span></div><div><strong>SVG / PDF</strong><span>주요 결과물 형식</span></div></div>
-       </section>
-       <section id="problem" className="bramer-docs-section">
-         <span className="bramer-docs-section-number">01 · WHY BRAMER</span><h2>로고를 만드는 일과 브랜드를 운영하는 일 사이에는 간극이 있습니다.</h2>
-         <p>브랜드 개발 프로젝트에서 로고 자체는 분명한 결과물입니다. 그러나 파일을 전달받은 구성원은 어떤 배경에서 로고를 사용해야 하는지, 여백을 얼마나 확보해야 하는지, 서체와 컬러를 어떤 우선순위로 적용할지 반복해서 판단해야 합니다. 이러한 판단이 개인의 경험에만 의존하면 시간이 지날수록 브랜드 표현이 분산될 수 있습니다.</p>
-         <p>규정의 부재만이 문제는 아닙니다. 규정이 존재하더라도 읽기 어렵거나 일상적인 제작 과정에서 꺼내 쓰기 어렵다면 실제 활용성은 낮아집니다. BRAMER는 제작자의 관점과 운영자의 관점을 연결하는 문서 구조, 명료한 설명, 재사용 가능한 응용 예시를 함께 다룹니다.</p>
        </section>
        <section id="principles" className="bramer-docs-section">
          <span className="bramer-docs-section-number">02 · PRINCIPLES</span><h2>시스템을 설계하는 네 가지 원칙</h2>
@@ -93,11 +86,6 @@ export default function TechnicalManifesto({onHome,onBeta}:Props){
          <span className="bramer-docs-section-number">07 · DATA & BETA</span><h2>현재의 저장 방식과 베타 이용 조건을 명확히 안내합니다.</h2>
          <p>브랜드 프로젝트는 현재 사용 중인 브라우저의 로컬 저장 영역에 보관됩니다. 따라서 기기 또는 브라우저를 변경하거나 사이트 데이터를 삭제하면 이전 자료를 다시 사용할 수 없을 수 있습니다. 중앙 계정 저장 및 여러 기기 간 자동 동기화는 제공되지 않습니다.</p>
          <p>베타 이용 정보는 성함과 연락처 조합의 확인값을 현재 브라우저에 저장하는 방식으로 사용됩니다. 이는 서버 기반 회원 인증이나 휴대전화 본인 확인이 아니며, 동일 브라우저에서만 재진입을 돕습니다. 중요한 자료는 출력한 파일을 별도로 관리하는 것이 좋습니다.</p>
-       </section>
-       <section id="research" className="bramer-docs-section">
-         <span className="bramer-docs-section-number">08 · DIRECTION</span><h2>브랜드 가이드라인을 만드는 방식을 계속 연구합니다.</h2>
-         <p>BRAMER는 각 업종과 운영 환경에서 어떤 브랜드 규칙이 필요한지, 제작자가 정의한 기준을 다른 구성원이 얼마나 쉽게 이해하고 적용할 수 있는지에 관한 문제의식에서 출발했습니다. 복잡한 제작 업무를 무조건 자동화하는 것보다, 판단의 기준을 투명하게 만들고 수정 가능한 상태로 제공하는 것이 중요하다고 생각합니다.</p>
-         <p>앞으로의 검토 과제는 다양한 형태의 로고에 대한 분석 정확도, 사용 규칙의 이해도, 인쇄·디지털 응용 표현의 일관성, 문서 편집 경험, 업종별 우선순위의 실증 검증입니다. 현재 기능과 향후 연구 방향을 구분하여 안내하며, 구현되지 않은 기능을 완성된 서비스로 소개하지 않습니다.</p>
        </section>
        <section id="credits" className="bramer-docs-section bramer-docs-credit">
          <span className="bramer-docs-section-number">09 · CREATOR</span><h2>BRAMER를 설계하고 운영하는 사람들</h2>
