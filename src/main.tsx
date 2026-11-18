@@ -65,3 +65,5 @@ import './onboarding.css';
 import './bramer-editorial-ui.css';
 
 import './beta-auth-refinement.css';
+
+import './technical-manifesto.css';
