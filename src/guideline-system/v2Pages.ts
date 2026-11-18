@@ -26,8 +26,37 @@ export const APPLICATION_KEYS: ApplicationKey[] = ['businessCard','logoSticker',
 
 const esc = (s:string) => String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]!));
 const hex = (s:string, fallback='#111111') => /^#[0-9a-f]{6}$/i.test(s||'') ? s : fallback;
-const inkOn = (color:string) => {const c=hex(color).slice(1);const r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16);return r*.299+g*.587+b*.114>155?'#111111':'#FFFFFF';};
-const guide = (project:BrandProject,title:string,subtitle:string,content:string):string => `<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 2970 2100"><rect width="2970" height="2100" fill="#fff"/><text x="110" y="138" font-family="Arial,sans-serif" font-size="75" font-weight="700" fill="${hex(project.colors.primary)}">${esc(title)}</text><text x="1120" y="140" font-family="Arial,sans-serif" font-size="31" fill="#555">${esc(subtitle)}</text><path d="M110 215H2860" stroke="#D6D6D6" stroke-width="3"/>${content}<path d="M110 1900H2860" stroke="#D6D6D6" stroke-width="3"/><text x="110" y="1965" font-family="Arial,sans-serif" font-size="28" fill="#666">${esc(project.englishName || project.name)}</text><text x="2860" y="1965" text-anchor="end" font-family="Arial,sans-serif" font-size="24" fill="#888">BRAMER · BRAND GUIDELINES</text></svg>`;
+const luminance = (color:string):number => {
+  const value=hex(color).slice(1);
+  const channels=[0,2,4].map(i=>parseInt(value.slice(i,i+2),16)/255).map(v=>v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4));
+  return channels[0]*0.2126+channels[1]*0.7152+channels[2]*0.0722;
+};
+const contrastRatio = (a:string,b:string):number => {
+  const la=luminance(a), lb=luminance(b);
+  return (Math.max(la,lb)+0.05)/(Math.min(la,lb)+0.05);
+};
+const inkOn = (color:string):string => contrastRatio(color,'#111111')>=contrastRatio(color,'#FFFFFF')?'#111111':'#FFFFFF';
+const editorialInk = (primary:string):string => contrastRatio(primary,'#FFFFFF')>=3?hex(primary):'#242424';
+/** Fit a single label within its design box without changing the user's value. */
+const fittedText = (value:string,x:number,y:number,maxWidth:number,fontSize:number,fill:string,weight=400):string => {
+  const v=String(value||'').trim();
+  if(!v) return '';
+  const estimated=[...v].reduce((sum,ch)=>sum+(/[가-힣\u3040-\u30ff\u4e00-\u9fff]/u.test(ch)?1:/[A-Z0-9]/.test(ch)?.66:/\s/.test(ch)?.33:.53),0);
+  const size=Math.max(16,Math.min(fontSize,Math.floor(maxWidth/Math.max(1,estimated))));
+  return `<text x="${x}" y="${y}" font-family="Pretendard,Arial,sans-serif" font-size="${size}" font-weight="${weight}" fill="${fill}">${esc(v)}</text>`;
+};
+const wrapCopy = (value:string,maxUnits:number,maxLines:number):string[] => {
+  const chunks:string[]=[];
+  let line='',count=0;
+  for(const ch of [...String(value||'').trim()]){
+    const unit=/[가-힣\u3040-\u30ff\u4e00-\u9fff]/u.test(ch)?2:1;
+    if(count+unit>maxUnits && line){chunks.push(line.trim());line='';count=0;if(ch===' ')continue;}
+    line+=ch;count+=unit;
+  }
+  if(line.trim())chunks.push(line.trim());
+  return chunks.slice(0,maxLines);
+};
+const guide = (project:BrandProject,title:string,subtitle:string,content:string):string => `<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 2970 2100"><rect width="2970" height="2100" fill="#fff"/>${fittedText(title,110,140,880,75,editorialInk(project.colors.primary),700)}${fittedText(subtitle,1120,140,1720,31,'#555555',500)}<path d="M110 215H2860" stroke="#D6D6D6" stroke-width="3"/>${content}<path d="M110 1900H2860" stroke="#D6D6D6" stroke-width="3"/>${fittedText(project.englishName || project.name,110,1965,1080,28,'#666666')}<text x="2860" y="1965" text-anchor="end" font-family="Arial,sans-serif" font-size="24" fill="#888">BRAMER · BRAND GUIDELINES</text></svg>`;
 function visibleLogoBox(asset: LogoAsset) {
   const canvas = asset.viewBox;
   const measured = asset.analysis?.geometry?.visualBounds;
