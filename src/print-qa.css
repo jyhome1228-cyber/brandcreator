@@ -1,6 +1,6 @@
 /* BRAMER PDF export: print only the 26 SVG artboards, never editor chrome.
  * At 96 CSS dpi, 210mm may round one pixel beyond a printed A4 sheet.
- * A 0.5mm safety reduction avoids accidental overflow and blank pages.
+ * Explicit page breaks keep each full-bleed A4 artboard on its own sheet.
  */
 @media print {
   @page { size: 297mm 210mm; margin: 0; }
@@ -47,9 +47,9 @@
     position: relative !important;
     box-sizing: border-box !important;
     width: 297mm !important;
-    height: 209mm !important;
+    height: 210mm !important;
     min-height: 0 !important;
-    max-height: 209mm !important;
+    max-height: 210mm !important;
     margin: 0 !important;
     padding: 0 !important;
     border: 0 !important;
