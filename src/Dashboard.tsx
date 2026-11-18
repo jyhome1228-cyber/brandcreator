@@ -1,4 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
+import BramerLogo from './components/BramerLogo';
 import BramerSelect from './components/BramerSelect';
 import WorkspaceNav from './components/WorkspaceNav';
 import { INDUSTRY_PRIORITIES } from './engines/industryPriorities';
@@ -39,7 +40,7 @@ export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,on
   const priorities = INDUSTRY_PRIORITIES[industry];
   return <div className="bramer-dash">
     <header className="bramer-dash-header">
-      <button className="bramer-dash-logo" onClick={onHome} type="button" aria-label="Bramer 랜딩페이지로 이동">BRAMER.</button>
+      <button className="bramer-dash-logo" onClick={onHome} type="button" aria-label="Bramer 랜딩페이지로 이동"><BramerLogo /></button>
       <span className="bramer-dash-product">브랜드 가이드라인 제작</span>
       <button className="bramer-dash-header-start" onClick={()=>onCreate()} type="button">새 가이드라인 만들기</button>
     </header>
