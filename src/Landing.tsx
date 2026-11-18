@@ -307,10 +307,25 @@ export default function Landing({ onStart }: LandingProps) {
           <h2>{tr("어렵지 않게, 순서대로.","Simple steps, clear results.")}</h2>
           <p>{tr("브랜드 가이드라인을 처음 만드는 사람도 차근차근 따라 할 수 있도록 구성했습니다.","Designed to guide you through every step, even if this is your first brand guideline.")}</p>
         </div>
-        <div className="bramer-home-steps" data-reveal>
-          <article><span className="bramer-step-count">1</span><h3>{tr('로고 등록','Upload logo')}</h3><p>{tr('브랜드명과 SVG 로고를 등록하고 기본 정보를 설정하세요.','Add your brand name, SVG logo, and basic information.')}</p></article>
-          <article><span className="bramer-step-count">2</span><h3>{tr('규칙 검토','Review standards')}</h3><p>{tr('업종별 참고 기준을 살펴보고 로고 여백과 컬러·서체를 검토하세요.','Review industry guidance, logo spacing, colors, and fonts.')}</p></article>
-          <article><span className="bramer-step-count">3</span><h3>{tr('가이드라인 제작','Create guidelines')}</h3><p>{tr('페이지를 확인하고 내용을 편집한 다음 PDF 또는 SVG로 내보내세요.','Edit your pages and export them as PDF or SVG.')}</p></article>
+        <div className="bramer-home-process" data-reveal>
+          <div className="bramer-process-track" aria-hidden="true"><span/><span/><span/></div>
+          <div className="bramer-process-list">
+            <article className="bramer-process-step">
+              <div className="bramer-process-index"><span>01</span><small>INPUT</small></div>
+              <div className="bramer-process-copy"><h3>{tr('브랜드의 시작을 등록합니다.','Start with your brand.')}</h3><p>{tr('브랜드명과 SVG 로고를 입력하세요. 컬러와 서체를 더하면 브랜드의 기본 정보가 완성됩니다.','Upload an SVG logo and enter your brand name. Add colors and typography to establish the foundation.')}</p></div>
+              <div className="bramer-process-graphic bramer-process-graphic-logo" aria-hidden="true"><span>BRAND.</span><i/></div>
+            </article>
+            <article className="bramer-process-step">
+              <div className="bramer-process-index"><span>02</span><small>DEFINE</small></div>
+              <div className="bramer-process-copy"><h3>{tr('브랜드의 사용 기준을 정리합니다.','Define consistent standards.')}</h3><p>{tr('로고의 비례와 보호 공간, 최소 크기와 컬러 규칙을 확인하고 필요한 기준을 조정하세요.','Review logo proportions, clear space, minimum sizes and color rules, then refine them as needed.')}</p></div>
+              <div className="bramer-process-graphic bramer-process-graphic-grid" aria-hidden="true"><span>B.</span><i/></div>
+            </article>
+            <article className="bramer-process-step">
+              <div className="bramer-process-index"><span>03</span><small>DELIVER</small></div>
+              <div className="bramer-process-copy"><h3>{tr('하나의 가이드라인으로 완성합니다.','Create and deliver your guideline.')}</h3><p>{tr('17개 제작 항목과 응용 디자인을 하나의 문서로 검토하고 PDF 또는 SVG로 내보내세요.','Review 17 core items and applications in one document, then export to PDF or SVG.')}</p></div>
+              <div className="bramer-process-graphic bramer-process-graphic-pages" aria-hidden="true"><i/><i/><i/><span>GUIDELINES</span></div>
+            </article>
+          </div>
         </div>
       </section>
 
@@ -367,11 +382,11 @@ export default function Landing({ onStart }: LandingProps) {
     <footer className="bramer-home-footer">
       <div className="bramer-footer-inner">
         <div className="bramer-footer-columns">
-          <div className="bramer-footer-col"><h3>Bramer</h3><a href="#top">{tr('서비스 소개','Overview')}</a><a href="#preview">{tr('결과물 미리보기','Guideline sample')}</a><a href="#how">이용 방법</a></div>
+          <div className="bramer-footer-col"><h3>Bramer</h3><a href="#top">{tr('서비스 소개','Overview')}</a><a href="#preview">{tr('결과물 미리보기','Guideline sample')}</a><a href="#how">{tr("이용 방법","How it works")}</a></div>
           <div className="bramer-footer-col"><h3>{tr('가이드라인','Guidelines')}</h3><a href="#/create">{tr('새 가이드라인 만들기','New guideline')}</a><a href="#/create">{tr('가이드라인 제작','Guideline editor')}</a><a href="#preview">{tr('샘플 가이드라인','Guideline samples')}</a></div>
           <div className="bramer-footer-col"><h3>{tr('업종별 가이드','Industry guide')}</h3><a href="#/guide">{tr('업종별 추천 구성','Industry recommendations')}</a><a href="#/guide">{tr('필요한 가이드 항목','Guideline contents')}</a><a href="#/guide">{tr('자료 체크리스트','Asset checklist')}</a></div>
           <div className="bramer-footer-col"><h3>{tr('자료 준비','Preparation')}</h3><a href="#resources">{tr('준비 자료 안내','Preparing assets')}</a><a href="#technology">{tr('SVG 업로드 안내','Uploading SVG')}</a><a href="#data-info">{tr('프로젝트 저장 안내','Saving projects')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('지원','Support')}</h3><a href="#help">도움말</a><a href="#faq">{tr('자주 묻는 질문','FAQ')}</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">{tr('업데이트 내역','Updates')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('지원','Support')}</h3><a href="#help">{tr("도움말","Help")}</a><a href="#faq">{tr('자주 묻는 질문','FAQ')}</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">{tr('업데이트 내역','Updates')}</a></div>
           <div className="bramer-footer-col"><h3>{tr('이용 안내','Information')}</h3><a href="#privacy-info">{tr('파일 이용 안내','File handling')}</a><a href="#data-info">{tr('저장 방식 안내','Storage options')}</a><a href="#technology">{tr('기술 및 제작 방식','Technology')}</a></div>
         </div>
         <div className="bramer-footer-bottom"><div><strong>BRAMER.</strong><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>{tr('현재 제공되는 기능을 기준으로 안내합니다.','Features described reflect the current beta version.')}</small></div>
