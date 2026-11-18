@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import BramerLogo from './components/BramerLogo';
 import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
+import TechnicalManifesto from './TechnicalManifesto';
 import WelcomeExperience from './WelcomeExperience';
 import Dashboard from './Dashboard';
 import ProjectLibrary from './ProjectLibrary';
@@ -69,12 +70,27 @@ function isHex(value: string): boolean {
 
 export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
-  const [mode, setMode] = useState<'landing' | 'welcome' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/welcome' ? 'landing' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
+  const [mode, setMode] = useState<'landing' | 'manifesto' | 'welcome' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/manifesto' ? 'manifesto' : location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/welcome' ? 'landing' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
   const [showFirstCoach, setShowFirstCoach] = useState(false);
   const [welcomeLanguage, setWelcomeLanguage] = useState<'ko'|'en'>(() => {
     try { return localStorage.getItem('bramer-site-language')==='en'?'en':'ko'; } catch { return 'ko'; }
   });
-  const goToDashboard = () => {
+  const hasBetaSession = () => {
+    try { return sessionStorage.getItem('bramer-beta-session-v1') === 'active'; }
+    catch { return false; }
+  };
+  const openManifesto = () => {
+    window.location.hash = '/manifesto';
+    setMode('manifesto');
+    window.scrollTo({top:0,behavior:'instant'});
+  };
+  const enterBetaFromManifesto = () => {
+    try {sessionStorage.setItem('bramer-open-registration-v1','1');} catch { /* Optional flag */ }
+    window.location.hash = '/';
+    setMode('landing');
+    window.scrollTo({top:0,behavior:'instant'});
+  };
+    const goToDashboard = () => {
     window.location.hash = '/dashboard';
     setMode('dashboard');
     window.scrollTo({top:0,behavior:'instant'});
@@ -121,7 +137,8 @@ export default function App() {
   };
   useEffect(() => {
     const syncRoute = () => {
-      if (window.location.hash === '#/dashboard') setMode('dashboard');
+      if (window.location.hash === '#/manifesto') setMode('manifesto');
+      else if (window.location.hash === '#/dashboard') setMode('dashboard');
       else if (window.location.hash === '#/welcome') setMode(previous => previous === 'welcome' ? previous : 'landing');
       else if (window.location.hash === '#/guide') setMode('guide');
       else if (window.location.hash === '#/projects') setMode('projects');
@@ -428,13 +445,19 @@ export default function App() {
   };
 
   if (!hydrated && (mode==='setup' || mode==='editor')) return <div className="bramer-loading-project" role="status">저장된 프로젝트 확인 중...</div>;
+  // This client-side guard prevents accidental pre-registration workspace access.
+  // Browser-session access is not a substitute for backend authorization.
+  if (!hasBetaSession() && ['dashboard','setup','editor','projects','help','guide'].includes(mode)) {
+    return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
+  }
+  if (mode === 'manifesto') return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
   if (mode === 'projects') return <ProjectLibrary projects={savedProjects}
     onOpen={id=>void resumeSavedProject(id)} onRemove={id=>void removeSavedProject(id)}
     onNew={()=>void createNewProject()} onBack={goHome} onGuide={openGuide} onHelp={openHelp}
     error={libraryError}/>;
   if (mode === 'help') return <HelpView onHome={goHome} onProjects={()=>void openProjectLibrary()}
     onGuide={openGuide} onNew={()=>void createNewProject()} onHelp={openHelp}/>;
-  if (mode === 'landing') return <Landing onStart={enterWorkspace} />;
+  if (mode === 'landing') return <Landing onStart={enterWorkspace} onManifesto={openManifesto} />;
   if (mode === 'welcome') return <WelcomeExperience onFinish={finishWelcome} english={welcomeLanguage==='en'}/>;
   if (mode === 'dashboard' || mode === 'guide') return <Dashboard
     view={mode}
