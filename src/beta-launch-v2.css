@@ -1,27 +1,27 @@
 /* BRAMER beta launch — refined hero and concise consent-first trial entry */
 .bramer-landing .bramer-home-hero{
-  position:relative;isolation:isolate;overflow:hidden;background:#0b0a10;
+  position:relative;isolation:isolate;overflow:hidden;background:#0b0b0b;
   min-height:min(750px,calc(100svh - 74px));padding-top:115px;padding-bottom:105px;
 }
 .bramer-landing .bramer-home-hero::before{
   content:"";position:absolute;inset:0;z-index:-2;pointer-events:none;
-  background:radial-gradient(ellipse 45% 42% at 51% 31%,rgba(104,77,178,.23),transparent 80%),
-             radial-gradient(ellipse 28% 50% at 75% 10%,rgba(59,47,104,.12),transparent 80%),#0b0a10;
+  background:radial-gradient(ellipse 45% 42% at 51% 31%,rgba(110,110,110,.10),transparent 80%),
+             radial-gradient(ellipse 28% 50% at 75% 10%,rgba(90,90,90,.06),transparent 80%),#0b0b0b;
 }
 .bramer-landing .bramer-home-hero::after{
   content:"";position:absolute;z-index:-1;left:50%;bottom:0;transform:translateX(-50%);width:min(830px,88%);
-  height:1px;background:linear-gradient(90deg,transparent,#464056,transparent);opacity:.65;
+  height:1px;background:linear-gradient(90deg,transparent,#414141,transparent);opacity:.65;
 }
 .bramer-landing .bramer-home-hero-content{max-width:900px;}
 .bramer-landing .bramer-home-hero h1{font-size:clamp(35px,4.5vw,61px)!important;font-weight:650!important;line-height:1.35!important;letter-spacing:-.058em!important;}
-.bramer-landing .bramer-home-hero h1 span{color:#b7a7f7;}
-.bramer-hero-support{margin:21px 0 0;color:#b1afb7;font-size:14px!important;line-height:1.7!important;}
+.bramer-landing .bramer-home-hero h1 span{color:#f0f0f0;}
+.bramer-hero-support{margin:21px 0 0;color:#b4b4b4;font-size:14px!important;line-height:1.7!important;}
 .bramer-landing .bramer-audience-roller{margin-top:14px;margin-bottom:18px;}
 .bramer-landing .bramer-roller-frame{height:105px;}
-.bramer-landing .bramer-roller-slide>span{font-size:11px;color:#9f99b4;}
-.bramer-landing .bramer-roller-slide strong{font-size:17px!important;color:#f0eef7;font-weight:560;}
-.bramer-landing .bramer-roller-slide p{font-size:13px!important;color:#a6a1ad;}
-.bramer-landing .bramer-roller-controls button.active::before{background:#bbaaf3;}
+.bramer-landing .bramer-roller-slide>span{font-size:11px;color:#aaaaaa;}
+.bramer-landing .bramer-roller-slide strong{font-size:17px!important;color:#f0f0f0;font-weight:560;}
+.bramer-landing .bramer-roller-slide p{font-size:13px!important;color:#a9a9a9;}
+.bramer-landing .bramer-roller-controls button.active::before{background:#e5e5e5;}
 .bramer-landing .bramer-home-hero .bramer-home-primary{border-radius:7px;min-height:48px;font-size:13px!important;padding:0 23px;}
 .bramer-landing .bramer-beta-overlay{z-index:1050;}
 .bramer-landing .bramer-beta-dialog{
