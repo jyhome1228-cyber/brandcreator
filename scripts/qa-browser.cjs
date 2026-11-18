@@ -49,7 +49,7 @@ try{
  await visitor.getByRole('heading',{name:/브랜드의 기준을/}).waitFor();
  assert.equal(await visitor.locator('.bramer-dash-layout').count(),0,'Anonymous visitors must not see the workspace');
  assert.ok(await visitor.getByText('NINEWORKS · 나인웍스').count()>0,'Documentation identifies the creator');
- await visitor.getByRole('button',{name:'베타 시작하기'}).click();
+ await visitor.getByRole('button',{name:'베타 시작하기',exact:true}).click();
  await visitor.waitForURL('**/#/');
  await visitor.getByRole('dialog').waitFor();
  await visitor.getByRole('heading',{name:'브레이머를 무료로 체험하세요.'}).waitFor();
