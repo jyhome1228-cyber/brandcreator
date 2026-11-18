@@ -66,7 +66,9 @@ try{
  pass('one stronger hero image per rotating audience and no audience label');
  const editorCards=await page.locator('.bramer-help-grid article').count();
  assert.equal(editorCards,3,'Support section keeps three information cards');
- assert.equal(await page.locator('.bramer-home-steps article').count(),3,'How it works retains three actionable steps');
+ assert.equal(await page.locator('.bramer-process-list .bramer-process-step').count(),3,'How it works retains three actionable steps');
+ assert.equal(await page.locator('.bramer-process-graphic').count(),3,'All three process steps have distinct visuals');
+ assert.equal(await page.locator('.bramer-home-footer').count(),1,'Footer remains a single section');
  pass('supplied hero imagery, low opacity and unified landing cards');
  await page.locator('.bramer-engine-thumbnails button').nth(25).waitFor();
  assert.equal(await page.locator('.bramer-engine-thumbnails button').count(),26,'Real BRAMER generator sample should contain 26 pages for 17 items');
