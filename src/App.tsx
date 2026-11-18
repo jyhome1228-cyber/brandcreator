@@ -80,7 +80,7 @@ export default function App() {
     catch { return false; }
   };
   const openManifesto = () => {
-    window.location.hash = '/manifesto';
+    window.location.hash = '/technology';
     setMode('manifesto');
     window.scrollTo({top:0,behavior:'instant'});
   };
@@ -447,7 +447,7 @@ export default function App() {
   if (!hydrated && (mode==='setup' || mode==='editor')) return <div className="bramer-loading-project" role="status">저장된 프로젝트 확인 중...</div>;
   // This client-side guard prevents accidental pre-registration workspace access.
   // Browser-session access is not a substitute for backend authorization.
-  if (!hasBetaSession() && ['dashboard','setup','editor','projects','help','guide'].includes(mode)) {
+  if (!hasBetaSession() && ['dashboard','setup','editor','projects','help'].includes(mode)) {
     return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
   }
   if (mode === 'manifesto') return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
