@@ -189,7 +189,7 @@ export default function Landing({ onStart }: LandingProps) {
       <section className="bramer-home-preview-section" id="preview">
         <div className="bramer-home-section-heading" data-reveal>
           <h2>브랜드의 기준을, 하나의 가이드라인으로.</h2>
-          <p>로고 사용 규칙과 컬러, 타이포그래피를 정리하고<br className="bramer-desktop-break"/> 브랜드에 필요한 항목을 선택해 구성할 수 있어요.</p>
+          <p>로고와 브랜드 정보를 입력하면<br className="bramer-desktop-break"/> 17개 제작 항목을 기준으로 가이드라인과 기본 응용 디자인을 구성합니다.</p>
         </div>
         <GuidelinePreview/>
       </section>
@@ -201,7 +201,7 @@ export default function Landing({ onStart }: LandingProps) {
         </div>
         <div className="bramer-home-steps" data-reveal>
           <article><span className="bramer-step-count">1</span><h3>로고 등록</h3><p>브랜드명과 SVG 로고를 등록하고 기본 정보를 설정하세요.</p></article>
-          <article><span className="bramer-step-count">2</span><h3>규칙 선택</h3><p>업종에 맞는 추천 항목을 살펴보고 필요한 규칙을 선택하세요.</p></article>
+          <article><span className="bramer-step-count">2</span><h3>규칙 검토</h3><p>업종별 참고 기준을 살펴보고 로고 여백과 컬러·서체를 검토하세요.</p></article>
           <article><span className="bramer-step-count">3</span><h3>가이드라인 제작</h3><p>페이지를 확인하고 내용을 편집한 다음 PDF 또는 SVG로 내보내세요.</p></article>
         </div>
       </section>
@@ -220,12 +220,12 @@ export default function Landing({ onStart }: LandingProps) {
         <div className="bramer-help-grid">
           <article id="resources">
             <h3>준비할 자료</h3>
-            <p>브랜드명과 SVG 로고를 먼저 준비해 주세요. 업종에 따라 컬러 정보, 제품 사진, 패키지 이미지 등을 추가하면 좋아요.</p>
+            <p>브랜드명과 SVG 로고를 먼저 준비해 주세요. 브랜드 컬러, 서체, 소개 문구, 담당자 연락처를 준비하면 명함·서식 제작에도 활용할 수 있어요.</p>
             <a href="#/guide">업종별 준비 자료 확인</a>
           </article>
           <article id="data-info">
             <h3>프로젝트 저장과 불러오기</h3>
-            <p>현재는 계정 저장 방식이 아니에요. 제작 중인 프로젝트를 JSON 파일로 저장하고, 제작 화면에서 다시 불러올 수 있어요.</p>
+            <p>작업은 현재 브라우저에 자동 저장되고 ‘내 프로젝트’에서 이어서 열 수 있어요. 다른 기기에서 사용하려면 JSON 파일을 따로 백업해 주세요.</p>
             <a href="#/create">제작 화면 열기</a>
           </article>
           <article id="privacy-info">
@@ -236,10 +236,10 @@ export default function Landing({ onStart }: LandingProps) {
         </div>
         <section className="bramer-tech-section" id="technology" aria-labelledby="bramer-tech-title">
           <h3 id="bramer-tech-title">Bramer는 이렇게 작동합니다.</h3>
-          <p>브레이머는 업로드한 SVG 로고와 브랜드 정보를 바탕으로 기본적인 사용 규칙을 구성합니다. 로고의 비율과 컬러를 분석하고, 사용자가 선택한 업종과 항목에 따라 가이드라인 페이지를 생성합니다.</p>
+          <p>브레이머는 업로드한 SVG 로고와 브랜드 정보를 바탕으로 기본적인 사용 규칙을 구성합니다. 로고의 비율과 컬러를 분석하고, 17개 기본 제작 항목에 따라 가이드라인 페이지를 생성합니다.</p>
           <div className="bramer-tech-grid">
             <div><strong>SVG 분석</strong><span>로고의 구조·비율·컬러를 읽고 기본 규칙 설정에 활용합니다.</span></div>
-            <div><strong>업종별 구성</strong><span>초기 추천안을 제공하며 필요한 항목은 직접 추가하거나 제외할 수 있습니다.</span></div>
+            <div><strong>업종별 구성</strong><span>업종별 우선 검토 사항을 안내하며, 기본 17개 제작 항목은 모든 업종에서 동일하게 제공합니다.</span></div>
             <div><strong>문서 생성과 편집</strong><span>페이지별 내용을 수정하고 SVG 또는 PDF로 결과물을 내보낼 수 있습니다.</span></div>
           </div>
           <p className="bramer-tech-note">로고 여백과 최소 크기는 자동 제안값이며 최종 인쇄·사용 환경에서 확인이 필요합니다. Illustrator AI 원본은 현재 직접 변환하지 않아요. Illustrator에서 파일 → 다른 이름으로 저장 → SVG를 선택해 저장한 파일을 업로드해 주세요. 자동 생성 항목은 브랜드별 검토가 필요합니다.</p>
@@ -247,9 +247,9 @@ export default function Landing({ onStart }: LandingProps) {
         <div className="bramer-help-faq" id="faq">
           <h3>자주 묻는 질문</h3>
           <details><summary>어떤 로고 파일을 업로드해야 하나요?</summary><p>SVG는 로고의 형태와 크기를 유지하는 벡터 파일이에요. Illustrator AI 원본만 있다면 Illustrator에서 파일 → 다른 이름으로 저장 → 파일 형식 SVG를 선택하세요. 저장한 SVG를 Bramer에 업로드하면 됩니다.</p></details>
-          <details><summary>업종별 추천 항목을 수정할 수 있나요?</summary><p>네. 추천 항목은 제작 화면에서 추가하거나 제외할 수 있습니다. 현재의 추천값은 연구 검증 전의 초기 설정입니다.</p></details>
+          <details><summary>업종별 추천 항목을 수정할 수 있나요?</summary><p>현재는 업종별 특징과 검토할 규칙을 안내하고, 기본 17개 제작 항목은 동일하게 제공합니다. 업종별 안내는 연구 검증 전의 실무 참고 자료입니다.</p></details>
           <details><summary>완성한 가이드라인은 어떻게 저장하나요?</summary><p>페이지별 SVG, 전체 SVG 또는 PDF로 내보낼 수 있습니다. 이후 수정할 계획이라면 프로젝트 JSON도 별도로 저장해 주세요.</p></details>
-          <details><summary>모든 가이드라인이 자동으로 완성되나요?</summary><p>로고와 컬러의 기본 규칙은 자동으로 구성할 수 있지만, 사진 스타일·언어·응용 디자인 등은 브랜드별 내용을 직접 확정해야 합니다.</p></details>
+          <details><summary>모든 가이드라인이 자동으로 완성되나요?</summary><p>로고·컬러·서체와 기본 응용 디자인을 생성합니다. 브랜드 스토리·슬로건·연락처는 직접 입력해야 하며, 사진과 모션은 자동 생성하지 않습니다.</p></details>
         </div>
       </div>
     </section>
