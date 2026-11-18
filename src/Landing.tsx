@@ -162,8 +162,7 @@ export default function Landing({ onStart }: LandingProps) {
     <main id="top">
       <section className="bramer-home-hero">
         <div className="bramer-hero-image-layer" aria-hidden="true">
-          <div className="bramer-hero-image bramer-hero-image-left"/>
-          <div className="bramer-hero-image bramer-hero-image-right"/>
+          <div className={`bramer-hero-image ${audiences[audienceIndex].key === 'designer' ? 'bramer-hero-image-right' : 'bramer-hero-image-left'}`}/>
         </div>
         <div className="bramer-home-hero-content" data-reveal>
           <p className="bramer-home-overline">브랜드 가이드라인 제작 솔루션</p>
@@ -174,7 +173,6 @@ export default function Landing({ onStart }: LandingProps) {
             onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setRollPaused(false); }}>
             <div className="bramer-hero-rotation-stage" aria-live="off">
               <div className="bramer-hero-rotation-slide" key={audiences[audienceIndex].key}>
-                <span className="bramer-hero-audience-label">{audiences[audienceIndex].audience}</span>
                 <h1>{audiences[audienceIndex].titleTop}<br/><span>{audiences[audienceIndex].titleBottom}</span></h1>
                 <p className="bramer-hero-slide-description">{audiences[audienceIndex].description}</p>
               </div>
