@@ -631,7 +631,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       <rect x="1035" y="1400" width="1830" height="150" fill="${SOFT}"/>
       <text x="1075" y="1455" fill="${MUTED}" font-size="21">CHECK</text>
       <text x="1075" y="1505" fill="${BLACK}" font-size="27" font-weight="600">세부 형태가 뭉개지거나 식별성이 떨어지면 로고를 단순화하지 말고 사용 크기를 확대합니다.</text>
-      <text x="1075" y="1545" fill="${MUTED}" font-size="20">Minimum size is a lower limit, not a recommended default size.</text>`
+      <text x="1075" y="1545" fill="${MUTED}" font-size="20">NOT TO SCALE · Diagram enlarged for visibility. Verify the actual printed or digital dimensions.</text>`
     )
   });
 
