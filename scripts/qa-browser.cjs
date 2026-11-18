@@ -42,6 +42,19 @@ try{
  const faviconResponse=await page.request.get('http://127.0.0.1:'+port+favicon);
  assert.ok(faviconResponse.ok(),'Favicon fetch must succeed at deployed path');
  pass('GitHub Pages base path and favicon work');
+ // The public documentation must be accessible before beta enrollment, while
+ // a pasted direct dashboard URL must never show the workspace anonymously.
+ const visitor=await context.newPage();
+ await visitor.goto(url+'#/dashboard',{waitUntil:'domcontentloaded'});
+ await visitor.getByRole('heading',{name:/브랜드의 기준을/}).waitFor();
+ assert.equal(await visitor.locator('.bramer-dash-layout').count(),0,'Anonymous visitors must not see the workspace');
+ assert.ok(await visitor.getByText('NINEWORKS · 나인웍스').count()>0,'Documentation identifies the creator');
+ await visitor.getByRole('button',{name:'베타 시작하기'}).click();
+ await visitor.waitForURL('**/#/');
+ await visitor.getByRole('dialog').waitFor();
+ await visitor.getByRole('heading',{name:'브레이머를 무료로 체험하세요.'}).waitFor();
+ await visitor.close();
+ pass('public manifesto precedes beta registration and guards direct dashboard URL');
  const grayscale = (color,label) => {
    const values=color.split(/[^0-9.]+/).filter(Boolean).slice(0,3).map(Number);
    assert.ok(values.length===3 && Math.max(...values)-Math.min(...values)<=2,label+' is not neutral gray: '+color);
