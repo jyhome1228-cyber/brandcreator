@@ -295,3 +295,47 @@
  .bramer-docs .bramer-docs-hero h1{font-size:clamp(27px,6vw,33px)!important}
  .bramer-docs .bramer-docs-section h2{font-size:clamp(22px,5vw,26px)!important}
 }
+
+
+/* Editorial page-turn: a calm crossfade with barely perceptible directional movement.
+   Keep the outgoing document beneath the incoming page to prevent white flashing. */
+.bramer-landing .bramer-engine-preview .bramer-preview-page-stage{
+ position:relative;display:block;flex:0 1 990px;
+ width:100%;max-width:990px;aspect-ratio:297 / 210;
+ margin:0 auto;isolation:isolate;
+}
+.bramer-landing .bramer-engine-preview .bramer-preview-page-stage .bramer-engine-page{
+ position:relative;z-index:2;display:block;width:100%!important;height:auto;
+ max-width:none!important;aspect-ratio:297 / 210;
+ object-fit:contain;
+ will-change:opacity,transform;
+ animation:bramer-page-arrive .48s cubic-bezier(.22,1,.36,1) both!important;
+}
+.bramer-landing .bramer-engine-preview .bramer-preview-page-stage .bramer-engine-enter-page.backward{
+ --bramer-page-shift:-9px;
+}
+.bramer-landing .bramer-engine-preview .bramer-preview-page-stage .bramer-engine-enter-page.forward{
+ --bramer-page-shift:9px;
+}
+.bramer-landing .bramer-engine-preview .bramer-engine-exit-page{
+ position:absolute;z-index:1;inset:0;width:100%!important;height:100%!important;
+ max-width:none!important;object-fit:contain;background:#fff;
+ animation:bramer-page-depart .42s cubic-bezier(.4,0,.2,1) both;
+ pointer-events:none;
+}
+.bramer-landing .bramer-engine-preview .bramer-engine-exit-page.backward{--bramer-page-exit:7px}
+.bramer-landing .bramer-engine-preview .bramer-engine-exit-page.forward{--bramer-page-exit:-7px}
+@keyframes bramer-page-arrive{
+ 0%{opacity:0;transform:translate3d(var(--bramer-page-shift,9px),5px,0) scale(.995)}
+ 100%{opacity:1;transform:translate3d(0,0,0) scale(1)}
+}
+@keyframes bramer-page-depart{
+ 0%{opacity:1;transform:translate3d(0,0,0)}
+ 100%{opacity:0;transform:translate3d(var(--bramer-page-exit,-7px),-2px,0)}
+}
+@media(prefers-reduced-motion:reduce){
+ .bramer-landing .bramer-engine-preview .bramer-preview-page-stage .bramer-engine-page,
+ .bramer-landing .bramer-engine-preview .bramer-engine-exit-page{
+  animation:none!important;transform:none!important;opacity:1!important;
+ }
+}
