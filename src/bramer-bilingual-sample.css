@@ -40,3 +40,9 @@
 .bramer-real-tabs button{flex:0 1 auto}
 @media(max-width:760px){.bramer-language-switch{margin-left:auto;gap:3px}.bramer-language-switch button{font-size:11px!important}.bramer-real-preview .bramer-preview-canvas{padding:13px 7px;min-height:0}.bramer-real-sheet{padding:4% 5%}.bramer-real-tabs button{font-size:10px!important;padding:8px 10px}.bramer-real-body h3{margin:2% 0 3%}.bramer-real-body>p{margin:1.5% 0 0}.bramer-real-logo-field,.bramer-real-clear-field,.bramer-real-swatches,.bramer-real-apps{min-height:50px}}
 @media(max-width:480px){.bramer-site-header-inner{gap:9px}.bramer-language-switch{margin-left:auto}.bramer-real-body{padding-top:3%}.bramer-real-body h3{font-size:19px!important}.bramer-real-body>p{font-size:7px!important;line-height:1.3}.bramer-real-top,.bramer-real-bottom{font-size:6px}.bramer-real-tabs button{padding:8px 7px}}
+
+/* Export language controls share the same output choice for preview, SVG and print/PDF. */
+.bramer-doc-language{display:inline-flex;align-items:center;gap:8px;color:#777;font-size:12px;white-space:nowrap}
+.bramer-doc-language select{background:#fff;border:1px solid #d5d5d5;color:#171717;border-radius:5px;padding:8px 10px;font-size:12px;max-width:150px}
+@media(max-width:760px){.bramer-doc-language{font-size:11px}.bramer-doc-language select{padding:7px 6px;max-width:110px}}
+@media print{.bramer-doc-language{display:none!important}}
