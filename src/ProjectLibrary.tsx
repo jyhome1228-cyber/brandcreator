@@ -1,4 +1,5 @@
 import WorkspaceNav from './components/WorkspaceNav';
+import BramerLogo from './components/BramerLogo';
 import type { SavedBramerProject } from './engines/projectLibrary';
 
 type Props = {
@@ -15,7 +16,7 @@ type Props = {
 export default function ProjectLibrary({projects,onOpen,onRemove,onNew,onBack,onGuide,onHelp,error}:Props) {
   return <div className="bramer-dash bramer-projects-page">
     <header className="bramer-dash-header">
-      <button type="button" className="bramer-dash-logo" onClick={onBack}>BRAMER.</button>
+      <button type="button" className="bramer-dash-logo" onClick={onBack} aria-label="BRAMER 홈"><BramerLogo /></button>
       <span className="bramer-dash-product">브랜드 가이드라인 제작</span>
       <button type="button" className="bramer-dash-header-start" onClick={onNew}>새 가이드라인 만들기</button>
     </header>
