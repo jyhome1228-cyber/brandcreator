@@ -110,65 +110,77 @@ const lines = (items:Array<[string,string]>, x:number, y:number, gap=125):string
 const note = (text:string,y=1700):string=>fittedText(text,110,y,2720,29,'#777');
 const missing = (text:string)=>`<text x="110" y="1770" fill="#B45A2A" font-size="28" font-family="Arial,sans-serif">추가 입력 필요: ${esc(text)}</text>`;
 const appPage=(id:string,name:string,subtitle:string,project:BrandProject,markup:string):GuidelinePage=>({id,section:'application',title:name,subtitle,svg:guide(project,name,subtitle,markup)});
-const baseCard=(project:BrandProject,reverse=false):string=>{
-  const c=project.contact;
-  const bg=reverse?'#FFFFFF':hex(project.colors.primary);
-  const fg=reverse?'#141414':inkOn(bg);
-  if(!reverse) return `<rect width="900" height="500" rx="3" fill="${bg}"/>${logo(project,90,130,720,245,fg)}`;
-  const row=(label:string,value:string,y:number)=> value?.trim()
-    ? `${fittedText(label,70,y-28,130,18,'#777777',500)}${fittedText(value,70,y,770,25,'#242424')}`
-    : '';
-  return `<rect width="900" height="500" rx="3" fill="#FFFFFF" stroke="#DDDDDD"/>
-    ${fittedText(c?.personName||'이름 입력 필요',70,100,760,45,fg,650)}
-    ${fittedText(c?.position||'',70,150,760,26,'#777777')}
-    <path d="M70 198H830" stroke="#E6E6E6" stroke-width="2"/>
-    ${row('PHONE',c?.phone||'',280)}
-    ${row('EMAIL',c?.email||'',360)}
-    ${row('WEBSITE',c?.website||'',440)}`;
+
+const contactInfo=(project:BrandProject)=>project.contact||{personName:'',position:'',phone:'',email:'',website:'',company:'',address:''};
+const cardArtwork=(project:BrandProject,back=false):string=>{
+  const c=contactInfo(project);
+  const dark=hex(project.colors.primary),fg=inkOn(dark);
+  if(!back)return `<rect width="900" height="500" fill="${dark}"/>${logo(project,130,145,640,210,fg)}`;
+  return `<rect width="900" height="500" fill="#FFFFFF"/>
+    ${fittedText(c.personName||'이름 입력 필요',75,105,600,55,'#151515',700)}
+    ${fittedText(c.position||'',75,148,620,27,'#666666')}
+    ${fittedText(c.company||project.englishName||project.name,75,219,620,31,'#1A1A1A',650)}
+    ${fittedText(c.phone||'',75,284,640,27,'#333333')}
+    ${fittedText(c.email||'',75,322,640,26,'#333333')}
+    ${fittedText(c.website||'',75,360,640,26,'#333333')}
+    ${fittedText(c.address||'',75,426,745,22,'#666666')}
+    ${logo(project,690,55,130,50)}
+    <path d="M75 458H825" stroke="#DCDCDC" stroke-width="2"/>`;
 };
+const baseCard=(project:BrandProject,reverse=false):string=>cardArtwork(project,reverse);
 export function generateBusinessCardSvg(project:BrandProject,reverse=false):string {
-  const c=project.contact;
-  const bg=reverse?'#FFFFFF':hex(project.colors.primary), fg=reverse?'#111111':inkOn(bg);
-  const front=logo(project,95,110,710,280,fg);
-  const info=reverse
-    ? `${fittedText(c?.personName||'이름 입력 필요',70,110,760,46,'#191919',650)}
-       ${fittedText(c?.position||'',70,160,760,26,'#777777')}
-       <path d="M70 203H830" stroke="#DCDCDC" stroke-width="2"/>
-       ${fittedText(c?.phone||'',70,290,760,27,'#333333')}
-       ${fittedText(c?.email||'',70,355,760,27,'#333333')}
-       ${fittedText(c?.website||'',70,420,760,27,'#333333')}`
-    : front;
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 900 500"><rect width="900" height="500" fill="${bg}"/>${info}</svg>`;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 900 500">${cardArtwork(project,reverse)}</svg>`;
 }
+
 export function generateStickerSvg(project:BrandProject,shape:'circle'|'square'):string {
   const primary=hex(project.colors.primary),fg=inkOn(primary);
   return `<svg xmlns="http://www.w3.org/2000/svg" width="50mm" height="50mm" viewBox="0 0 500 500">${shape==='circle'?`<circle cx="250" cy="250" r="246" fill="${primary}"/>`:`<rect x="0" y="0" width="500" height="500" fill="${primary}"/>`}${logo(project,85,165,330,170,fg)}</svg>`;
 }
+
 export function generateLetterheadSvg(project:BrandProject):string {
-  const c=project.contact, primary=hex(project.colors.primary);
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 2100 2970">
-    <rect width="2100" height="2970" fill="#FFFFFF"/>
-    ${logo(project,170,145,650,210)}
-    <path d="M170 445H1930" stroke="${primary}" stroke-width="6"/>
-    <text x="170" y="605" font-size="57" font-family="Arial,sans-serif" font-weight="600" fill="#171717">${esc(project.name.slice(0,45))}</text>
-    <path d="M170 2540H1930" stroke="#DDDDDD" stroke-width="3"/>
-    <text x="170" y="2600" font-size="29" font-family="Arial,sans-serif" fill="#555">${esc((c?.company||project.name).slice(0,75))}</text>
-    <text x="170" y="2650" font-size="26" font-family="Arial,sans-serif" fill="#777">${esc((c?.address||'').slice(0,95))}</text>
-    <text x="170" y="2700" font-size="25" font-family="Arial,sans-serif" fill="#777">${esc([c?.phone,c?.email,c?.website].filter(Boolean).join('   ·   ').slice(0,115))}</text>
-  </svg>`;
+ const c=contactInfo(project),p=hex(project.colors.primary);
+ return `<svg xmlns="http://www.w3.org/2000/svg" width="210mm" height="297mm" viewBox="0 0 2100 2970">
+ <rect width="2100" height="2970" fill="#FFFFFF"/>
+ ${logo(project,165,175,550,175)}
+ <path d="M165 430H1935" stroke="${p}" stroke-width="5"/>
+ ${fittedText(project.name||project.englishName,165,620,1770,57,'#191919',650)}
+ <path d="M165 2560H1935" stroke="#D7D7D7" stroke-width="3"/>
+ ${fittedText(c.company||project.name,165,2640,850,32,'#242424',650)}
+ ${fittedText(c.address||'',165,2695,1750,26,'#555555')}
+ ${fittedText([c.phone,c.email,c.website].filter(Boolean).join(' · '),165,2750,1760,25,'#555555')}
+ <text x="1935" y="2840" text-anchor="end" font-family="Arial,sans-serif" font-size="20" fill="#999999">BRAND LETTERHEAD · A4</text>
+ </svg>`;
 }
-export function generateEnvelopeSvg(project:BrandProject, size:'small'|'large'):string {
-  const w=size==='small'?2200:3300, h=size==='small'?1100:2450;
-  const c=project.contact, p=hex(project.colors.primary);
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="${w/10}mm" height="${h/10}mm" viewBox="0 0 ${w} ${h}">
-    <rect width="${w}" height="${h}" fill="#FFFFFF"/>
-    <path d="M120 120H${w-120}" stroke="${p}" stroke-width="12"/>
-    ${logo(project,150,200,Math.min(750,w*.4),240)}
-    <text x="150" y="${h-245}" font-family="Arial,sans-serif" font-size="37" fill="#222" font-weight="600">${esc((c?.company||project.name).slice(0,50))}</text>
-    <text x="150" y="${h-180}" font-family="Arial,sans-serif" font-size="29" fill="#555">${esc((c?.address||'').slice(0,80))}</text>
-    <text x="150" y="${h-120}" font-family="Arial,sans-serif" font-size="26" fill="#777">${esc([c?.phone,c?.website].filter(Boolean).join(' · ').slice(0,80))}</text>
-  </svg>`;
+export function generateEnvelopeSvg(project:BrandProject,size:'small'|'large'):string {
+ const small=size==='small',w=small?2200:3300,h=small?1050:2450;
+ const c=contactInfo(project),p=hex(project.colors.primary);
+ const flap=small?160:235,origin=flap+(small?110:150),top=small?150:205;
+ const markW=small?545:745,markH=small?150:215;
+ const textWidth=w-origin-150,base=small?top+220:top+320;
+ const postalBox=small?52:72,boxGap=small?10:14;
+ const postalX=w-5*(postalBox+boxGap)-120,postalY=h-(small?170:280);
+ const boxes=Array.from({length:5},(_,i)=>`<rect x="${postalX+i*(postalBox+boxGap)}" y="${postalY}" width="${postalBox}" height="${postalBox}" rx="1" fill="none" stroke="#8B8B8B" stroke-width="2"/>`).join('');
+ return `<svg xmlns="http://www.w3.org/2000/svg" width="${w/10}mm" height="${h/10}mm" viewBox="0 0 ${w} ${h}">
+ <rect width="${w}" height="${h}" fill="#FFFFFF"/>
+ <path d="M${flap} 0V${h}L30 ${h-45}Q0 ${h-60} 0 ${h-135}V135Q0 55 40 40Z" fill="${p}"/>
+ <path d="M${flap} 0V${h}" stroke="#C8C8C8" stroke-width="3"/>
+ ${logo(project,origin,top,markW,markH)}
+ ${fittedText(c.company||project.englishName||project.name,origin,base,textWidth,small?31:40,'#171717',650)}
+ ${fittedText(c.address||'',origin,base+(small?58:76),textWidth,small?28:36,'#333333')}
+ ${fittedText(c.phone||'',origin,base+(small?116:152),textWidth,small?27:34,'#333333')}
+ ${fittedText(c.email||'',origin,base+(small?158:207),textWidth,small?26:32,'#333333')}
+ ${fittedText(c.website||'',origin,base+(small?200:262),textWidth,small?25:30,'#555555')}
+ ${boxes}
+ </svg>`;
 }
+const embedApplication=(svg:string,x:number,y:number,width:number,height:number):string=>{
+ const inner=svg.slice(svg.indexOf('>')+1,svg.lastIndexOf('</svg>'));
+ const viewBox=(svg.match(/viewBox="([^"]+)"/)||[])[1]||'0 0 900 500';
+ return `<svg xmlns="http://www.w3.org/2000/svg" x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${viewBox}" preserveAspectRatio="xMidYMid meet">${inner}</svg>`;
+};
+const dimensionH=(x:number,y:number,w:number,labelText:string):string=>`<path d="M${x} ${y-11}v22M${x+w} ${y-11}v22M${x} ${y}H${x+w}" stroke="#909090" stroke-width="2" fill="none"/><text x="${x+w/2}" y="${y+40}" font-family="Arial,sans-serif" font-size="26" fill="#444" text-anchor="middle">${labelText}</text>`;
+const dimensionV=(x:number,y:number,h:number,labelText:string):string=>`<path d="M${x-11} ${y}h22M${x-11} ${y+h}h22M${x} ${y}V${y+h}" stroke="#909090" stroke-width="2" fill="none"/><text x="${x+18}" y="${y+h/2}" font-family="Arial,sans-serif" font-size="24" fill="#444">${labelText}</text>`;
+
 export function generateApplicationPages(project:BrandProject):GuidelinePage[] {
   const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' };
   const p=hex(project.colors.primary), fg=inkOn(p);
