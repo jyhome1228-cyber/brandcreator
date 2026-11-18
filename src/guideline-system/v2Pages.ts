@@ -26,8 +26,37 @@ export const APPLICATION_KEYS: ApplicationKey[] = ['businessCard','logoSticker',
 
 const esc = (s:string) => String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&apos;'}[c]!));
 const hex = (s:string, fallback='#111111') => /^#[0-9a-f]{6}$/i.test(s||'') ? s : fallback;
-const inkOn = (color:string) => {const c=hex(color).slice(1);const r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16);return r*.299+g*.587+b*.114>155?'#111111':'#FFFFFF';};
-const guide = (project:BrandProject,title:string,subtitle:string,content:string):string => `<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 2970 2100"><rect width="2970" height="2100" fill="#fff"/><text x="110" y="138" font-family="Arial,sans-serif" font-size="75" font-weight="700" fill="${hex(project.colors.primary)}">${esc(title)}</text><text x="1120" y="140" font-family="Arial,sans-serif" font-size="31" fill="#555">${esc(subtitle)}</text><path d="M110 215H2860" stroke="#D6D6D6" stroke-width="3"/>${content}<path d="M110 1900H2860" stroke="#D6D6D6" stroke-width="3"/><text x="110" y="1965" font-family="Arial,sans-serif" font-size="28" fill="#666">${esc(project.englishName || project.name)}</text><text x="2860" y="1965" text-anchor="end" font-family="Arial,sans-serif" font-size="24" fill="#888">BRAMER · BRAND GUIDELINES</text></svg>`;
+const luminance = (color:string):number => {
+  const value=hex(color).slice(1);
+  const channels=[0,2,4].map(i=>parseInt(value.slice(i,i+2),16)/255).map(v=>v<=0.04045?v/12.92:Math.pow((v+0.055)/1.055,2.4));
+  return channels[0]*0.2126+channels[1]*0.7152+channels[2]*0.0722;
+};
+const contrastRatio = (a:string,b:string):number => {
+  const la=luminance(a), lb=luminance(b);
+  return (Math.max(la,lb)+0.05)/(Math.min(la,lb)+0.05);
+};
+const inkOn = (color:string):string => contrastRatio(color,'#111111')>=contrastRatio(color,'#FFFFFF')?'#111111':'#FFFFFF';
+const editorialInk = (primary:string):string => contrastRatio(primary,'#FFFFFF')>=3?hex(primary):'#242424';
+/** Fit a single label within its design box without changing the user's value. */
+const fittedText = (value:string,x:number,y:number,maxWidth:number,fontSize:number,fill:string,weight=400):string => {
+  const v=String(value||'').trim();
+  if(!v) return '';
+  const estimated=[...v].reduce((sum,ch)=>sum+(/[가-힣\u3040-\u30ff\u4e00-\u9fff]/u.test(ch)?1:/[A-Z0-9]/.test(ch)?.66:/\s/.test(ch)?.33:.53),0);
+  const size=Math.max(16,Math.min(fontSize,Math.floor(maxWidth/Math.max(1,estimated))));
+  return `<text x="${x}" y="${y}" font-family="Pretendard,Arial,sans-serif" font-size="${size}" font-weight="${weight}" fill="${fill}">${esc(v)}</text>`;
+};
+const wrapCopy = (value:string,maxUnits:number,maxLines:number):string[] => {
+  const chunks:string[]=[];
+  let line='',count=0;
+  for(const ch of [...String(value||'').trim()]){
+    const unit=/[가-힣\u3040-\u30ff\u4e00-\u9fff]/u.test(ch)?2:1;
+    if(count+unit>maxUnits && line){chunks.push(line.trim());line='';count=0;if(ch===' ')continue;}
+    line+=ch;count+=unit;
+  }
+  if(line.trim())chunks.push(line.trim());
+  return chunks.slice(0,maxLines);
+};
+const guide = (project:BrandProject,title:string,subtitle:string,content:string):string => `<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 2970 2100"><rect width="2970" height="2100" fill="#fff"/>${fittedText(title,110,140,880,75,editorialInk(project.colors.primary),700)}${fittedText(subtitle,1120,140,1720,31,'#555555',500)}<path d="M110 215H2860" stroke="#D6D6D6" stroke-width="3"/>${content}<path d="M110 1900H2860" stroke="#D6D6D6" stroke-width="3"/>${fittedText(project.englishName || project.name,110,1965,1080,28,'#666666')}<text x="2860" y="1965" text-anchor="end" font-family="Arial,sans-serif" font-size="24" fill="#888">BRAMER · BRAND GUIDELINES</text></svg>`;
 function visibleLogoBox(asset: LogoAsset) {
   const canvas = asset.viewBox;
   const measured = asset.analysis?.geometry?.visualBounds;
@@ -62,19 +91,34 @@ const note = (text:string,y=1700):string=>`<text x="110" y="${y}" fill="#777" fo
 const missing = (text:string)=>`<text x="110" y="1770" fill="#B45A2A" font-size="28" font-family="Arial,sans-serif">추가 입력 필요: ${esc(text)}</text>`;
 const appPage=(id:string,name:string,subtitle:string,project:BrandProject,markup:string):GuidelinePage=>({id,section:'application',title:name,subtitle,svg:guide(project,name,subtitle,markup)});
 const baseCard=(project:BrandProject,reverse=false):string=>{
-  const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' };
+  const c=project.contact;
   const bg=reverse?'#FFFFFF':hex(project.colors.primary);
   const fg=reverse?'#141414':inkOn(bg);
-  return `<rect width="900" height="500" rx="3" fill="${bg}" stroke="${reverse?'#ddd':'none'}"/>${reverse?
-    `<text x="70" y="100" font-family="Arial,sans-serif" font-size="35" font-weight="700" fill="${fg}">${esc(c.personName||'이름 미입력')}</text><text x="70" y="150" font-family="Arial,sans-serif" font-size="23" fill="#777">${esc(c.position||'직책 미입력')}</text>${lines([['PHONE',c.phone||''],['EMAIL',c.email||''],['WEB',c.website||'']],70,255,70).replace(/font-size="35"/g,'font-size="23"').replace(/font-size="24"/g,'font-size="18"')}`:
-    logo(project,80,145,740,195,fg)
-  }`;
+  if(!reverse) return `<rect width="900" height="500" rx="3" fill="${bg}"/>${logo(project,90,130,720,245,fg)}`;
+  const row=(label:string,value:string,y:number)=> value?.trim()
+    ? `${fittedText(label,70,y-28,130,18,'#777777',500)}${fittedText(value,70,y,770,25,'#242424')}`
+    : '';
+  return `<rect width="900" height="500" rx="3" fill="#FFFFFF" stroke="#DDDDDD"/>
+    ${fittedText(c?.personName||'이름 입력 필요',70,100,760,45,fg,650)}
+    ${fittedText(c?.position||'',70,150,760,26,'#777777')}
+    <path d="M70 198H830" stroke="#E6E6E6" stroke-width="2"/>
+    ${row('PHONE',c?.phone||'',280)}
+    ${row('EMAIL',c?.email||'',360)}
+    ${row('WEBSITE',c?.website||'',440)}`;
 };
 export function generateBusinessCardSvg(project:BrandProject,reverse=false):string {
-  const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' },bg=reverse?'#FFFFFF':hex(project.colors.primary),fg=reverse?'#111111':inkOn(bg);
-  const label=(v:string,y:number,size=26)=>`<text x="70" y="${y}" font-size="${size}" fill="${fg}" font-family="Arial,sans-serif">${esc(v)}</text>`;
-  const front=logo(project,55,95,790,310,fg);
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 900 500"><rect width="900" height="500" fill="${bg}"/>${reverse?`${label(c.personName||'이름 미입력',120,40)}${label(c.position||'',165,25)}${label(c.phone||'',325,26)}${label(c.email||'',365,26)}${label(c.website||'',405,26)}`:front}</svg>`;
+  const c=project.contact;
+  const bg=reverse?'#FFFFFF':hex(project.colors.primary), fg=reverse?'#111111':inkOn(bg);
+  const front=logo(project,95,110,710,280,fg);
+  const info=reverse
+    ? `${fittedText(c?.personName||'이름 입력 필요',70,110,760,46,'#191919',650)}
+       ${fittedText(c?.position||'',70,160,760,26,'#777777')}
+       <path d="M70 203H830" stroke="#DCDCDC" stroke-width="2"/>
+       ${fittedText(c?.phone||'',70,290,760,27,'#333333')}
+       ${fittedText(c?.email||'',70,355,760,27,'#333333')}
+       ${fittedText(c?.website||'',70,420,760,27,'#333333')}`
+    : front;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 900 500"><rect width="900" height="500" fill="${bg}"/>${info}</svg>`;
 }
 export function generateStickerSvg(project:BrandProject,shape:'circle'|'square'):string {
   const primary=hex(project.colors.primary),fg=inkOn(primary);
@@ -110,7 +154,17 @@ export function generateApplicationPages(project:BrandProject):GuidelinePage[] {
   const p=hex(project.colors.primary), fg=inkOn(p);
   return [
     appPage('v2-14-business-card','Business Card','명함 앞면 / 뒷면',project,
-      `<g transform="translate(170 500)">${baseCard(project)}</g><g transform="translate(1470 500)">${baseCard(project,true)}</g><text x="170" y="1075" fill="#777" font-size="27">FRONT · LOGO</text><text x="1470" y="1075" fill="#777" font-size="27">BACK · CONTACT</text>${lines([['NAME',c.personName||'입력 필요'],['POSITION',c.position||'입력 필요'],['PHONE',c.phone||'입력 필요'],['EMAIL',c.email||'입력 필요']],170,1250,95)}${note('90 × 50 mm 예시 · 인쇄 전 재단·도련·폰트 확인이 필요합니다.',1775)}`),
+      `<g transform="translate(170 480)">${baseCard(project)}</g>
+        <g transform="translate(1480 480)">${baseCard(project,true)}</g>
+        <text x="170" y="1050" fill="#777" font-family="Arial,sans-serif" font-size="27">FRONT · BRAND LOGO</text>
+        <text x="1480" y="1050" fill="#777" font-family="Arial,sans-serif" font-size="27">BACK · CONTACT INFORMATION</text>
+        <path d="M170 1200H2790" stroke="#E0E0E0" stroke-width="2"/>
+        ${fittedText('90 × 50 mm',170,1300,540,40,'#252525',600)}
+        ${fittedText(c.personName||'이름 미입력',170,1400,1100,34,'#252525')}
+        ${fittedText(c.position||'직책 미입력',170,1470,1100,28,'#666666')}
+        ${fittedText(c.phone||'연락처 미입력',1480,1370,1130,30,'#252525')}
+        ${fittedText(c.email||'이메일 미입력',1480,1450,1130,30,'#252525')}
+        ${note('SVG는 편집 가능한 디자인 원본입니다. 인쇄 전 재단·도련·서체 검수가 필요합니다.',1760)}`),
     appPage('v2-15-logo-sticker','Logo Sticker','원형 / 사각형',project,
       `<circle cx="830" cy="940" r="400" fill="${p}"/>${logo(project,520,810,620,260,fg)}<rect x="1610" y="540" width="800" height="800" fill="${p}"/>${logo(project,1700,810,620,260,fg)}<text x="630" y="1450" fill="#777" font-size="30">ROUND · 50mm</text><text x="1790" y="1450" fill="#777" font-size="30">SQUARE · 50mm</text>${note('스티커 SVG는 예시 규격입니다. 인쇄 전 도무송선 및 도련을 별도로 확인하세요.')}`),
     appPage('v2-16-letterhead','Letterhead','A4 공식 서식',project,
@@ -131,14 +185,22 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
   };
   const important=project.slogan?.trim()||'슬로건을 입력해 주세요.';
   const message=reviewPage(project,'Brand Message','브랜드 슬로건과 메시지',
-    `<text x="130" y="500" font-size="35" fill="#777" font-family="Arial,sans-serif">BRAND SLOGAN</text><text x="130" y="675" font-size="72" font-weight="700" fill="${hex(project.colors.primary)}" font-family="Arial,sans-serif">${esc(important.slice(0,65))}</text><text x="130" y="840" font-size="31" fill="#666" font-family="Arial,sans-serif">브랜드가 공식적으로 사용하는 문구를 입력하고 검토하세요.</text>${project.slogan?.trim()?'':missing('슬로건')}`, 'verbal','v2-13-brand-message');
+    `<text x="130" y="480" font-size="31" fill="#777" font-family="Pretendard,Arial,sans-serif">BRAND SLOGAN</text>
+      ${wrapCopy(important,53,3).map((line,i)=>fittedText(line,130,670+i*116,2610,78,editorialInk(project.colors.primary),650)).join('')}
+      <path d="M130 1160H2830" stroke="#DFDFDF" stroke-width="3"/>
+      <text x="130" y="1280" font-size="29" fill="#666" font-family="Pretendard,Arial,sans-serif">브랜드가 공식적으로 사용하는 문구를 입력하고 검토하세요.</text>
+      ${project.slogan?.trim()?'':missing('슬로건')}`, 'verbal','v2-13-brand-message');
   const incorrect=reviewPage(project,'Incorrect Usage','로고 사용 금지 사례',
     `<rect x="130" y="410" width="1280" height="990" fill="#F8F8F8"/><rect x="1550" y="410" width="1280" height="990" fill="#F8F8F8"/>${logo(project,275,560,990,290)}${logo(project,1800,610,680,350)}<path d="M1750 540L2640 1210M2640 540L1750 1210" stroke="#D44" stroke-width="13" opacity=".6"/><text x="240" y="1150" font-size="38" fill="#252525">DO · 원본 비율 유지</text><text x="1690" y="1150" font-size="38" fill="#B33">DON'T · 임의 회전/변형 금지</text>${note('금지 예시는 편집 지침이며, 실제 로고의 금지 변형 전체를 포괄하지 않습니다.')}`,'logo','v2-05-incorrect-usage');
   const contrastPage=reviewPage(project,'Color Contrast','배경 대비 확인',
     [project.colors.primary,project.colors.secondary,project.colors.accent,'#FFFFFF','#111111'].map((bg,i)=>{
       const safe=hex(bg),fg=inkOn(safe),x=140+(i%3)*925,y=440+Math.floor(i/3)*570;
-      return `<rect x="${x}" y="${y}" width="825" height="470" fill="${safe}" stroke="#DDD" stroke-width="2"/>${logo(project,x+130,y+95,565,245,fg)}<text x="${x+30}" y="${y+420}" fill="${fg}" font-family="Arial,sans-serif" font-size="27">${esc(safe)} · 시각적 검토 필요</text>`;
-    }).join('')+`${note('명도 기반 색상 선택은 참고용이며 실제 로고 형태의 시인성은 직접 확인해야 합니다.',1765)}`,'color','v2-09-color-contrast');
+      const ratio=contrastRatio(safe,fg);
+      return `<rect x="${x}" y="${y}" width="825" height="470" fill="${safe}" stroke="#DDD" stroke-width="2"/>
+        ${logo(project,x+130,y+95,565,245,fg)}
+        ${fittedText(safe,x+25,y+390,250,27,fg,650)}
+        ${fittedText('MONO ' + fg + ' · ' + ratio.toFixed(1) + ':1',x+280,y+390,520,25,fg)}`;
+    }).join('')+`${note('비율은 단색 로고와 배경의 계산값입니다. 실제 컬러 원본 로고의 적합성은 별도 검수하세요.',1765)}`,'color','v2-09-color-contrast');
   const main:GuidelinePage[]=[
     ...withTitle('01-cover','Cover','표지','intro'),
     ...withTitle('02-index','Index','목차 · 17개 제작 항목','intro'),
@@ -160,10 +222,11 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
     ...withTitle('16-title-typeface','Title Typography','제목 서체','typography'),
     ...withTitle('17-body-typeface','Body Typography','본문 서체','typography'),
     reviewPage(project,'Brand Overview','브랜드 소개',
-      `<text x="130" y="450" fill="#777" font-size="32" font-family="Arial,sans-serif">BRAND PROFILE</text>
-      <text x="130" y="600" fill="${hex(project.colors.primary)}" font-size="82" font-family="Arial,sans-serif" font-weight="700">${esc((project.name||project.englishName).slice(0,35))}</text>
-      <text x="130" y="750" fill="#555" font-size="33" font-family="Arial,sans-serif">${esc((project.englishName||'').slice(0,60))}</text>
-      ${(project.description?.trim()||'브랜드 설명을 입력해 주세요.').match(/.{1,54}/gu)?.slice(0,7).map((line,i)=>`<text x="130" y="${980+i*83}" font-size="37" font-family="Arial,sans-serif" fill="#222">${esc(line)}</text>`).join('')||''}
+      `<text x="130" y="455" fill="#777" font-size="31" font-family="Pretendard,Arial,sans-serif">BRAND PROFILE</text>
+      ${fittedText(project.name||project.englishName,130,610,2600,88,editorialInk(project.colors.primary),700)}
+      ${fittedText(project.englishName||'',130,705,2600,33,'#777777')}
+      <path d="M130 810H2830" stroke="#E2E2E2" stroke-width="3"/>
+      ${wrapCopy(project.description?.trim()||'브랜드 설명을 입력해 주세요.',66,7).map((line,i)=>fittedText(line,130,930+i*94,2600,39,'#242424')).join('')}
       ${project.description?.trim()?'':missing('브랜드 소개')}`, 'intro','v2-12-brand-overview'),
     message,
     ...generateApplicationPages(project),

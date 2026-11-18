@@ -107,11 +107,58 @@ try{
     assert.ok(pages.find(x=>x.id==='v2-13-brand-message').svg.includes('입력 필요'));
     assert.equal(pages.length,26);
   });
+  run('밝은 브랜드 컬러의 제목 가독성',()=>{
+    const p=fixture('white');
+    const page=generateV2Pages(p).find(x=>x.id==='v2-12-brand-overview').svg;
+    assert.ok(page.includes('fill="#242424"'), 'Light primary should use dark editorial heading');
+    assert.ok(!page.includes('font-size="88" fill="#F1F1F1"'), 'Very light primary should not be used as white-background heading');
+  });
+  run('긴 슬로건·브랜드명·연락처를 텍스트 프레임 안에 맞춤',()=>{
+    const p=fixture('wide');
+    p.name='건강미 프리미엄 헬스케어 연구개발센터 브랜드 시스템';
+    p.englishName='Healthy Me International Research Development Studio';
+    p.description='매우 긴 문장에서도 가이드라인의 본문이 오른쪽 여백을 넘어가지 않도록 편집 기준을 적용합니다. '.repeat(8);
+    p.slogan='건강한 일상을 위한 지속 가능한 과학적 접근과 좋은 습관을 모두의 삶 속에 자연스럽게 연결합니다.';
+    p.contact.personName='대한민국 브랜드 전략 및 브랜드 디자인 총괄 책임자';
+    p.contact.email='long-business-email-address-and-department@example-very-long-company-domain.com';
+    const pages=generateV2Pages(p);
+    const overview=pages.find(x=>x.id==='v2-12-brand-overview').svg;
+    const message=pages.find(x=>x.id==='v2-13-brand-message').svg;
+    const business=generateBusinessCardSvg(p,true);
+    assert.ok(overview.includes('font-size="'));
+    assert.ok(message.includes('브랜드 슬로건과 메시지'));
+    assert.ok(message.includes('건강한 일상을'));
+    assert.ok(!/NaN|Infinity/.test(overview+message+business));
+    assert.ok(!business.includes('textLength='));
+    assert.ok(business.includes('long-business-email'));
+    fs.writeFileSync(path.join(tmp,'long-content-overview.svg'),overview);
+    fs.writeFileSync(path.join(tmp,'long-content-message.svg'),message);
+    fs.writeFileSync(path.join(tmp,'long-content-card.svg'),business);
+    count+=3;
+  });
+  run('컬러 대비의 계산 결과와 문서 활용 주의사항 표시',()=>{
+    const p=fixture('compact');
+    const page=generateV2Pages(p).find(x=>x.id==='v2-09-color-contrast').svg;
+    assert.ok(page.includes('MONO #'));
+    assert.ok(page.includes(':1'));
+    assert.ok(page.includes('실제 컬러 원본 로고'));
+    assert.ok(page.includes('원본 로고'));
+  });
+  run('명함 SVG의 정확한 출력 규격과 최소 안전 여백',()=>{
+    const p=fixture('wide');
+    const front=generateBusinessCardSvg(p),back=generateBusinessCardSvg(p,true);
+    for (const svg of [front,back]) {
+      assert.ok(svg.includes('width="90mm" height="50mm"'));
+      assert.ok(svg.includes('viewBox="0 0 900 500"'));
+    }
+    assert.ok(back.includes('x="70"'), 'Contact text should begin within a 7mm margin');
+    assert.ok(!back.includes('x="7" '), 'The old 0.7mm unsafe margin must be removed');
+  });
   // Python stdlib XML parser checks XML well-formedness, namespace closure, ampersands and nested logos.
   execFileSync('python3',['-c',
     'import glob,sys,xml.etree.ElementTree as E; files=glob.glob(sys.argv[1]+"/*.svg"); [E.parse(p) for p in files]; print("PASS SVG XML",len(files))',
     tmp],{stdio:'inherit'});
-  console.log(`\nBRAMER phase-1 QA: ${checks} logical checks, ${count} well-formed SVG samples across 6 synthetic logo types.`);
+  console.log(`\nBRAMER phase-1/2 QA: ${checks} logical checks, ${count} well-formed SVG samples across 6 synthetic logo types.`);
 } finally {
   fs.rmSync(tmp,{recursive:true,force:true});
 }
