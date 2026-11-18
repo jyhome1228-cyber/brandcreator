@@ -162,6 +162,9 @@ try{
     assert.ok(page('08-clear-space-2').svg.includes('ALLOWED'));
     assert.ok(page('08-clear-space-2').svg.includes('NOT ALLOWED'));
     assert.ok(!page('08-clear-space-2').svg.includes('Do not stretch'));
+    assert.ok(page('v2-05-incorrect-usage').svg.includes('rotate(14'));
+    assert.ok(page('v2-05-incorrect-usage').svg.includes('scale(1.55 .72)'));
+    assert.ok(page('v2-05-incorrect-usage').svg.includes('LOW CONTRAST'));
     assert.ok(page('11-monochromatic').svg.includes('BLACK ON LIGHT'));
     assert.ok(page('11-monochromatic').svg.includes('WHITE ON DARK'));
     assert.ok(page('11-monochromatic').svg.includes('feColorMatrix'));
