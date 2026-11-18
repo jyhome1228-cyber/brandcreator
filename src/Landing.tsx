@@ -337,17 +337,17 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
           <article id="resources">
             <h3>{tr('준비할 자료','What to prepare')}</h3>
             <p>{tr('브랜드명과 SVG 로고를 먼저 준비해 주세요. 브랜드 컬러, 서체, 소개 문구, 담당자 연락처를 준비하면 명함·서식 제작에도 활용할 수 있어요.','Prepare your brand name and SVG logo. Brand colors, fonts, descriptions, and contact details can also be used in stationery designs.')}</p>
-            <a href="#/guide">{tr('업종별 준비 자료 확인','Industry preparation guide')}</a>
+            <a href="#/guide">{tr('업종별 가이드 보기','View industry guide')}</a>
           </article>
           <article id="data-info">
             <h3>{tr('프로젝트 저장과 불러오기','Saving your projects')}</h3>
-            <p>{tr('작업은 현재 브라우저에 자동 저장되고 ‘내 프로젝트’에서 이어서 열 수 있어요. 다른 기기에서 사용하려면 JSON 파일을 따로 백업해 주세요.','Projects are stored in this browser. Export a JSON backup before switching devices.')}</p>
-            <a href="#/create">{tr('제작 화면 열기','Open the editor')}</a>
+            <p>{tr('작업은 현재 브라우저에 저장됩니다. 다른 기기와 자동으로 동기화되지는 않으니 저장된 자료를 정기적으로 확인해 주세요.','Projects are stored in this browser and are not synced across devices.')}</p>
+            <button type="button" className="bramer-help-link-button" onClick={event=>openBeta(event,'register')}>{tr('베타 등록하고 시작하기','Register for beta')}</button>
           </article>
           <article id="privacy-info">
             <h3>{tr('파일 이용 안내','How files are handled')}</h3>
             <p>{tr('입력한 브랜드 자료는 브라우저에서 가이드라인을 구성하는 데 사용됩니다. 별도의 계정 및 클라우드 저장 기능은 현재 제공하지 않아요.','Your brand information is processed in your browser. Account-based cloud storage is not yet available.')}</p>
-            <a href="#/create">{tr('제작 공간 둘러보기','Explore the workspace')}</a>
+            <button type="button" className="bramer-help-link-button" onClick={event=>openBeta(event,'register')}>{tr('무료 체험 시작하기','Start free trial')}</button>
           </article>
         </div>
         <section className="bramer-tech-section bramer-tech-editorial" id="technology" aria-labelledby="bramer-tech-title">
@@ -360,7 +360,7 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
           <h3>{tr('자주 묻는 질문','Frequently asked questions')}</h3>
           <details><summary>{tr('어떤 로고 파일을 업로드해야 하나요?','What logo file should I upload?')}</summary><p>{tr('SVG는 로고의 형태와 크기를 유지하는 벡터 파일이에요. Illustrator AI 원본만 있다면 Illustrator에서 파일 → 다른 이름으로 저장 → 파일 형식 SVG를 선택하세요. 저장한 SVG를 Bramer에 업로드하면 됩니다.','Upload an SVG vector file. In Illustrator, use Save As and select SVG, then upload that file to BRAMER.')}</p></details>
           <details><summary>{tr('업종별 추천 항목을 수정할 수 있나요?','Can I customize industry recommendations?')}</summary><p>{tr('현재는 업종별 특징과 검토할 규칙을 안내하고, 기본 17개 제작 항목은 동일하게 제공합니다. 업종별 안내는 연구 검증 전의 실무 참고 자료입니다.','BRAMER offers suggested industry-specific considerations. All industries currently share 17 core items. Recommendations are practical references, not validated research findings.')}</p></details>
-          <details><summary>{tr('완성한 가이드라인은 어떻게 저장하나요?','How do I save my guideline?')}</summary><p>{tr('페이지별 SVG, 전체 SVG 또는 PDF로 내보낼 수 있습니다. 이후 수정할 계획이라면 프로젝트 JSON도 별도로 저장해 주세요.','You can export individual SVGs, all SVGs, or a PDF. Save a project JSON backup if you plan to edit later.')}</p></details>
+          <details><summary>{tr('완성한 가이드라인은 어떻게 저장하나요?','How do I save my guideline?')}</summary><p>{tr('페이지별 SVG, 전체 SVG 또는 PDF로 내보낼 수 있습니다. 프로젝트는 현재 브라우저에 저장됩니다.','Export individual SVGs, a complete SVG set, or a PDF. Projects are stored in this browser.')}</p></details>
           <details><summary>{tr('모든 가이드라인이 자동으로 완성되나요?','Is everything generated automatically?')}</summary><p>{tr('로고·컬러·서체와 기본 응용 디자인을 생성합니다. 브랜드 스토리·슬로건·연락처는 직접 입력해야 하며, 사진과 모션은 자동 생성하지 않습니다.','BRAMER generates core logo, color, typography, and application pages. You must supply your own story, slogan, and contact details. Photos and motion are not generated.')}</p></details>
         </div>
       </div>
@@ -369,10 +369,21 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
     <footer className="bramer-home-footer">
       <div className="bramer-footer-inner">
         <div className="bramer-footer-columns bramer-footer-curated">
-          <div className="bramer-footer-col"><h3>BRAMER</h3><a href="#top">{tr('서비스 소개','Overview')}</a><a href="#preview">{tr('결과물 미리보기','Guideline preview')}</a><a href="#how">{tr('이용 방법','How it works')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('기술과 설계','Technology')}</h3><a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 소개','Technical documentation')}</a><a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('서비스 설계 철학','Design philosophy')}</a><a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 구조와 검증','Architecture & validation')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('이용 안내','Resources')}</h3><a href="#resources">{tr('준비할 자료','Preparation')}</a><a href="#faq">{tr('자주 묻는 질문','FAQ')}</a><a href="#privacy-info">{tr('데이터 보관 안내','Data storage')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('시작하기','Get started')}</h3><a href="#top" onClick={event=>{event.preventDefault();openBeta(undefined,'register')}}>{tr('베타 무료 체험','Free beta')}</a><a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('제작·운영 정보','Creator & operator')}</a><span className="bramer-footer-company">NINEWORKS · 박재영</span></div>
+          <div className="bramer-footer-col"><h3>BRAMER</h3>
+            <a href="#preview">{tr('가이드라인 미리보기','Guideline preview')}</a>
+            <a href="#how">{tr('이용 방법','How it works')}</a>
+          </div>
+          <div className="bramer-footer-col"><h3>{tr('가이드','Guides')}</h3>
+            <a href="#/guide">{tr('업종별 가이드','Industry guide')}</a>
+            <a href="#faq">{tr('자주 묻는 질문','FAQ')}</a>
+          </div>
+          <div className="bramer-footer-col"><h3>{tr('기술 소개','Technology')}</h3>
+            <a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('설계와 기술','Design & technology')}</a>
+          </div>
+          <div className="bramer-footer-col"><h3>{tr('이용하기','Get started')}</h3>
+            <button type="button" className="bramer-footer-link-button" onClick={event=>openBeta(event,'register')}>{tr('베타 무료 체험','Free beta')}</button>
+            <span className="bramer-footer-company">NINEWORKS · 박재영</span>
+          </div>
         </div>
         <div className="bramer-footer-bottom"><div><BramerLogo light /><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>{tr('현재 제공되는 기능을 기준으로 안내합니다.','Features described reflect the current beta version.')}</small></div>
       </div>
