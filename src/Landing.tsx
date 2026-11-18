@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent, type TouchEvent, type KeyboardEvent } from 'react';
+import BramerLogo from './components/BramerLogo';
 import { parseLogoSvg } from './engines/svgParser';
 import { generateV2Pages } from './guideline-system/v2Pages';
 import { localizeGuidelinePages } from './guideline-system/localizeGuideline';
@@ -268,7 +269,7 @@ export default function Landing({ onStart }: LandingProps) {
   return <div className="bramer-landing" ref={rootRef}>
     <header className="bramer-site-header">
       <div className="bramer-site-header-inner">
-        <a className="bramer-site-logo" href="#top" aria-label="Bramer 홈">BRAMER.</a>
+        <a className="bramer-site-logo" href="#top" aria-label="Bramer 홈"><BramerLogo light /></a>
         <nav aria-label={tr("메인 메뉴", "Main navigation")} className="bramer-site-menu">
           <a href="#preview">{tr("서비스 소개","Overview")}</a>
           <a href="#how">{tr("이용 방법","How it works")}</a>
@@ -405,7 +406,7 @@ export default function Landing({ onStart }: LandingProps) {
           <div className="bramer-footer-col"><h3>{tr('지원','Support')}</h3><a href="#help">{tr("도움말","Help")}</a><a href="#faq">{tr('자주 묻는 질문','FAQ')}</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">{tr('업데이트 내역','Updates')}</a></div>
           <div className="bramer-footer-col"><h3>{tr('이용 안내','Information')}</h3><a href="#privacy-info">{tr('파일 이용 안내','File handling')}</a><a href="#data-info">{tr('저장 방식 안내','Storage options')}</a><a href="#technology">{tr('기술 및 제작 방식','Technology')}</a></div>
         </div>
-        <div className="bramer-footer-bottom"><div><strong>BRAMER.</strong><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>{tr('현재 제공되는 기능을 기준으로 안내합니다.','Features described reflect the current beta version.')}</small></div>
+        <div className="bramer-footer-bottom"><div><BramerLogo light /><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>{tr('현재 제공되는 기능을 기준으로 안내합니다.','Features described reflect the current beta version.')}</small></div>
       </div>
     </footer>
     {betaOpen ? <div className="bramer-beta-overlay" onMouseDown={event => {if(event.target===event.currentTarget)closeBeta();}}>
