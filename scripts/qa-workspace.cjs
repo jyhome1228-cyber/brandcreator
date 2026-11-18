@@ -45,9 +45,18 @@ assert.ok(app.includes('<WorkspaceNav active="create"'));
 assert.ok(app.includes('className="bramer-editor-global-menu"'));
 assert.ok(app.includes("mode === 'help'"));
 assert.ok(app.includes("window.location.hash = '/help'"));
-assert.ok(help.includes('계정 및 클라우드 동기화 기능이 없습니다'));
+assert.ok(help.includes('클라우드 동기화 기능은 아직 제공하지 않습니다'));
 assert.ok(dash.includes('실무적 제안') || dash.includes('실무적 제안'));
 assert.ok(dash.includes('22개 브랜드 사례 분석'));
 console.log('PASS 8 industries with differentiated important/optional/beyond requirements');
 console.log('PASS consistent workspace menus on creation, guide, project list, help and editor');
 console.log('PASS how-to routing, local-storage disclosure and research evidence disclaimer');
+assert.ok(help.includes('bramer-help-document'),'Help page should provide a document reading column');
+assert.ok(help.includes('bramer-help-local-nav'),'Help page should provide a sectional table of contents');
+for(const section of ['help-overview','help-steps','help-files','help-output','help-faq']){
+  assert.ok(help.includes('id="'+section+'"'),'Missing help anchor: '+section);
+  assert.ok(help.includes("document.getElementById('"+section+"')"),'Missing in-page scroll action: '+section);
+}
+assert.ok(help.includes('BRAMER 사용 가이드'));
+assert.ok(help.includes('내 프로젝트') || help.includes('이전 프로젝트'));
+console.log('PASS editorial documentation hierarchy and linked sections');

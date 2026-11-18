@@ -1,0 +1,85 @@
+/* BRAMER documentation — GitBook-inspired information hierarchy, own brand language */
+.bramer-help-page{background:#fff!important}
+.bramer-help-page .bramer-dash-header{background:#fff;box-shadow:none;border-bottom:1px solid #eaeaea}
+.bramer-help-page .bramer-dash-layout{grid-template-columns:245px minmax(0,1fr)!important}
+.bramer-help-page .bramer-dash-sidebar{top:66px;padding:25px 15px 23px;border-color:#ececea;overflow-y:auto}
+.bramer-help-page .bramer-dash-nav{gap:3px}
+.bramer-help-page .bramer-dash-nav button{font-size:12px!important;min-height:40px;padding:11px 13px}
+.bramer-help-local-nav{display:flex;flex-direction:column;align-items:stretch;border-top:1px solid #eaeae8;margin:29px 6px 0;padding:23px 0 0;gap:3px}
+.bramer-help-local-nav>span{font-weight:650;font-size:11px;color:#373737;margin:0 0 10px 10px}
+.bramer-help-local-nav button{font-size:12px;color:#73736f;text-decoration:none;border:0;background:transparent;text-align:left;cursor:pointer;border-radius:6px;line-height:1.5;padding:9px 10px;transition:background .18s,color .18s}
+.bramer-help-local-nav button:hover,.bramer-help-local-nav button:focus-visible{background:#f4f3f6;color:#4f3986}
+.bramer-help-page .bramer-dash-content{max-width:none;width:100%;padding:0 55px 100px!important}
+.bramer-help-document{max-width:840px;margin:0 auto;min-width:0}
+.bramer-help-document [id]{scroll-margin-top:102px}
+.bramer-help-intro{padding:67px 0 36px}
+.bramer-help-intro .bramer-dash-eyebrow{font-size:11px!important;font-weight:550;letter-spacing:.035em!important;color:#8b868f}
+.bramer-help-intro h1{font-size:clamp(29px,3vw,37px)!important;font-weight:700!important;letter-spacing:-.055em!important;line-height:1.3!important;margin:10px 0 16px}
+.bramer-help-lead{font-size:15px!important;line-height:1.8;color:#77736f;max-width:620px;margin:0}
+.bramer-help-intro-actions{display:flex;flex-wrap:wrap;gap:9px;margin-top:25px}
+.bramer-help-intro-actions button{min-height:43px;font-size:12px!important;padding:11px 18px!important;border-radius:7px}
+.bramer-help-secondary{background:#fff;border:1px solid #d9d9d6;color:#333;cursor:pointer}
+.bramer-help-secondary:hover{background:#f6f6f4}
+.bramer-help-hero-graphic{position:relative;background:#f7f6f8;border:1px solid #efedf0;border-radius:9px;min-height:280px;padding:35px 39px 30px;display:flex;flex-direction:column;justify-content:space-between;gap:30px;overflow:hidden}
+.bramer-help-hero-graphic:before{content:"";position:absolute;inset:0;opacity:.26;background-image:linear-gradient(#dcd9e4 1px,transparent 1px),linear-gradient(90deg,#dcd9e4 1px,transparent 1px);background-size:32px 32px;mask-image:linear-gradient(to bottom,black,transparent)}
+.bramer-help-hero-brand,.bramer-help-graphic-steps,.bramer-help-hero-footer{position:relative;z-index:1}
+.bramer-help-hero-brand{display:flex;align-items:baseline;gap:17px}
+.bramer-help-hero-brand>span{font-size:clamp(31px,4vw,44px);font-weight:300;letter-spacing:-.07em;color:#211b29}
+.bramer-help-hero-brand small{font-size:12px;color:#87818f;letter-spacing:.005em}
+.bramer-help-graphic-steps{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.bramer-help-graphic-steps>div{border:1px solid #dedbe2;border-radius:7px;background:rgba(255,255,255,.88);padding:18px 14px;min-height:90px;display:flex;flex-direction:column;justify-content:space-between;gap:12px}
+.bramer-help-graphic-steps b{font-size:11px;color:#9378db;font-weight:700}
+.bramer-help-graphic-steps span{font-size:12px;color:#28252e;letter-spacing:-.01em;line-height:1.4;font-weight:600}
+.bramer-help-hero-footer{font-size:10px;color:#a39fa8;letter-spacing:.08em;text-align:right}
+.bramer-help-chapter{margin-top:75px;padding:0}
+.bramer-help-chapter-heading{margin-bottom:23px}
+.bramer-help-chapter-heading>span{font-size:10px;letter-spacing:.065em;color:#8b77b6;font-weight:700}
+.bramer-help-chapter-heading h2{font-size:clamp(21px,2.5vw,26px)!important;font-weight:700!important;letter-spacing:-.045em!important;line-height:1.4!important;margin:9px 0 7px}
+.bramer-help-chapter-heading p{font-size:13px;color:#85817f;line-height:1.75;margin:0}
+.bramer-help-steps-list{border-top:1px solid #e6e5e3}
+.bramer-help-page .bramer-help-step{display:flex;gap:22px;padding:25px 6px 27px;border-bottom:1px solid #e9e9e6}
+.bramer-help-page .bramer-help-step>span{font-size:12px;min-width:30px;padding-top:3px;font-weight:600;color:#a4a0a4}
+.bramer-help-page .bramer-help-step h3{font-size:15px!important;line-height:1.5;font-weight:650;margin:0 0 7px}
+.bramer-help-page .bramer-help-step p{font-size:13px;color:#64615e;line-height:1.75;margin:0 0 5px}
+.bramer-help-page .bramer-help-step small{font-size:12px;color:#96928f;line-height:1.7;display:block;word-break:keep-all}
+.bramer-help-info-grid,.bramer-help-output-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:11px}
+.bramer-help-info-grid article,.bramer-help-output-grid>div{border:1px solid #e7e6e4;border-radius:8px;padding:21px 18px;min-width:0;background:#fff}
+.bramer-help-info-grid article>span,.bramer-help-output-grid>div>span{display:block;font-size:11px;color:#9378bd;font-weight:650;margin-bottom:15px}
+.bramer-help-info-grid article strong,.bramer-help-output-grid strong{display:block;font-size:13px;font-weight:650;color:#292929;line-height:1.55}
+.bramer-help-info-grid p,.bramer-help-output-grid p{font-size:12px;color:#7b7774;line-height:1.8;margin:10px 0 0;word-break:keep-all}
+.bramer-help-text-link{font-size:12px;color:#66538b;margin:20px 0 0;cursor:pointer;background:transparent;border:0;padding:0 0 5px;border-bottom:1px solid #b7a7d4}
+.bramer-help-text-link:hover{color:#342351}
+.bramer-help-storage-note{margin-top:15px;border-left:3px solid #b7a7f7;background:#f7f6fa;padding:19px 21px}
+.bramer-help-storage-note strong{font-size:12px}
+.bramer-help-storage-note p{font-size:12px;color:#76717b;line-height:1.8;margin:7px 0 0}
+.bramer-help-page .bramer-help-faq{margin-top:75px}
+.bramer-help-page .bramer-help-faq details{border:0;border-bottom:1px solid #e7e7e5;padding:19px 7px 19px;background:transparent}
+.bramer-help-page .bramer-help-faq details:first-of-type{border-top:1px solid #e7e7e5}
+.bramer-help-page .bramer-help-faq summary{font-size:13px!important;line-height:1.65;font-weight:600;list-style:none;position:relative;padding-right:30px}
+.bramer-help-page .bramer-help-faq summary::-webkit-details-marker{display:none}
+.bramer-help-page .bramer-help-faq summary:after{content:"+";position:absolute;right:5px;top:0;font-weight:400;font-size:20px;color:#929292}
+.bramer-help-page .bramer-help-faq details[open] summary:after{content:"−"}
+.bramer-help-page .bramer-help-faq details p{font-size:12px;line-height:1.9;color:#797773;padding:0 22px 0 0;margin:13px 0 0}
+.bramer-help-document-footer{display:flex;justify-content:space-between;gap:15px;margin-top:75px;border-top:1px solid #e8e8e6;padding-top:21px;font-size:11px;color:#989592}
+.bramer-help-document-footer span:first-child{color:#444;font-weight:550;font-size:14px;letter-spacing:-.04em}
+@media(max-width:1100px){.bramer-help-page .bramer-dash-content{padding:0 30px 80px!important}}
+@media(max-width:760px){
+ .bramer-help-page .bramer-dash-layout{display:block}
+ .bramer-help-page .bramer-dash-sidebar{position:static;height:auto;overflow:visible;padding:10px 14px 8px}
+ .bramer-help-local-nav{display:flex;flex-direction:row;gap:2px;overflow-x:auto;padding:10px 0 0;margin:12px 0 0;white-space:nowrap}
+ .bramer-help-local-nav>span{display:none}
+ .bramer-help-local-nav button{flex:0 0 auto;font-size:11px;padding:9px 11px}
+ .bramer-help-page .bramer-dash-content{padding:0 17px 72px!important}
+ .bramer-help-intro{padding:35px 0 28px}
+ .bramer-help-intro h1{font-size:29px!important}
+ .bramer-help-lead{font-size:13px!important}
+ .bramer-help-hero-graphic{min-height:248px;padding:23px 19px}
+ .bramer-help-hero-brand{flex-direction:column;gap:5px}
+ .bramer-help-hero-brand>span{font-size:35px}
+ .bramer-help-graphic-steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .bramer-help-graphic-steps>div{min-height:72px;padding:12px}
+ .bramer-help-chapter{margin-top:51px}
+ .bramer-help-info-grid,.bramer-help-output-grid{grid-template-columns:1fr}
+ .bramer-help-info-grid article,.bramer-help-output-grid>div{padding:18px}
+ .bramer-help-document-footer{margin-top:50px}
+}
