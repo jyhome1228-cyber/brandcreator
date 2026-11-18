@@ -66,6 +66,9 @@ try{
  await publicPages.getByRole('heading',{name:/브랜드의 기준을/}).waitFor();
  const links=await publicPages.locator('.bramer-docs-sidebar nav a').all();
  assert.equal(links.length,8,'Technical navigation only displays current information sections');
+ await publicPages.locator('.bramer-docs-sidebar nav').getByRole('link',{name:'기술 구조'}).click();
+ assert.ok(publicPages.url().includes('#/technology'),'Technical sidebar selection must stay inside the technical document');
+ await publicPages.locator('#architecture').waitFor();
  await publicPages.close();
  pass('header and documentation routes display the correct industry and technology pages');
  const grayscale = (color,label) => {
