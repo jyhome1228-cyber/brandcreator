@@ -26,6 +26,7 @@ const audiences = [
 const samplePages = ['cover', 'logo', 'clearspace', 'color', 'typography', 'application'] as const;
 function GuidelinePreview({ english }: { english: boolean }) {
   const [index, setIndex] = useState(0);
+  const sampleLogoSrc = window.location.pathname.startsWith('/brandcreator/') ? '/brandcreator/bramer-sample-logo.svg' : '/bramer-sample-logo.svg';
   const labels = english ? ['Cover', 'Logo', 'Clear space', 'Colors', 'Typography', 'Applications'] : ['표지', '로고', '보호 공간', '컬러', '서체', '응용'];
   return (
     <div className="bramer-preview bramer-real-preview" data-reveal>
@@ -38,13 +39,13 @@ function GuidelinePreview({ english }: { english: boolean }) {
           <div className="bramer-real-sheet" key={index}>
             <div className="bramer-real-top"><span>BRAMER.</span><span>BRAND GUIDELINES — 2026</span></div>
             {index === 0 ? <div className="bramer-real-cover">
-              <img src={`${import.meta.env.BASE_URL}bramer-sample-logo.svg`} alt="BRAMER" />
+              <img src={sampleLogoSrc} alt="BRAMER" />
               <strong>Brand Guidelines</strong><p>Visual Identity Standards</p>
             </div> : index === 1 ? <div className="bramer-real-body"><div className="bramer-real-kicker">01 — LOGO SYSTEM</div><h3>Primary Logo</h3>
-              <div className="bramer-real-logo-field"><img src={`${import.meta.env.BASE_URL}bramer-sample-logo.svg`} alt="BRAMER primary logo"/></div>
+              <div className="bramer-real-logo-field"><img src={sampleLogoSrc} alt="BRAMER primary logo"/></div>
               <p>{english ? 'Use the primary wordmark consistently across brand communication.' : '브랜드 커뮤니케이션 전반에 기본 워드마크를 일관되게 사용합니다.'}</p></div>
             : index === 2 ? <div className="bramer-real-body"><div className="bramer-real-kicker">02 — LOGO SYSTEM</div><h3>Clear Space</h3>
-              <div className="bramer-real-clear-field"><div className="bramer-real-clear-border"><img src={`${import.meta.env.BASE_URL}bramer-sample-logo.svg`} alt="BRAMER clear space example" /></div></div>
+              <div className="bramer-real-clear-field"><div className="bramer-real-clear-border"><img src={sampleLogoSrc} alt="BRAMER clear space example" /></div></div>
               <p>{english ? 'Keep a consistent protective area around the wordmark.' : '워드마크 주변에 일정한 보호 공간을 확보합니다.'}</p></div>
             : index === 3 ? <div className="bramer-real-body"><div className="bramer-real-kicker">03 — COLOR SYSTEM</div><h3>Brand Colors</h3>
               <div className="bramer-real-swatches"><div><span>PRIMARY</span><b>#231815</b></div><div><span>BLACK</span><b>#111111</b></div><div><span>WHITE</span><b>#FFFFFF</b></div></div>
@@ -53,7 +54,7 @@ function GuidelinePreview({ english }: { english: boolean }) {
               <div className="bramer-real-type"><strong>Aa Bb Cc</strong><span>BRAMER. — Identity, consistency, clarity.</span><small>HEADLINE / BODY / CAPTION</small></div>
               <p>{english ? 'A simple editorial hierarchy for brand communication.' : '명확한 정보 위계를 위한 타이포그래피 구성 예시입니다.'}</p></div>
             : <div className="bramer-real-body"><div className="bramer-real-kicker">05 — APPLICATION</div><h3>Brand Applications</h3>
-              <div className="bramer-real-apps"><div><img src={`${import.meta.env.BASE_URL}bramer-sample-logo.svg`} alt="BRAMER stationery"/></div><div><img src={`${import.meta.env.BASE_URL}bramer-sample-logo.svg`} alt="BRAMER card"/></div></div>
+              <div className="bramer-real-apps"><div><img src={sampleLogoSrc} alt="BRAMER stationery"/></div><div><img src={sampleLogoSrc} alt="BRAMER card"/></div></div>
               <p>{english ? 'Example stationery and business card layouts using the supplied logo.' : '제공된 로고를 적용한 명함·서식 응용 예시입니다.'}</p></div>}
             <div className="bramer-real-bottom"><span>BRAMER — VISUAL IDENTITY SYSTEM</span><span>{String(index+1).padStart(2,'0')}</span></div>
           </div>
