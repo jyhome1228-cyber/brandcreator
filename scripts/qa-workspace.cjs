@@ -55,7 +55,7 @@ assert.ok(help.includes('bramer-help-document'),'Help page should provide a docu
 assert.ok(help.includes('bramer-help-local-nav'),'Help page should provide a sectional table of contents');
 for(const section of ['help-overview','help-steps','help-files','help-output','help-faq']){
   assert.ok(help.includes('id="'+section+'"'),'Missing help anchor: '+section);
-  assert.ok(help.includes('href="#'+section+'"'),'Missing help navigation link: '+section);
+  assert.ok(help.includes("document.getElementById('"+section+"')"),'Missing in-page scroll action: '+section);
 }
 assert.ok(help.includes('BRAMER 사용 가이드'));
 assert.ok(help.includes('내 프로젝트') || help.includes('이전 프로젝트'));
