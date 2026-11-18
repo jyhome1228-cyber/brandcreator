@@ -14,12 +14,12 @@ const steps = [
   {number:'02',title:'업종별 기준 검토',description:'8개 업종의 특징을 참고하고, 특히 확인해야 할 사용 규칙을 검토합니다.',detail:'기본 17개 제작 항목은 업종에 관계없이 같으며, 업종별 가이드는 참고용 제안입니다.'},
   {number:'03',title:'SVG 로고 업로드',description:'Illustrator에서 SVG로 저장한 원본 로고를 업로드합니다.',detail:'업로드 후 로고의 실제 영역, 비율, 색상을 분석합니다. AI 원본 파일 자체는 직접 업로드할 수 없습니다.'},
   {number:'04',title:'컬러·서체·사용 규정',description:'브랜드 컬러, 제목·본문 서체, 로고 보호 공간과 최소 크기를 설정합니다.',detail:'자동 계산된 보호 공간·최소 크기는 검토용 제안값입니다. 승인된 브랜드 규정과 비교해야 합니다.'},
-  {number:'05',title:'결과물 생성·출력',description:'명함·스티커·레터헤드·봉투 정보를 입력하고 26페이지 가이드라인을 생성합니다.',detail:'가이드라인을 검토한 뒤 PDF 및 SVG로 출력하고, 프로젝트 JSON을 별도로 백업할 수 있습니다.'},
+  {number:'05',title:'결과물 생성·출력',description:'명함·스티커·레터헤드·봉투 정보를 입력하고 26페이지 가이드라인을 생성합니다.',detail:'가이드라인을 검토한 뒤 SVG 및 PDF로 내보낼 수 있습니다.'},
 ] as const;
 
 const questions = [
  {title:'이전 작업은 어디에서 다시 열 수 있나요?',answer:'왼쪽의 내 프로젝트에서 현재 브라우저에 자동 저장된 프로젝트를 열 수 있습니다. 회원 계정이나 클라우드 동기화 기능은 아직 제공하지 않습니다.'},
- {title:'다른 컴퓨터에서도 같은 프로젝트를 사용할 수 있나요?',answer:'제작 화면의 JSON 백업 파일을 보관한 후 다른 기기에서 프로젝트 불러오기를 사용해 복원할 수 있습니다. 브라우저 저장 데이터가 삭제되면 로컬 프로젝트가 사라질 수 있습니다.'},
+ {title:'다른 컴퓨터에서도 같은 프로젝트를 사용할 수 있나요?',answer:'현재 프로젝트는 사용 중인 브라우저에 저장됩니다. 다른 기기와 자동으로 동기화되지 않으니, 중요한 결과물은 SVG 또는 PDF로 내보내 보관해 주세요.'},
  {title:'Adobe Illustrator의 AI 파일을 바로 업로드할 수 있나요?',answer:'현재는 SVG 파일만 지원합니다. Illustrator에서 파일 → 다른 이름으로 저장 → SVG를 선택해 내보내 주세요.'},
  {title:'자동 생성된 로고 규칙을 바로 납품해도 되나요?',answer:'최소 크기와 보호 공간은 제안값입니다. 실제 브랜드의 승인된 규정, 사용 매체, 인쇄 및 디지털 환경을 확인한 후 확정해 주세요.'},
  {title:'명함·스티커·봉투는 바로 인쇄 가능한가요?',answer:'편집 가능한 기본 SVG 디자인을 제공합니다. 인쇄 전 도련, 도무송, 봉투 전개도, 인쇄 컬러와 서체를 별도로 확인해야 합니다.'},
@@ -99,7 +99,7 @@ export default function HelpView({onHome,onProjects,onGuide,onNew,onHelp}:Props)
             <div><span>02</span><strong>SVG</strong><p>페이지별 벡터 디자인과 기본 응용 디자인을 내보냅니다.</p></div>
             <div><span>03</span><strong>프로젝트 JSON</strong><p>편집 데이터를 백업하고 다른 기기에서 가져올 수 있습니다.</p></div>
           </div>
-          <div className="bramer-help-storage-note"><strong>저장 안내</strong><p>현재 프로젝트는 이 브라우저에 자동 저장됩니다. 계정별 클라우드 저장은 제공하지 않으므로 중요한 작업은 JSON 파일로도 백업해 주세요.</p></div>
+          <div className="bramer-help-storage-note"><strong>저장 안내</strong><p>프로젝트는 현재 브라우저에 자동 저장됩니다. 다른 기기와 자동으로 연결되지 않으니 중요한 결과물은 별도로 보관해 주세요.</p></div>
         </section>
 
         <section id="help-faq" className="bramer-help-chapter bramer-help-faq">
