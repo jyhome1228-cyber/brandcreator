@@ -151,8 +151,31 @@ try{
       assert.ok(svg.includes('width="90mm" height="50mm"'));
       assert.ok(svg.includes('viewBox="0 0 900 500"'));
     }
-    assert.ok(back.includes('x="70"'), 'Contact text should begin within a 7mm margin');
+    assert.ok(back.includes('x="75"'), 'Contact text should begin within a 7.5mm safe margin');
     assert.ok(!back.includes('x="7" '), 'The old 0.7mm unsafe margin must be removed');
+  });
+  run('실물 서식 규격 및 가이드라인 미리보기 치수 검증',()=>{
+    const p=fixture('wide');
+    const a4=generateLetterheadSvg(p);
+    const small=generateEnvelopeSvg(p,'small');
+    const large=generateEnvelopeSvg(p,'large');
+    assert.ok(a4.includes('width="210mm" height="297mm"'));
+    assert.ok(small.includes('width="220mm" height="105mm"'));
+    assert.ok(large.includes('width="330mm" height="245mm"'));
+    assert.equal((small.match(/rx="1"/g)||[]).length,5,'Five postal boxes on small envelope');
+    assert.equal((large.match(/rx="1"/g)||[]).length,5,'Five postal boxes on large envelope');
+    assert.ok(a4.includes('서울특별시 테스트로 10'));
+    assert.ok(small.includes('010-1234-5678'));
+    assert.ok(large.includes('test@example.com'));
+    const pages=generateV2Pages(p);
+    for(const id of ['v2-14-business-card','v2-16-letterhead','v2-17-envelope']){
+      const page=pages.find(page=>page.id===id);
+      assert.ok(page?.svg.includes(' mm'),'Dimension guides must appear in '+id);
+      assert.ok(!page.svg.includes('주소 입력 필요'),'Given address should be used');
+    }
+    assert.ok(pages.find(x=>x.id==='05-grid-system-1').svg.includes('1X'));
+    assert.ok(pages.find(x=>x.id==='06-grid-system-2').svg.includes('1X'));
+    assert.ok((pages.find(x=>x.id==='06-grid-system-2').svg.match(/stroke="#BDBDBD"/g)||[]).length>=30,'Grid uses at least 30 aligned guide lines');
   });
   run('17개 항목의 페이지 제목과 실제 시각 콘텐츠가 일치하는지 점검',()=>{
     const p=fixture('compact'),pages=generateV2Pages(p);
