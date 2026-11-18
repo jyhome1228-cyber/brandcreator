@@ -10,61 +10,69 @@ const audiences = [
   {
     key: 'designer', audience: '브랜드 디자이너',
     titleTop: '로고는 완성했는데,', titleBottom: '가이드라인 전달이 막막하다면.',
+    enTop: 'Your logo is ready.', enBottom: 'Your guidelines should be too.',
+    enDescription: 'Create, edit, and deliver brand guidelines with ease.',
     description: '디자인 이후 가이드라인의 제작과 편집, 전달 과정을 더 편리하게 이어갈 수 있도록 돕습니다.',
   },
   {
     key: 'brand', audience: '브랜드 운영 기업',
     titleTop: '로고는 있는데,', titleBottom: '브랜드 기준이 없다면.',
+    enTop: 'Have a logo,', enBottom: 'but no brand standards?',
+    enDescription: 'Build consistent rules for logos, colors, typography, and applications.',
     description: '브랜드 운영에 필요한 로고 사용 규정, 컬러, 서체와 응용 기준을 쉽고 체계적으로 정리합니다.',
   },
 ] as const;
 
-const samples = [
-  { title: '브랜드 표지', type: 'cover' },
-  { title: '로고 규칙', type: 'logo' },
-  { title: '컬러 시스템', type: 'color' },
-] as const;
-
-function GuidelinePreview() {
+const samplePages = ['cover', 'logo', 'clearspace', 'color', 'typography', 'application'] as const;
+function GuidelinePreview({ english }: { english: boolean }) {
   const [index, setIndex] = useState(0);
-  const changePreview = (next: number) => { if (next !== index) setIndex(next); };
+  const labels = english ? ['Cover', 'Logo', 'Clear space', 'Colors', 'Typography', 'Applications'] : ['표지', '로고', '보호 공간', '컬러', '서체', '응용'];
   return (
-    <div className="bramer-preview" data-reveal>
+    <div className="bramer-preview bramer-real-preview" data-reveal>
       <div className="bramer-preview-window">
         <div className="bramer-preview-toolbar">
-          <span className="bramer-preview-window-title">가이드라인 미리보기</span>
-          <span>{index + 1} / {samples.length}</span>
+          <span className="bramer-preview-window-title">{english ? 'BRAMER Brand Guidelines · Sample' : 'BRAMER 브랜드 가이드라인 · 완성형 샘플'}</span>
+          <span>{index + 1} / {samplePages.length}</span>
         </div>
-        <div className="bramer-preview-canvas" aria-live="polite"><div className="bramer-preview-transition" key={index}>
-          {index === 0 && <div className="bramer-sample bramer-sample-cover">
-            <div className="bramer-sample-meta">Brand Guidelines <span>2026</span></div>
-            <strong>Brand<br/>Guidelines</strong>
-            <div className="bramer-sample-baseline">Your Brand <span>Visual Identity System</span></div>
-          </div>}
-          {index === 1 && <div className="bramer-sample bramer-sample-logo">
-            <div className="bramer-sample-meta">Logo Usage <span>01</span></div>
-            <strong>Logo &amp; Clear Space</strong>
-            <div className="bramer-sample-logo-demo"><div>Brand.</div></div>
-            <div className="bramer-sample-baseline">Primary Logo <span>Minimum Clear Space</span></div>
-          </div>}
-          {index === 2 && <div className="bramer-sample bramer-sample-color">
-            <div className="bramer-sample-meta">Color System <span>02</span></div>
-            <strong>Brand Colors</strong>
-            <div className="bramer-sample-colors"><div><small>Primary</small><span>#151515</span></div><div><small>Secondary</small><span>#DADADA</span></div><div><small>Accent</small><span>#A6A6A6</span></div></div>
-            <div className="bramer-sample-baseline">Color Palette <span>Brand Identity</span></div>
-          </div>}
-          </div></div>
-        <div className="bramer-preview-options" aria-label="미리보기 페이지 선택">
-          {samples.map((sample, i) => <button key={sample.type} type="button" className={i === index ? 'active' : ''} aria-pressed={i === index} onClick={() => changePreview(i)}>{sample.title}</button>)}
+        <div className="bramer-preview-canvas">
+          <div className="bramer-real-sheet" key={index}>
+            <div className="bramer-real-top"><span>BRAMER.</span><span>BRAND GUIDELINES — 2026</span></div>
+            {index === 0 ? <div className="bramer-real-cover">
+              <img src="/bramer-sample-logo.svg" alt="BRAMER" />
+              <strong>Brand Guidelines</strong><p>Visual Identity Standards</p>
+            </div> : index === 1 ? <div className="bramer-real-body"><div className="bramer-real-kicker">01 — LOGO SYSTEM</div><h3>Primary Logo</h3>
+              <div className="bramer-real-logo-field"><img src="/bramer-sample-logo.svg" alt="BRAMER primary logo"/></div>
+              <p>{english ? 'Use the primary wordmark consistently across brand communication.' : '브랜드 커뮤니케이션 전반에 기본 워드마크를 일관되게 사용합니다.'}</p></div>
+            : index === 2 ? <div className="bramer-real-body"><div className="bramer-real-kicker">02 — LOGO SYSTEM</div><h3>Clear Space</h3>
+              <div className="bramer-real-clear-field"><div className="bramer-real-clear-border"><img src="/bramer-sample-logo.svg" alt="BRAMER clear space example" /></div></div>
+              <p>{english ? 'Keep a consistent protective area around the wordmark.' : '워드마크 주변에 일정한 보호 공간을 확보합니다.'}</p></div>
+            : index === 3 ? <div className="bramer-real-body"><div className="bramer-real-kicker">03 — COLOR SYSTEM</div><h3>Brand Colors</h3>
+              <div className="bramer-real-swatches"><div><span>PRIMARY</span><b>#231815</b></div><div><span>BLACK</span><b>#111111</b></div><div><span>WHITE</span><b>#FFFFFF</b></div></div>
+              <p>{english ? 'Primary color is drawn from the supplied BRAMER vector logo; supporting colors are sample recommendations.' : '기본 색상은 제공된 BRAMER 로고를 기준으로 했으며, 보조 컬러는 샘플 제안입니다.'}</p></div>
+            : index === 4 ? <div className="bramer-real-body"><div className="bramer-real-kicker">04 — TYPOGRAPHY</div><h3>Typography</h3>
+              <div className="bramer-real-type"><strong>Aa Bb Cc</strong><span>BRAMER. — Identity, consistency, clarity.</span><small>HEADLINE / BODY / CAPTION</small></div>
+              <p>{english ? 'A simple editorial hierarchy for brand communication.' : '명확한 정보 위계를 위한 타이포그래피 구성 예시입니다.'}</p></div>
+            : <div className="bramer-real-body"><div className="bramer-real-kicker">05 — APPLICATION</div><h3>Brand Applications</h3>
+              <div className="bramer-real-apps"><div><img src="/bramer-sample-logo.svg" alt="BRAMER stationery"/></div><div><img src="/bramer-sample-logo.svg" alt="BRAMER card"/></div></div>
+              <p>{english ? 'Example stationery and business card layouts using the supplied logo.' : '제공된 로고를 적용한 명함·서식 응용 예시입니다.'}</p></div>}
+            <div className="bramer-real-bottom"><span>BRAMER — VISUAL IDENTITY SYSTEM</span><span>{String(index+1).padStart(2,'0')}</span></div>
+          </div>
+        </div>
+        <div className="bramer-preview-options bramer-real-tabs" aria-label={english ? 'Select sample page' : '샘플 페이지 선택'}>
+          {samplePages.map((page,i) => <button key={page} type="button" className={i===index?'active':''} aria-pressed={i===index} onClick={() => setIndex(i)}>{labels[i]}</button>)}
         </div>
       </div>
-      <p className="bramer-preview-note">미리보기는 예시이며, 실제 결과물은 입력한 브랜드 정보에 따라 달라집니다.</p>
+      <p className="bramer-preview-note">{english ? 'Design demonstration based on the provided BRAMER logo. Supporting layouts and colors are illustrative, not approved brand standards.' : '제공된 BRAMER 로고를 활용한 디자인 샘플입니다. 보조 색상과 응용 규정은 확정된 브랜드 규정이 아닌 예시입니다.'}</p>
     </div>
   );
 }
 
 export default function Landing({ onStart }: LandingProps) {
   const rootRef = useRef<HTMLDivElement>(null);
+  const [language, setLanguage] = useState<'ko' | 'en'>(() => { try { return localStorage.getItem('bramer-site-language') === 'en' ? 'en' : 'ko'; } catch { return 'ko'; } });
+  const en = language === 'en';
+  const tr = (ko: string, english: string) => en ? english : ko;
+  const changeLanguage = (next: 'ko' | 'en') => { setLanguage(next); try { localStorage.setItem('bramer-site-language', next); } catch { /* optional preference */ } };
   const [audienceIndex, setAudienceIndex] = useState(0);
   const [rollPaused, setRollPaused] = useState(false);
   const [betaOpen, setBetaOpen] = useState(false);
@@ -149,13 +157,13 @@ export default function Landing({ onStart }: LandingProps) {
     <header className="bramer-site-header">
       <div className="bramer-site-header-inner">
         <a className="bramer-site-logo" href="#top" aria-label="Bramer 홈">BRAMER.</a>
-        <nav aria-label="메인 메뉴" className="bramer-site-menu">
-          <a href="#preview">서비스 소개</a>
-          <a href="#how">이용 방법</a>
-          <a href="#/guide">업종별 가이드</a>
-          <a href="#help">도움말</a>
+        <nav aria-label={tr("메인 메뉴", "Main navigation")} className="bramer-site-menu">
+          <a href="#preview">{tr("서비스 소개","Overview")}</a>
+          <a href="#how">{tr("이용 방법","How it works")}</a>
+          <a href="#/guide">{tr("업종별 가이드","Industry guide")}</a>
+          <a href="#help">{tr("도움말","Help")}</a>
         </nav>
-        <button type="button" className="bramer-site-start" onClick={openBeta}>시작하기</button>
+        <div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div><button type="button" className="bramer-site-start" onClick={openBeta}>{tr("시작하기","Get started")}</button>
       </div>
     </header>
 
@@ -165,7 +173,7 @@ export default function Landing({ onStart }: LandingProps) {
           <div className={`bramer-hero-image ${audiences[audienceIndex].key === 'designer' ? 'bramer-hero-image-right' : 'bramer-hero-image-left'}`}/>
         </div>
         <div className="bramer-home-hero-content" data-reveal>
-          <p className="bramer-home-overline">브랜드 가이드라인 제작 솔루션</p>
+          <p className="bramer-home-overline">{tr("브랜드 가이드라인 제작 솔루션","BRAND GUIDELINE CREATION SOLUTION")}</p>
           <div className="bramer-hero-rotation" aria-label="기업과 디자이너를 위한 서비스 소개"
             onMouseEnter={() => setRollPaused(true)}
             onMouseLeave={() => setRollPaused(false)}
@@ -173,8 +181,8 @@ export default function Landing({ onStart }: LandingProps) {
             onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget)) setRollPaused(false); }}>
             <div className="bramer-hero-rotation-stage" aria-live="off">
               <div className="bramer-hero-rotation-slide" key={audiences[audienceIndex].key}>
-                <h1>{audiences[audienceIndex].titleTop}<br/><span>{audiences[audienceIndex].titleBottom}</span></h1>
-                <p className="bramer-hero-slide-description">{audiences[audienceIndex].description}</p>
+                <h1>{en ? audiences[audienceIndex].enTop : audiences[audienceIndex].titleTop}<br/><span>{en ? audiences[audienceIndex].enBottom : audiences[audienceIndex].titleBottom}</span></h1>
+                <p className="bramer-hero-slide-description">{en ? audiences[audienceIndex].enDescription : audiences[audienceIndex].description}</p>
               </div>
             </div>
             <div className="bramer-roller-controls" aria-label="대상별 소개 선택">
@@ -184,23 +192,23 @@ export default function Landing({ onStart }: LandingProps) {
                 onClick={() => setAudienceIndex(index)}/>)}
             </div>
           </div>
-          <button type="button" className="bramer-home-primary" onClick={openBeta}>베타 무료 체험하기</button>
+          <button type="button" className="bramer-home-primary" onClick={openBeta}>{tr("베타 무료 체험하기","Try the beta for free")}</button>
         </div>
       </section>
 
       <section className="bramer-home-preview-section" id="preview">
         <div className="bramer-home-section-heading" data-reveal>
-          <h2>브랜드의 기준을, 하나의 가이드라인으로.</h2>
-          <p>로고와 브랜드 정보를 입력하면<br className="bramer-desktop-break"/> 17개 제작 항목을 기준으로 가이드라인과 기본 응용 디자인을 구성합니다.</p>
+          <h2>{tr("브랜드의 기준을, 하나의 가이드라인으로.","A complete brand guideline, all in one place.")}</h2>
+          <p>{tr("로고와 브랜드 정보를 입력하면 17개 제작 항목을 기준으로 가이드라인과 기본 응용 디자인을 구성합니다.","Upload your logo and brand information to build guidelines and applications across 17 core items.")}</p>
         </div>
-        <GuidelinePreview/>
+        <GuidelinePreview english={en}/>
       </section>
 
       <section className="bramer-home-steps-section" id="how">
         <div className="bramer-home-section-heading" data-reveal>
           <span className="bramer-section-eyebrow">HOW IT WORKS / 01</span>
-          <h2>어렵지 않게, 순서대로.</h2>
-          <p>브랜드 가이드라인을 처음 만드는 사람도<br className="bramer-desktop-break"/> 차근차근 따라 할 수 있도록 구성했습니다.</p>
+          <h2>{tr("어렵지 않게, 순서대로.","Simple steps, clear results.")}</h2>
+          <p>{tr("브랜드 가이드라인을 처음 만드는 사람도 차근차근 따라 할 수 있도록 구성했습니다.","Designed to guide you through every step, even if this is your first brand guideline.")}</p>
         </div>
         <div className="bramer-home-steps" data-reveal>
           <article><span className="bramer-step-count">1</span><h3>로고 등록</h3><p>브랜드명과 SVG 로고를 등록하고 기본 정보를 설정하세요.</p></article>
@@ -210,16 +218,16 @@ export default function Landing({ onStart }: LandingProps) {
       </section>
 
       <section className="bramer-home-last-section" data-reveal>
-        <h2>브랜드의 기준을 만들어볼까요?</h2>
-        <p>로고에서 시작해, 브랜드를 더 일관되게.</p>
-        <button type="button" className="bramer-home-primary" onClick={openBeta}>지금 시작하기</button>
+        <h2>{tr("브랜드의 기준을 만들어볼까요?","Ready to define your brand standards?")}</h2>
+        <p>{tr("로고에서 시작해, 브랜드를 더 일관되게.","Start with your logo. Build a consistent brand.")}</p>
+        <button type="button" className="bramer-home-primary" onClick={openBeta}>{tr("지금 시작하기","Start now")}</button>
       </section>
 <section className="bramer-help-section" id="help" aria-labelledby="bramer-help-heading">
       <div className="bramer-help-inner">
         <div className="bramer-home-section-heading">
           <span className="bramer-section-eyebrow">HELP & RESOURCES / 02</span>
-          <h2 id="bramer-help-heading">이용하면서 궁금한 점이 있나요?</h2>
-          <p>준비할 자료부터 파일 저장까지, 자주 묻는 내용을 모았어요.</p>
+          <h2 id="bramer-help-heading">{tr("이용하면서 궁금한 점이 있나요?","Need help getting started?")}</h2>
+          <p>{tr("준비할 자료부터 파일 저장까지, 자주 묻는 내용을 모았어요.","Find answers about preparing assets and saving your files.")}</p>
         </div>
         <div className="bramer-help-grid">
           <article id="resources">
@@ -276,8 +284,8 @@ export default function Landing({ onStart }: LandingProps) {
       <div className="bramer-beta-dialog" role="dialog" aria-modal="true" aria-labelledby="bramer-beta-title" aria-describedby="bramer-beta-description" ref={dialogRef} tabIndex={-1}>
         <button type="button" className="bramer-beta-close" aria-label="닫기" onClick={closeBeta}>닫기</button>
         <span className="bramer-beta-label">BRAMER BETA</span>
-        <h2 id="bramer-beta-title">12월 31일까지, 자유롭게 체험하세요.</h2>
-        <p id="bramer-beta-description">BRAMER는 <strong>{BETA_END}</strong>까지 무료 베타테스트를 진행합니다. 간단한 정보 입력 후 바로 가이드라인을 만들어볼 수 있어요.</p>
+        <h2 id="bramer-beta-title">{tr("12월 31일까지, 자유롭게 체험하세요.","Explore BRAMER free through December 31.")}</h2>
+        <p id="bramer-beta-description">{tr("BRAMER는 2026년 12월 31일까지 무료 베타테스트를 진행합니다. 간단한 정보 입력 후 바로 가이드라인을 만들어볼 수 있어요.","BRAMER is in free beta until December 31, 2026. Enter a few details to start creating your guideline.")}</p>
         {sessionRegistered ? <div className="bramer-beta-registered">
           <p>이 브라우저에서 베타 체험을 시작했어요. 바로 제작 화면으로 이동할 수 있습니다.</p>
           <button className="bramer-beta-primary" type="button" onClick={enterRegistered}>체험 이어가기</button>
