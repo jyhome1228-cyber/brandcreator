@@ -10,6 +10,7 @@ import BramerSelect from './components/BramerSelect';
 import { INDUSTRY_RATIONALE } from './engines/industryRationale';
 import { downloadAllSvg, downloadSvg } from './export/download';
 import { CORE_ITEMS, generateV2Pages, generateBusinessCardSvg, generateStickerSvg, generateLetterheadSvg, generateEnvelopeSvg } from './guideline-system/v2Pages';
+import { localizeGuidelinePages, type DocumentLanguage } from './guideline-system/localizeGuideline';
 import { CATEGORIES, INDUSTRIES, INDUSTRY_GUIDANCE, getDefaultSelection, type GuidelineCategory, type IndustryId } from './engines/industryRecommendations';
 import type { BrandProject, GuidelinePage } from './types/guideline';
 
@@ -253,7 +254,9 @@ export default function App() {
     catch(e) {setLibraryError(e instanceof Error ? e.message : '프로젝트를 삭제하지 못했습니다.');}
   };
 
-  const pages = useMemo(() => generateV2Pages(project), [project]);
+  const [documentLanguage, setDocumentLanguage] = useState<DocumentLanguage>(() => { try { return localStorage.getItem('bramer-document-language') === 'en' ? 'en' : 'ko'; } catch { return 'ko'; } });
+  const selectDocumentLanguage = (value: DocumentLanguage) => { setDocumentLanguage(value); try { localStorage.setItem('bramer-document-language',value); } catch { /* Optional preference */ } };
+  const pages = useMemo(() => localizeGuidelinePages(generateV2Pages(project), documentLanguage), [project, documentLanguage]);
   const changeIndustry = (value: IndustryId) => {
     setIndustry(value);
     setSelectedCategories(getDefaultSelection(value));
@@ -995,7 +998,7 @@ export default function App() {
               <span className="project-name">{project.englishName} · {enabledPages.length} pages</span>
             </div>
           </div>
-          <div className="header-actions"><button className="button ghost" onClick={() => navigateWorkspace('dashboard')}>대시보드</button><span className="bramer-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
+          <div className="header-actions"><label className="bramer-doc-language">결과물 언어 <select value={documentLanguage} onChange={event => selectDocumentLanguage(event.target.value as DocumentLanguage)} aria-label="가이드라인 출력 언어"><option value="ko">한국어 KO</option><option value="en">English EN</option></select></label><button className="button ghost" onClick={() => navigateWorkspace('dashboard')}>대시보드</button><span className="bramer-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
             <button className="button ghost" onClick={() => void saveToBrowser()}>브라우저 저장</button>
             <button className="button ghost" onClick={() => void openProjectLibrary()}>내 프로젝트</button>
             <button className="button ghost" onClick={saveProject}>JSON 백업</button>
