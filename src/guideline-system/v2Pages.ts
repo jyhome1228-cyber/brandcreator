@@ -257,7 +257,20 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
       <text x="130" y="1280" font-size="29" fill="#666" font-family="Pretendard,Arial,sans-serif">브랜드가 공식적으로 사용하는 문구를 입력하고 검토하세요.</text>
       ${project.slogan?.trim()?'':missing('슬로건')}`, 'verbal','v2-13-brand-message');
   const incorrect=reviewPage(project,'Incorrect Usage','로고 사용 금지 사례',
-    `<rect x="130" y="410" width="1280" height="990" fill="#F8F8F8"/><rect x="1550" y="410" width="1280" height="990" fill="#F8F8F8"/>${logo(project,275,560,990,290)}${logo(project,1800,610,680,350)}<path d="M1750 540L2640 1210M2640 540L1750 1210" stroke="#D44" stroke-width="13" opacity=".6"/><text x="240" y="1150" font-size="38" fill="#252525">DO · 원본 비율 유지</text><text x="1690" y="1150" font-size="38" fill="#B33">DON'T · 임의 회전/변형 금지</text>${note('금지 예시는 편집 지침이며, 실제 로고의 금지 변형 전체를 포괄하지 않습니다.')}`,'logo','v2-05-incorrect-usage');
+    `<rect x="150" y="380" width="1220" height="590" fill="#FAFAFA" stroke="#E6E6E6" stroke-width="2"/>
+      <rect x="1580" y="380" width="1220" height="590" fill="#FAFAFA" stroke="#E6E6E6" stroke-width="2"/>
+      <rect x="150" y="1020" width="1220" height="590" fill="#FAFAFA" stroke="#E6E6E6" stroke-width="2"/>
+      <rect x="1580" y="1020" width="1220" height="590" fill="#E7E7E7" stroke="#D7D7D7" stroke-width="2"/>
+      ${logo(project,365,505,800,260)}
+      <g transform="rotate(14 2180 650)">${logo(project,1770,505,800,260)}</g>
+      <g transform="translate(-400 200) scale(1.55 .72)">${logo(project,365,1150,800,260)}</g>
+      ${logo(project,1770,1150,800,260,'#FFFFFF')}
+      ${fittedText('DO · KEEP ORIGINAL',195,875,1130,32,'#242424',600)}
+      ${fittedText("DON'T · ROTATE",1625,875,1130,32,'#B04343',600)}
+      ${fittedText("DON'T · DISTORT",195,1515,1130,32,'#B04343',600)}
+      ${fittedText("DON'T · LOW CONTRAST",1625,1515,1130,32,'#B04343',600)}
+      ${note('오른쪽·아래 예시는 의도적으로 잘못 적용한 로고입니다. 형태·비례·시인성을 점검하세요.',1770)}`,
+    'logo','v2-05-incorrect-usage');
   const contrastPage=reviewPage(project,'Color Contrast','배경 대비 확인',
     [project.colors.primary,project.colors.secondary,project.colors.accent,'#FFFFFF','#111111'].map((bg,i)=>{
       const safe=hex(bg),fg=inkOn(safe),x=140+(i%3)*925,y=440+Math.floor(i/3)*570;
