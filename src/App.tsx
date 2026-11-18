@@ -367,23 +367,6 @@ export default function App() {
     }));
   };
 
-  const saveProject = () => {
-    const snapshot = {
-      version: 1,
-      product: 'bramer',
-      industry,
-      selectedCategories,
-      project,
-      enabled,
-    };
-    const url = URL.createObjectURL(new Blob([JSON.stringify(snapshot, null, 2)], { type: 'application/json' }));
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `bramer-${(project.englishName || project.name || 'project').replace(/[^a-z0-9가-힣_-]/gi, '-')}.json`;
-    link.click();
-    URL.revokeObjectURL(url);
-  };
-
   const restoreProject = async (event: ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
