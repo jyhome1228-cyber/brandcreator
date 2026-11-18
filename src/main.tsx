@@ -51,3 +51,5 @@ import './bramer-v2.css';
 import './workspace-unified.css';
 
 import './print-qa.css';
+
+import './help-docs.css';
