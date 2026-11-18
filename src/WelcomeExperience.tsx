@@ -12,7 +12,7 @@ export default function WelcomeExperience({onFinish,english}:WelcomeExperiencePr
  const [logoStage,setLogoStage] = useState(false);
  useEffect(()=>{
    if (!logoStage) return;
-   const timer=window.setTimeout(onFinish,1400);
+   const timer=window.setTimeout(onFinish,1250);
    return ()=>window.clearTimeout(timer);
  },[logoStage,onFinish]);
  useEffect(()=>{
@@ -32,11 +32,11 @@ export default function WelcomeExperience({onFinish,english}:WelcomeExperiencePr
    </section>:<section className="bramer-welcome-body" key={step}>
      <p className="bramer-welcome-eyebrow">{step===0?'WELCOME TO BRAMER':'HOW BRAMER WORKS'}</p>
      {step===0?<>
-       <h1>{english?'Hello, welcome to BRAMER.':'안녕하세요.\n브레이머를 소개합니다.'}</h1>
-       <p className="bramer-welcome-description">{english?'BRAMER turns your brand assets into a practical guideline. Define how your logo, color, typography, and applications should work together, and share your brand standards with clarity.':'브레이머는 완성된 로고가 브랜드의 모든 접점에서 일관되게 사용되도록 돕는 가이드라인 제작 솔루션입니다. 로고의 사용 규칙부터 컬러, 서체, 명함과 서식까지 브랜드에 필요한 기준을 체계적인 문서로 정리해 보세요.'}</p>
+       <h1>{english?'Hello, welcome to BRAMER.':'안녕하세요. 브레이머를 소개합니다.'}</h1>
+       <p className="bramer-welcome-description">{english?'BRAMER helps you create clear, consistent brand guidelines. Organize your logo usage, colors, typography, and applications into one practical document.':'브레이머는 로고부터 컬러, 서체, 응용 디자인까지 브랜드의 기준을 하나의 문서로 정리합니다. 필요한 정보를 입력하고 사용 규칙을 확인한 뒤, 완성된 가이드라인을 간편하게 제작해 보세요.'}</p>
        <div className="bramer-welcome-caption">{english?'A clear process, from logo to guideline.':'복잡한 제작 과정은 줄이고, 브랜드의 기준은 더 명확하게.'}</div>
      </>:<>
-       <h1>{english?'Three simple steps to begin.':'세 단계로 간단하게\n시작할 수 있습니다.'}</h1>
+       <h1>{english?'Three simple steps to begin.':'세 단계로 간단하게 시작하세요.'}</h1>
        <div className="bramer-welcome-steps">{steps.map(item=><article key={item.index}><span>{item.index}</span><div><h2>{english?item.english:item.title}</h2><p>{english?item.enBody:item.body}</p></div></article>)}</div>
      </>}
      <div className="bramer-welcome-bottom"><span>{String(step+1).padStart(2,'0')} / 02</span><button type="button" className="bramer-welcome-next" onClick={next}>{step===0?(english?'See how it works':'사용 방법 알아보기'):(english?'Start BRAMER':'이제 시작합니다')}<span aria-hidden="true">→</span></button></div>
