@@ -56,8 +56,15 @@ function contrastRatio(a: string, b: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+/** Prefer a white mark on genuinely dark surfaces, never a dark-on-dark logo. */
 function contrast(hex: string): string {
+  if (relativeLuminance(hex) <= 0.25 && contrastRatio(hex, WHITE) >= 3) return WHITE;
   return contrastRatio(hex, BLACK) >= contrastRatio(hex, WHITE) ? BLACK : WHITE;
+}
+function safeLogoColor(background: string, proposed: string): string {
+  const bg = safeHex(background, WHITE);
+  const ink = safeHex(proposed, BLACK);
+  return contrastRatio(bg, ink) >= 3 ? ink : contrast(bg);
 }
 
 /**
@@ -151,17 +158,15 @@ function logo(asset: LogoAsset | null, x: number, y: number, width: number, heig
   if (!asset) {
     return `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="none" stroke="${LINE}" stroke-width="2"/><text x="${x + width / 2}" y="${y + height / 2}" fill="${MUTED}" font-size="34" text-anchor="middle">LOGO SVG</text>`;
   }
-  const normalized = color?.toUpperCase();
-  const monochrome = normalized === WHITE || normalized === BLACK;
-  const inner = color && !monochrome ? recolorInner(asset.inner, color) : asset.inner;
   const v = visibleLogoBox(asset);
-  // An SVG may define its fills in nested CSS classes, not only fill attributes.
-  // A color-matrix forces an exact monochrome variant while preserving opacity.
-  const id = `bramer-mono-${Math.round(x)}-${Math.round(y)}-${normalized === WHITE ? 'w' : 'b'}`;
-  const channel = normalized === WHITE ? 1 : 0;
-  const filter = monochrome ? `<defs><filter id="${id}" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 ${channel}  0 0 0 0 ${channel}  0 0 0 0 ${channel}  0 0 0 1 0"/></filter></defs>` : '';
-  const content = monochrome ? `<g filter="url(#${id})">${inner}</g>` : inner;
-  return `<svg x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${v.x} ${v.y} ${v.width} ${v.height}" preserveAspectRatio="xMidYMid meet">${filter}${content}</svg>`;
+  // Any explicitly requested solid mark (including non-black brand colors)
+  // must recolor class-based SVG fills reliably. The color matrix preserves alpha.
+  const requested = color ? safeHex(color, BLACK) : null;
+  const channel = requested ? hexRgb(requested).map(value => (value / 255).toFixed(6)) : [];
+  const id = `bramer-solid-${Math.round(x)}-${Math.round(y)}-${requested?.slice(1).toLowerCase() || 'raw'}`;
+  const filter = requested ? `<defs><filter id="${id}" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 ${channel[0]}  0 0 0 0 ${channel[1]}  0 0 0 0 ${channel[2]}  0 0 0 1 0"/></filter></defs>` : '';
+  const inner = requested ? `<g filter="url(#${id})">${asset.inner}</g>` : asset.inner;
+  return `<svg x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${v.x} ${v.y} ${v.width} ${v.height}" preserveAspectRatio="xMidYMid meet">${filter}${inner}</svg>`;
 }
 
 function fitLogo(asset: LogoAsset | null, x: number, y: number, width: number, height: number, padding = 0): { x: number; y: number; width: number; height: number } {
@@ -181,7 +186,7 @@ function fitLogo(asset: LogoAsset | null, x: number, y: number, width: number, h
 function footer(project: BrandProject, section: string, inverted = false): string {
   const color = inverted ? 'rgba(255,255,255,.72)' : MUTED;
   const line = inverted ? 'rgba(255,255,255,.28)' : LINE;
-  const logoColor = inverted ? WHITE : safeHex(project.colors.primary);
+  const logoColor = inverted ? WHITE : safeLogoColor(WHITE, project.colors.primary);
   return `<line x1="105" y1="1895" x2="2865" y2="1895" stroke="${line}" stroke-width="2"/>${logo(project.logo, 105, 1930, 150, 55, logoColor)}<text x="1485" y="1970" fill="${color}" font-size="22" text-anchor="middle">${esc(section)}</text><text x="2865" y="1970" fill="${color}" font-size="22" text-anchor="end">Brand Guidelines</text>`;
 }
 
@@ -222,7 +227,7 @@ function swatch(project: BrandProject, color: string, x: number, labelText: stri
 function colorCell(project: BrandProject, bg: string, logoColor: string, x: number, y: number, w: number, h: number, title: string): string {
   const safeBg = safeHex(bg, WHITE);
   const safeLogo = safeHex(logoColor, BLACK);
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${safeBg}"/>${label(title, x + 26, y + 44, surfaceInk(safeBg))}${logo(project.logo, x + 135, y + 78, w - 270, h - 130, safeLogo)}`;
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${safeBg}"/>${label(title, x + 26, y + 44, surfaceInk(safeBg))}${logo(project.logo, x + 135, y + 78, w - 270, h - 130, safeLogoColor(safeBg, safeLogo))}`;
 }
 
 function usageCell(project: BrandProject, bg: string, logoColor: string, x: number, y: number, w: number, h: number): string {
@@ -524,7 +529,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       `${leftMeta([['Primary', 'Brand color'], ['Mono', 'Black / White'], ['Reverse', 'High contrast']])}
       ${panel(1035, 460, 885, 500, WHITE, LINE)}
       ${label('01 · PRIMARY', 1075, 520)}
-      ${logo(project.logo, 1220, 650, 520, 170, primary)}
+      ${logo(project.logo, 1220, 650, 520, 170, safeLogoColor(WHITE, primary))}
       ${panel(1955, 460, 910, 500, primary)}
       ${label('02 · REVERSE', 1995, 520, contrast(primary))}
       ${logo(project.logo, 2150, 650, 520, 170, contrast(primary))}
@@ -674,7 +679,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
     svg: commonPage(project, 'COLOR', 'Combinations', copy.combination,
       `${leftMeta([['Rule', 'Contrast first'], ['Preferred', 'Primary / White'], ['Avoid', 'Low contrast']])}
       ${colorCell(project, primary, contrast(primary), 1035, 460, 885, 330, 'PRIMARY')}
-      ${colorCell(project, WHITE, primary, 1955, 460, 910, 330, 'WHITE')}
+      ${colorCell(project, WHITE, safeLogoColor(WHITE, primary), 1955, 460, 910, 330, 'WHITE')}
       ${colorCell(project, BLACK, WHITE, 1035, 825, 885, 330, 'BLACK')}
       ${colorCell(project, secondary, contrast(secondary), 1955, 825, 910, 330, 'SECONDARY')}
       ${colorCell(project, accent, contrast(accent), 1035, 1190, 885, 330, 'ACCENT')}
