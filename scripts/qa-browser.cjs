@@ -43,7 +43,7 @@ try{
  assert.ok(faviconResponse.ok(),'Favicon fetch must succeed at deployed path');
  pass('GitHub Pages base path and favicon work');
  const grayscale = (color,label) => {
-   const values=(color.match(/\\d+(?:\\.\\d+)?/g)||[]).slice(0,3).map(Number);
+   const values=color.split(/[^0-9.]+/).filter(Boolean).slice(0,3).map(Number);
    assert.ok(values.length===3 && Math.max(...values)-Math.min(...values)<=2,label+' is not neutral gray: '+color);
  };
  grayscale(await page.locator('.bramer-hero-rotation-slide h1 span').evaluate(el=>getComputedStyle(el).color),'Landing headline');
