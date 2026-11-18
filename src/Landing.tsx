@@ -34,7 +34,7 @@ const bramerSampleBase: BrandProject = {
   slogan: 'From Logo to Brand Standards.',
   year: '2026',
   logo: null,
-  colors: { primary: '#231815', secondary: '#F1F1F1', accent: '#A6A6A6' },
+  colors: { primary: '#000000', secondary: '#FFFFFF', accent: '#777777' },
   typography: { title: 'Inter', body: 'Pretendard' },
   rules: { clearSpace: 0.25, minimumPrintMm: 10, minimumDigitalPx: 40 },
   contact: { personName: '', position: '', phone: '', email: '', website: '', company: 'BRAMER', address: '' },
@@ -52,7 +52,8 @@ function GuidelinePreview({ english }: { english: boolean }) {
       .then(response => { if (!response.ok) throw new Error('Sample logo unavailable'); return response.text(); })
       .then(svg => {
         if (!cancelled) {
-          const logo = parseLogoSvg(svg, 'bramer-sample-logo.svg');
+          // Preview-only monochrome variant; original source asset remains unchanged.
+          const logo = parseLogoSvg(svg.replace(/#231815/gi, '#000000'), 'bramer-sample-logo.svg');
           setSampleProject({
             ...bramerSampleBase,
             logo,
