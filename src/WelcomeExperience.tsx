@@ -28,7 +28,7 @@ export default function WelcomeExperience({onFinish,english}:WelcomeExperiencePr
  return <main className="bramer-welcome" aria-label={english?'BRAMER introduction':'BRAMER 시작 안내'}>
    <header className="bramer-welcome-header"><strong>BRAMER.</strong><button type="button" onClick={onFinish}>{english?'Skip introduction':'건너뛰기'}</button></header>
    {logoStage?<section className="bramer-welcome-mark" aria-live="polite">
-     <strong>BRAMER.</strong><p>{english?'Your brand standards begin here.':'브랜드의 기준을 만드는 새로운 시작.'}</p>
+     <img src={window.location.pathname.startsWith("/brandcreator/") ? "/brandcreator/bramer-sample-logo.svg" : "/bramer-sample-logo.svg"} alt="BRAMER" /><p>{english?'Your brand standards begin here.':'브랜드의 기준을 만드는 새로운 시작.'}</p>
    </section>:<section className="bramer-welcome-body" key={step}>
      <p className="bramer-welcome-eyebrow">{step===0?'WELCOME TO BRAMER':'HOW BRAMER WORKS'}</p>
      {step===0?<>
