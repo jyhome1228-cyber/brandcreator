@@ -61,6 +61,12 @@ function contrast(hex: string): string {
   if (relativeLuminance(hex) <= 0.25 && contrastRatio(hex, WHITE) >= 3) return WHITE;
   return contrastRatio(hex, BLACK) >= contrastRatio(hex, WHITE) ? BLACK : WHITE;
 }
+function lightBackgroundLogoVariant(asset: LogoAsset | null): string | undefined {
+  // White-only/very pale original SVGs disappear on white guideline pages.
+  // Keep multi-color originals intact; only replace a wholly low-contrast asset.
+  return asset?.colors.length && asset.colors.every(color => contrastRatio(color, WHITE) < 3)
+    ? BLACK : undefined;
+}
 function safeLogoColor(background: string, proposed: string): string {
   const bg = safeHex(background, WHITE);
   const ink = safeHex(proposed, BLACK);
@@ -469,7 +475,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       `${leftMeta([['Role', 'Core brand asset'], ['Priority', 'Primary version first'], ['Rule', 'Do not redraw']])}
       ${panel(1035, 460, 1830, 720, WHITE, LINE)}
       ${label('PRIMARY LOGO', 1080, 520)}
-      ${logo(project.logo, 1390, 660, 1120, 310)}
+      ${logo(project.logo, 1390, 660, 1120, 310, lightBackgroundLogoVariant(project.logo))}
       ${panel(1035, 1215, 885, 330, primary)}
       ${label('REVERSE', 1075, 1270, contrast(primary))}
       ${logo(project.logo, 1240, 1330, 480, 140, contrast(primary))}
@@ -507,7 +513,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
         <line x1="1080" y1="1100" x2="2800" y2="1100" stroke="${GUIDE}" stroke-width="2"/>
         <line x1="1080" y1="1300" x2="2800" y2="1300" stroke="${GUIDE}" stroke-width="2"/>
       </g>
-      ${logo(project.logo, gridLogo.x, gridLogo.y, gridLogo.width, gridLogo.height)}
+      ${logo(project.logo, gridLogo.x, gridLogo.y, gridLogo.width, gridLogo.height, lightBackgroundLogoVariant(project.logo))}
       ${measurementLine(gridLogo.x, 1360, gridLogo.x + gridLogo.width, 1360, `${ratioText}X`, gridLogo.x + gridLogo.width / 2, 1420)}
       ${measurementLine(2740, gridLogo.y, 2740, gridLogo.y + gridLogo.height, '1X', 2780, gridLogo.y + gridLogo.height / 2)}
       <rect x="1035" y="1535" width="565" height="120" fill="${SOFT}"/>
@@ -558,7 +564,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       ${panel(1035, 460, 1830, 1010, '#FAFAFA', LINE)}
       <rect x="${clearLogo.x - clearPx}" y="${clearLogo.y - clearPx}" width="${clearLogo.width + clearPx * 2}" height="${clearLogo.height + clearPx * 2}" fill="#EFEFEF" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="12 9"/>
       <rect x="${clearLogo.x}" y="${clearLogo.y}" width="${clearLogo.width}" height="${clearLogo.height}" fill="#FFFFFF"/>
-      ${logo(project.logo, clearLogo.x, clearLogo.y, clearLogo.width, clearLogo.height)}
+      ${logo(project.logo, clearLogo.x, clearLogo.y, clearLogo.width, clearLogo.height, lightBackgroundLogoVariant(project.logo))}
       ${measurementLine(clearLogo.x - clearPx, clearLogo.y - clearPx - 38, clearLogo.x, clearLogo.y - clearPx - 38, `${clear}X`, clearLogo.x - clearPx / 2, clearLogo.y - clearPx - 55)}
       ${measurementLine(clearLogo.x + clearLogo.width, clearLogo.y - clearPx - 38, clearLogo.x + clearLogo.width + clearPx, clearLogo.y - clearPx - 38, `${clear}X`, clearLogo.x + clearLogo.width + clearPx / 2, clearLogo.y - clearPx - 55)}
       <text x="1070" y="1535" fill="${MUTED}" font-size="22">SAFE AREA</text>
@@ -602,7 +608,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       ${label('PRINT', 1080, 520)}
       <text x="1080" y="620" fill="${BLACK}" font-size="88" font-weight="700">${project.rules.minimumPrintMm} mm</text>
       <text x="1080" y="675" fill="${MUTED}" font-size="23">Minimum width for printed material</text>
-      ${logo(project.logo, 1195, 900, 565, 180)}
+      ${logo(project.logo, 1195, 900, 565, 180, lightBackgroundLogoVariant(project.logo))}
       <line x1="1195" y1="1135" x2="1760" y2="1135" stroke="${BLACK}" stroke-width="2"/>
       <text x="1478" y="1185" fill="${MUTED}" font-size="22" text-anchor="middle">${project.rules.minimumPrintMm} mm</text>
 
@@ -610,7 +616,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       ${label('DIGITAL', 2000, 520)}
       <text x="2000" y="620" fill="${BLACK}" font-size="88" font-weight="700">${project.rules.minimumDigitalPx} px</text>
       <text x="2000" y="675" fill="${MUTED}" font-size="23">Minimum width for digital interface</text>
-      ${logo(project.logo, 2120, 900, 580, 180)}
+      ${logo(project.logo, 2120, 900, 580, 180, lightBackgroundLogoVariant(project.logo))}
       <line x1="2120" y1="1135" x2="2700" y2="1135" stroke="${BLACK}" stroke-width="2"/>
       <text x="2410" y="1185" fill="${MUTED}" font-size="22" text-anchor="middle">${project.rules.minimumDigitalPx} px</text>
 
