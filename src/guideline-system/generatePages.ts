@@ -255,6 +255,38 @@ function typographySample(project: BrandProject, font: string, x: number, y: num
   return `<g style="font-family:${fontStack(font)}"><text x="${x}" y="${y}" fill="${BLACK}" font-size="${size}" font-weight="700">${esc(font)}</text><text x="${x}" y="${y + 190}" fill="${BLACK}" font-size="42">ABCDEFGHIJKLMNOPQRSTUVWXYZ</text><text x="${x}" y="${y + 255}" fill="${BLACK}" font-size="42">abcdefghijklmnopqrstuvwxyz</text><text x="${x}" y="${y + 320}" fill="${BLACK}" font-size="42">0123456789</text><text x="${x}" y="${y + 385}" fill="${BLACK}" font-size="42">#&amp;$+-%_?/()[]{}.,</text></g>`;
 }
 
+
+/** Shared geometric grid: lines snap exactly to the visible SVG artwork bounds. */
+export function constructionGridArtwork(project:BrandProject,x:number,y:number,w:number,h:number):string {
+ const visible=project.logo?visibleLogoBox(project.logo):null;
+ const ratio=visible?visible.width/visible.height:1;
+ const paddingX=w*.08,paddingY=h*.15;
+ const availableW=w-2*paddingX,availableH=h-2*paddingY;
+ const logoW=Math.min(availableW,availableH*ratio);
+ const logoH=logoW/ratio;
+ const bx=x+(w-logoW)/2,by=y+(h-logoH)/2;
+ const vertical=Array.from({length:25},(_,i)=>{
+   const vx=bx+logoW*i/24;
+   return `<line x1="${vx.toFixed(2)}" y1="${(y+26).toFixed(2)}" x2="${vx.toFixed(2)}" y2="${(y+h-26).toFixed(2)}" stroke="#BDBDBD" stroke-width="${i===0||i===24?2.5:1.3}"/>`;
+ }).join('');
+ const horizontal=Array.from({length:9},(_,i)=>{
+   const hy=by+logoH*i/8;
+   return `<line x1="${(x+24).toFixed(2)}" y1="${hy.toFixed(2)}" x2="${(x+w-24).toFixed(2)}" y2="${hy.toFixed(2)}" stroke="#BDBDBD" stroke-width="${i===0||i===8?2.5:1.3}"/>`;
+ }).join('');
+ const corners=`<rect x="${bx}" y="${by}" width="${logoW}" height="${logoH}" fill="none" stroke="#595959" stroke-width="2.6"/>
+   <line x1="${bx+logoW/2}" y1="${y+16}" x2="${bx+logoW/2}" y2="${y+h-16}" stroke="#8C8C8C" stroke-dasharray="10 9" stroke-width="2"/>
+   <line x1="${x+16}" y1="${by+logoH/2}" x2="${x+w-16}" y2="${by+logoH/2}" stroke="#8C8C8C" stroke-dasharray="10 9" stroke-width="2"/>`;
+ const measureY=y+h-36;
+ const measures=`<path d="M${bx} ${measureY-9}v18M${bx+logoW} ${measureY-9}v18M${bx} ${measureY}H${bx+logoW}" stroke="#777" stroke-width="2" fill="none"/>
+ <text x="${bx+logoW/2}" y="${measureY-12}" text-anchor="middle" font-size="24" fill="#555">${ratio.toFixed(2)}X</text>
+ <path d="M${x+w-45} ${by}h14M${x+w-45} ${by+logoH}h14M${x+w-37} ${by}V${by+logoH}" stroke="#777" stroke-width="2" fill="none"/>
+ <text x="${x+w-28}" y="${by+logoH/2}" font-size="24" fill="#555">1X</text>`;
+ return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#FAFAFA" stroke="#E2E2E2" stroke-width="2"/>
+ <g opacity=".68">${vertical}${horizontal}</g>${corners}
+ ${logo(project.logo,bx,by,logoW,logoH,lightBackgroundLogoVariant(project.logo))}
+ ${measures}`;
+}
+
 export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
   const primary = safeHex(project.colors.primary);
   const secondary = safeHex(project.colors.secondary, '#EAEAEA');
@@ -496,41 +528,16 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
     )
   });
 
-  // 05 Construction grid
-  const gridBox = { x: 1140, y: 610, w: 1600, h: 650 };
-  const gridLogo = fitLogo(project.logo, gridBox.x + 180, gridBox.y + 150, gridBox.w - 360, gridBox.h - 300);
+  // 05 Construction grid — calculated from the actual visible SVG geometry.
   add({
     id: '05-grid-system-1',
     section: 'logo',
     title: 'LOGO',
     subtitle: 'Construction grid',
-    svg: commonPage(project, 'LOGO', 'Construction grid', copy.construction,
-      `${leftMeta([['Base unit', 'X = Logo height'], ['Ratio', `${ratioText} : 1`], ['Alignment', 'Optical center']])}
-      ${panel(1035, 460, 1830, 1040, '#FAFAFA', LINE)}
-      <g opacity=".58">
-        <line x1="1170" y1="540" x2="1170" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="1370" y1="540" x2="1370" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="1570" y1="540" x2="1570" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="1770" y1="540" x2="1770" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="1970" y1="540" x2="1970" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="2170" y1="540" x2="2170" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="2370" y1="540" x2="2370" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="2570" y1="540" x2="2570" y2="1400" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="1080" y1="700" x2="2800" y2="700" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="1080" y1="900" x2="2800" y2="900" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="1080" y1="1100" x2="2800" y2="1100" stroke="${GUIDE}" stroke-width="2"/>
-        <line x1="1080" y1="1300" x2="2800" y2="1300" stroke="${GUIDE}" stroke-width="2"/>
-      </g>
-      ${logo(project.logo, gridLogo.x, gridLogo.y, gridLogo.width, gridLogo.height, lightBackgroundLogoVariant(project.logo))}
-      ${measurementLine(gridLogo.x, 1360, gridLogo.x + gridLogo.width, 1360, `${ratioText}X`, gridLogo.x + gridLogo.width / 2, 1420)}
-      ${measurementLine(2740, gridLogo.y, 2740, gridLogo.y + gridLogo.height, '1X', 2780, gridLogo.y + gridLogo.height / 2)}
-      <rect x="1035" y="1535" width="565" height="120" fill="${SOFT}"/>
-      <rect x="1632" y="1535" width="565" height="120" fill="${SOFT}"/>
-      <rect x="2229" y="1535" width="636" height="120" fill="${SOFT}"/>
-      <text x="1065" y="1580" fill="${MUTED}" font-size="20">BASE UNIT</text><text x="1065" y="1625" fill="${BLACK}" font-size="28" font-weight="700">1X = Logo height</text>
-      <text x="1662" y="1580" fill="${MUTED}" font-size="20">PROPORTION</text><text x="1662" y="1625" fill="${BLACK}" font-size="28" font-weight="700">${ratioText} : 1</text>
-      <text x="2259" y="1580" fill="${MUTED}" font-size="20">REPRODUCTION</text><text x="2259" y="1625" fill="${BLACK}" font-size="28" font-weight="700">Scale proportionally</text>`
-    )
+    svg: commonPage(project,'LOGO','Construction grid',copy.construction,
+      `${leftMeta([['Base unit','1X = visible logo height'],['Ratio',ratioText+' : 1'],['Grid','24 × 8 divisions']])}
+      ${constructionGridArtwork(project,1070,515,1780,1050)}
+      ${label('Reproduction · Keep source artwork proportions',1090,1650)}`)
   });
 
   // 06 Logo variations
