@@ -45,10 +45,7 @@ function GuidelinePreview({ english }: { english: boolean }) {
   const [sampleError, setSampleError] = useState(false);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
-  const thumbStripRef = useRef<HTMLDivElement>(null);
   const touchStartX = useRef<number | null>(null);
-  const pointerStart = useRef<{x:number;left:number;dragged:boolean}|null>(null);
-  const suppressThumbnailClick = useRef(false);
   const changePage = (next: number, total: number) => {
     if (!total) return;
     setPlaying(false);
@@ -94,13 +91,6 @@ function GuidelinePreview({ english }: { english: boolean }) {
     const timer = window.setInterval(() => setIndex(previous => (previous + 1) % pages.length), 5500);
     return () => window.clearInterval(timer);
   }, [playing, pages.length]);
-  useEffect(() => {
-    const strip = thumbStripRef.current;
-    const active = strip?.querySelector<HTMLElement>('.bramer-engine-thumbnails button.active');
-    if (!strip || !active) return;
-    const target = active.offsetLeft - strip.offsetLeft - (strip.clientWidth - active.clientWidth) / 2;
-    strip.scrollTo({left: Math.max(0,target),behavior:'smooth'});
-  }, [index, pages.length]);
   const onSwipeStart = (event: TouchEvent<HTMLDivElement>) => { touchStartX.current = event.touches[0]?.clientX ?? null; };
   const onSwipeEnd = (event: React.TouchEvent<HTMLDivElement>) => {
     const x = touchStartX.current;
@@ -121,45 +111,27 @@ function GuidelinePreview({ english }: { english: boolean }) {
     <div className="bramer-preview bramer-engine-preview" data-reveal>
       <div className="bramer-preview-window">
         <div className="bramer-preview-toolbar">
-          <span className="bramer-preview-window-title">{english ? 'BRAMER · Generated Guideline' : 'BRAMER · 실제 생성된 가이드라인'}</span>
-          <span>{pages.length ? `${index + 1} / ${pages.length}` : '—'} {english ? 'pages · 17 core items' : '페이지 · 17개 제작 항목'}</span>
+          <span className="bramer-preview-window-title">{english ? 'Brand Guidelines' : '브랜드 가이드라인'}</span>
+          <span className="bramer-preview-page-count">{pages.length ? `${String(index+1).padStart(2,'0')} / ${String(pages.length).padStart(2,'0')}` : '—'}</span>
         </div>
-        <div className="bramer-preview-canvas bramer-engine-canvas" aria-live="polite" tabIndex={0} role="region" aria-label={english ? "Guideline preview. Swipe, or use arrow keys." : "가이드라인 미리보기. 좌우 스와이프 또는 방향키로 이동합니다."} onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onKeyDown={onPreviewKey}>
-          {current ? <img className="bramer-engine-page" key={current.id + (english ? '-en' : '-ko')} src={selectedImage} alt={`${current.title} — ${current.subtitle}`} loading="eager" /> : (
-            <p className="bramer-engine-loading" role="status">{sampleError ? (english ? 'The BRAMER sample could not be loaded.' : 'BRAMER 샘플을 불러오지 못했습니다.') : (english ? 'Generating BRAMER sample guideline…' : 'BRAMER 가이드라인을 생성하고 있습니다…')}</p>
-          )}
+        <div className="bramer-preview-canvas bramer-engine-canvas" aria-live="polite" tabIndex={0} role="region"
+          aria-label={english ? 'Guideline sample, use arrow keys or swipe to change pages' : '가이드라인 미리보기, 방향키 또는 스와이프로 페이지 이동'}
+          onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onKeyDown={onPreviewKey}>
+          {current ? <img className="bramer-engine-page" key={current.id+(english?'-en':'-ko')} src={selectedImage}
+            alt={`${current.title} — ${current.subtitle}`} loading="eager"/> :
+            <p className="bramer-engine-loading" role="status">{sampleError?(english?'Preview unavailable':'미리보기를 불러올 수 없습니다.'):(english?'Preparing preview…':'미리보기를 준비하고 있습니다…')}</p>}
         </div>
-        {pages.length > 0 && <div className="bramer-engine-navigation">
-          <button type="button" onClick={() => changePage(index-1,pages.length)} aria-label={english ? 'Previous page' : '이전 페이지'}>‹</button>
-          <span>{current.title}<small>{current.subtitle}</small></span>
-          <button type="button" onClick={() => changePage(index+1,pages.length)} aria-label={english ? 'Next page' : '다음 페이지'}>›</button>
-          <label className="bramer-engine-jump"><span>{english ? 'Page' : '페이지 이동'}</span><select aria-label={english ? 'Jump to page' : '페이지 바로 이동'} value={index} onChange={event => changePage(Number(event.target.value),pages.length)}>{pages.map((page,i)=><option value={i} key={page.id}>{String(i+1).padStart(2,'0')} · {page.title}</option>)}</select></label>
-          <button className="bramer-engine-play" type="button" onClick={() => setPlaying(value => !value)} aria-pressed={playing}>{playing ? (english ? 'Pause' : '일시정지') : (english ? 'Auto play' : '자동 넘김')}</button>
+        {pages.length>0 && <div className="bramer-engine-navigation bramer-engine-navigation-minimal">
+          <button type="button" onClick={()=>changePage(index-1,pages.length)} aria-label={english?'Previous page':'이전 페이지'}>‹</button>
+          <label className="bramer-engine-jump"><span className="bramer-sr-only">{english?'Select page':'페이지 선택'}</span>
+            <select aria-label={english?'Jump to page':'페이지 바로 이동'} value={index}
+              onChange={event=>changePage(Number(event.target.value),pages.length)}>
+              {pages.map((page,i)=><option value={i} key={page.id}>{String(i+1).padStart(2,'0')} · {page.title}</option>)}
+            </select>
+          </label>
+          <button type="button" onClick={()=>changePage(index+1,pages.length)} aria-label={english?'Next page':'다음 페이지'}>›</button>
         </div>}
-        {pages.length > 0 && <div className="bramer-engine-thumbnails" ref={thumbStripRef} aria-label={english ? 'Guideline pages — drag to browse' : '가이드라인 페이지 목록 — 드래그하여 탐색'}
-          onPointerDown={event => {
-            if(event.pointerType==='mouse' && event.button===0) pointerStart.current={x:event.clientX,left:event.currentTarget.scrollLeft,dragged:false};
-          }}
-          onPointerMove={event => {
-            const start=pointerStart.current;
-            if (!start) return;
-            const dx=event.clientX-start.x;
-            if(Math.abs(dx)>5)start.dragged=true;
-            if(start.dragged)event.currentTarget.scrollLeft=start.left-dx;
-          }}
-          onPointerUp={() => {
-            if(pointerStart.current?.dragged){
-              suppressThumbnailClick.current=true;
-              window.setTimeout(()=>{suppressThumbnailClick.current=false;},0);
-            }
-            pointerStart.current=null;
-          }}
-          onPointerLeave={()=>{pointerStart.current=null;}}>
-          {pages.map((page, i) => <button type="button" key={page.id} className={i === index ? 'active' : ''} aria-pressed={i === index} title={page.title} onClick={event => {if(suppressThumbnailClick.current){event.preventDefault();return;}changePage(i,pages.length);}}><span>{String(i+1).padStart(2,'0')}</span><small>{page.title}</small></button>)}
-        </div>}
-        <p className="bramer-engine-hint">{english ? 'Swipe the page or use ← → keys. Drag the page list or jump directly to a page.' : '페이지를 좌우로 밀거나 방향키로 이동하세요. 아래 목록을 드래그하거나 페이지를 바로 선택할 수 있습니다.'}</p>
       </div>
-      <p className="bramer-preview-note">{english ? 'Generated using the same 17-item BRAMER guideline engine as the editor. This example uses the BRAMER logo and demonstration brand settings; sample contact information is fictional.' : '제작 프로그램과 동일한 17개 항목의 BRAMER 생성 엔진으로 만든 결과물입니다. BRAMER 로고와 예시 설정을 사용했으며, 명함과 서식의 연락처는 예시 데이터입니다.'}</p>
     </div>
   );
 }
@@ -313,14 +285,14 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
             </div>
           </div>
           <button type="button" className="bramer-home-primary" onClick={event => openBeta(event,'register')}>{tr("베타 무료 체험하기","Try the beta for free")}</button>
-          <button type="button" className="bramer-hero-tech-link" onClick={onManifesto}>{tr("BRAMER의 기술과 제작 원리","Explore the BRAMER technology")}</button>
+          <button type="button" className="bramer-hero-tech-link" onClick={onManifesto}>{tr("BRAMER 기술 살펴보기","Explore the system")}</button>
         </div>
       </section>
 
       <section className="bramer-home-preview-section" id="preview">
         <div className="bramer-home-section-heading" data-reveal>
           <h2>{tr("브랜드의 기준을, 하나의 가이드라인으로.","A complete brand guideline, all in one place.")}</h2>
-          <p>{tr("로고와 브랜드 정보를 입력하면 17개 제작 항목을 기준으로 가이드라인과 기본 응용 디자인을 구성합니다.","Upload your logo and brand information to build guidelines and applications across 17 core items.")}</p>
+          <p>{tr("로고에서 가이드라인까지, 하나의 흐름으로.","From logo to guideline, in one seamless workflow.")}</p>
         </div>
         <GuidelinePreview english={en}/>
       </section>
@@ -329,23 +301,22 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
         <div className="bramer-home-section-heading" data-reveal>
           <span className="bramer-section-eyebrow">HOW IT WORKS / 01</span>
           <h2>{tr("어렵지 않게, 순서대로.","Simple steps, clear results.")}</h2>
-          <p>{tr("브랜드 가이드라인을 처음 만드는 사람도 차근차근 따라 할 수 있도록 구성했습니다.","Designed to guide you through every step, even if this is your first brand guideline.")}</p>
+          <p>{tr("세 단계로 명확하게 완성하세요.","Three clear steps. One consistent brand.")}</p>
         </div>
         <div className="bramer-home-process" data-reveal>
-          <div className="bramer-process-track" aria-hidden="true"><span/><span/><span/></div>
           <div className="bramer-process-list">
             <article className="bramer-process-step">
-              <div className="bramer-process-index"><span>01</span><small>INPUT</small></div>
+              <div className="bramer-process-index"><span>01</span></div>
               <div className="bramer-process-copy"><h3>{tr('브랜드의 시작을 등록합니다.','Start with your brand.')}</h3><p>{tr('브랜드명과 SVG 로고를 입력하세요. 컬러와 서체를 더하면 브랜드의 기본 정보가 완성됩니다.','Upload an SVG logo and enter your brand name. Add colors and typography to establish the foundation.')}</p></div>
               <div className="bramer-process-graphic bramer-process-graphic-logo" aria-hidden="true"><span>BRAND.</span><i/></div>
             </article>
             <article className="bramer-process-step">
-              <div className="bramer-process-index"><span>02</span><small>DEFINE</small></div>
+              <div className="bramer-process-index"><span>02</span></div>
               <div className="bramer-process-copy"><h3>{tr('브랜드의 사용 기준을 정리합니다.','Define consistent standards.')}</h3><p>{tr('로고의 비례와 보호 공간, 최소 크기와 컬러 규칙을 확인하고 필요한 기준을 조정하세요.','Review logo proportions, clear space, minimum sizes and color rules, then refine them as needed.')}</p></div>
               <div className="bramer-process-graphic bramer-process-graphic-grid" aria-hidden="true"><span>B.</span><i/></div>
             </article>
             <article className="bramer-process-step">
-              <div className="bramer-process-index"><span>03</span><small>DELIVER</small></div>
+              <div className="bramer-process-index"><span>03</span></div>
               <div className="bramer-process-copy"><h3>{tr('하나의 가이드라인으로 완성합니다.','Create and deliver your guideline.')}</h3><p>{tr('17개 제작 항목과 응용 디자인을 하나의 문서로 검토하고 PDF 또는 SVG로 내보내세요.','Review 17 core items and applications in one document, then export to PDF or SVG.')}</p></div>
               <div className="bramer-process-graphic bramer-process-graphic-pages" aria-hidden="true"><i/><i/><i/><span>GUIDELINES</span></div>
             </article>
@@ -384,9 +355,9 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
         </div>
         <section className="bramer-tech-section bramer-tech-editorial" id="technology" aria-labelledby="bramer-tech-title">
           <span className="bramer-section-eyebrow">BRAMER / THE SYSTEM</span>
-          <h3 id="bramer-tech-title">{tr('브랜드의 규칙을 만드는 기술.','Technology built for brand consistency.')}</h3>
-          <p>{tr('로고의 시각 구조를 읽고, 사용 규칙을 정리하고, 운영에 필요한 가이드라인으로 연결합니다. BRAMER가 어떤 원칙으로 설계되었는지, 실제로 무엇을 할 수 있는지 기술 문서에서 확인해 보세요.','Explore how BRAMER turns vector artwork and brand information into guidelines, and learn which decisions still require human review.')}</p>
-          <button type="button" className="bramer-tech-open-docs" onClick={onManifesto}>{tr('기술 소개와 매니페스토 읽기','Read technical documentation and manifesto')}</button>
+          <h3 id="bramer-tech-title">{tr('브랜드를 위한 정교한 시스템.','A system for every brand.')}</h3>
+          <p>{tr('로고에서 가이드라인까지. BRAMER의 기술과 설계 기준을 살펴보세요.','Explore the technology behind BRAMER.')}</p>
+          <button type="button" className="bramer-tech-open-docs" onClick={onManifesto}>{tr('기술과 설계 원칙 자세히 보기','Explore the technology')}</button>
         </section>
         <div className="bramer-help-faq" id="faq">
           <h3>{tr('자주 묻는 질문','Frequently asked questions')}</h3>
@@ -402,7 +373,7 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
       <div className="bramer-footer-inner">
         <div className="bramer-footer-columns bramer-footer-curated">
           <div className="bramer-footer-col"><h3>BRAMER</h3><a href="#top">{tr('서비스 소개','Overview')}</a><a href="#preview">{tr('결과물 미리보기','Guideline preview')}</a><a href="#how">{tr('이용 방법','How it works')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('기술과 철학','Technology & principles')}</h3><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 소개','Technical documentation')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('브랜드 매니페스토','Brand manifesto')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('제작 원리와 검증','How it works & limitations')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('기술과 설계','Technology')}</h3><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 소개','Technical documentation')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('서비스 설계 철학','Design philosophy')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 구조와 검증','Architecture & validation')}</a></div>
           <div className="bramer-footer-col"><h3>{tr('이용 안내','Resources')}</h3><a href="#resources">{tr('준비할 자료','Preparation')}</a><a href="#faq">{tr('자주 묻는 질문','FAQ')}</a><a href="#privacy-info">{tr('데이터 보관 안내','Data storage')}</a></div>
           <div className="bramer-footer-col"><h3>{tr('시작하기','Get started')}</h3><a href="#top" onClick={event=>{event.preventDefault();openBeta(undefined,'register')}}>{tr('베타 무료 체험','Free beta')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('제작·운영 정보','Creator & operator')}</a><span className="bramer-footer-company">NINEWORKS · 박재영</span></div>
         </div>
