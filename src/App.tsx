@@ -957,6 +957,9 @@ export default function App() {
       </div>
       <main className="editor-layout">
         <aside className="page-sidebar" aria-label="가이드라인 목차">
+          <div className="bramer-editor-global-menu">
+            <WorkspaceNav active="create" onHome={goHome} onProjects={()=>void openProjectLibrary()} onGuide={openGuide} onHelp={openHelp} onNew={()=>void createNewProject()}/>
+          </div>
           <div className="sidebar-heading">
             <strong>CONTENTS</strong>
             <span>{enabledPages.length}/{pages.length}</span>
