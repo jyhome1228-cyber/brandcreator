@@ -109,3 +109,50 @@
  .bramer-landing .bramer-preview-side-button.next{right:5px}
  .bramer-landing .bramer-preview-page-select{margin-top:9px}
 }
+
+
+/* Paper-first preview: no gray stage, only a very soft paper elevation. */
+.bramer-landing .bramer-home-preview-section{background:#fff!important}
+.bramer-landing .bramer-engine-preview .bramer-preview-window{background:#fff!important;border:0!important;box-shadow:none!important}
+.bramer-landing .bramer-engine-preview .bramer-engine-canvas,
+.bramer-landing .bramer-engine-preview .bramer-engine-side-controls{
+ background:#fff!important;
+ border:0!important;
+ border-radius:0!important;
+ padding:26px 58px!important;
+ box-shadow:none!important;
+ overflow:visible!important;
+}
+.bramer-landing .bramer-engine-preview .bramer-engine-page{
+ display:block!important;
+ width:100%!important;
+ max-width:990px!important;
+ border:0!important;
+ border-radius:0!important;
+ box-shadow:0 4px 18px rgba(0,0,0,.055),0 18px 42px rgba(0,0,0,.025)!important;
+}
+.bramer-landing .bramer-preview-side-button{
+ width:42px!important;height:56px!important;
+ border:0!important;border-radius:0!important;
+ background:transparent!important;box-shadow:none!important;
+ color:#666!important;opacity:.75;
+ padding:0!important;
+ transition:opacity .2s,color .2s,transform .25s ease!important;
+}
+.bramer-landing .bramer-preview-side-button svg{display:block;width:23px;height:23px;stroke-width:1.35}
+.bramer-landing .bramer-preview-side-button.previous{left:0!important}
+.bramer-landing .bramer-preview-side-button.next{right:0!important}
+.bramer-landing .bramer-preview-side-button:hover{
+ background:transparent!important;box-shadow:none!important;
+ border:0!important;color:#111!important;opacity:1;
+ transform:translateY(-50%) scale(1.06)!important;
+}
+.bramer-landing .bramer-preview-side-button:focus-visible{outline:1px solid #222!important;outline-offset:3px}
+@media(max-width:800px){
+ .bramer-landing .bramer-engine-preview .bramer-engine-canvas,
+ .bramer-landing .bramer-engine-preview .bramer-engine-side-controls{padding:12px 26px!important}
+ .bramer-landing .bramer-preview-side-button{width:26px!important;height:43px!important}
+ .bramer-landing .bramer-preview-side-button svg{width:19px;height:19px}
+ .bramer-landing .bramer-preview-side-button.previous{left:-2px!important}
+ .bramer-landing .bramer-preview-side-button.next{right:-2px!important}
+}
