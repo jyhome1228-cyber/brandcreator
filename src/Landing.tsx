@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent, type TouchEvent, type KeyboardEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
 import { generateV2Pages } from './guideline-system/v2Pages';
 import { localizeGuidelinePages } from './guideline-system/localizeGuideline';
@@ -30,7 +30,7 @@ const audiences = [
 const bramerSampleBase: BrandProject = {
   name: '브레이머',
   englishName: 'BRAMER',
-  description: 'BRAMER는 로고에서 시작해 일관된 브랜드 사용 기준을 만들어가는 브랜드 가이드라인 제작 솔루션입니다.',
+  description: 'BRAMER는 로고를 완성한 이후에도 브랜드가 일관된 모습으로 사용될 수 있도록 돕는 브랜드 가이드라인 제작 솔루션입니다. 로고의 비례와 보호 공간, 최소 사용 크기부터 컬러와 타이포그래피, 명함과 공식 서식에 이르기까지 다양한 제작 기준을 하나의 문서로 정리합니다. 디자이너는 반복적인 문서 작업을 줄이고 브랜드 운영자는 명확한 기준을 공유할 수 있습니다. BRAMER는 디자인 결과물이 실제 업무와 다양한 접점에서 지속적으로 활용되도록 돕는 체계적인 제작 환경을 지향합니다.',
   slogan: 'From Logo to Brand Standards.',
   year: '2026',
   logo: null,
@@ -45,6 +45,15 @@ function GuidelinePreview({ english }: { english: boolean }) {
   const [sampleError, setSampleError] = useState(false);
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
+  const thumbStripRef = useRef<HTMLDivElement>(null);
+  const touchStartX = useRef<number | null>(null);
+  const pointerStart = useRef<{x:number;left:number;dragged:boolean}|null>(null);
+  const suppressThumbnailClick = useRef(false);
+  const changePage = (next: number, total: number) => {
+    if (!total) return;
+    setPlaying(false);
+    setIndex(((next % total) + total) % total);
+  };
   useEffect(() => {
     let cancelled = false;
     const source = window.location.pathname.startsWith("/brandcreator/") ? "/brandcreator/bramer-sample-logo.svg" : "/bramer-sample-logo.svg";
@@ -85,6 +94,27 @@ function GuidelinePreview({ english }: { english: boolean }) {
     const timer = window.setInterval(() => setIndex(previous => (previous + 1) % pages.length), 5500);
     return () => window.clearInterval(timer);
   }, [playing, pages.length]);
+  useEffect(() => {
+    const strip = thumbStripRef.current;
+    const active = strip?.querySelector<HTMLElement>('.bramer-engine-thumbnails button.active');
+    if (!strip || !active) return;
+    const target = active.offsetLeft - strip.offsetLeft - (strip.clientWidth - active.clientWidth) / 2;
+    strip.scrollTo({left: Math.max(0,target),behavior:'smooth'});
+  }, [index, pages.length]);
+  const onSwipeStart = (event: TouchEvent<HTMLDivElement>) => { touchStartX.current = event.touches[0]?.clientX ?? null; };
+  const onSwipeEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+    const x = touchStartX.current;
+    touchStartX.current = null;
+    if (x === null || !event.changedTouches[0]) return;
+    const dx = event.changedTouches[0].clientX - x;
+    if (Math.abs(dx) > 45) changePage(index + (dx < 0 ? 1 : -1),pages.length);
+  };
+  const onPreviewKey = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (event.key==='ArrowRight'){event.preventDefault();changePage(index+1,pages.length);}
+    if (event.key==='ArrowLeft'){event.preventDefault();changePage(index-1,pages.length);}
+    if (event.key==='Home'){event.preventDefault();changePage(0,pages.length);}
+    if (event.key==='End'){event.preventDefault();changePage(pages.length-1,pages.length);}
+  };
   const current = pages[index];
   const selectedImage = useMemo(() => current ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(current.svg)}` : '', [current]);
   return (
@@ -94,20 +124,40 @@ function GuidelinePreview({ english }: { english: boolean }) {
           <span className="bramer-preview-window-title">{english ? 'BRAMER · Generated Guideline' : 'BRAMER · 실제 생성된 가이드라인'}</span>
           <span>{pages.length ? `${index + 1} / ${pages.length}` : '—'} {english ? 'pages · 17 core items' : '페이지 · 17개 제작 항목'}</span>
         </div>
-        <div className="bramer-preview-canvas bramer-engine-canvas" aria-live="polite">
+        <div className="bramer-preview-canvas bramer-engine-canvas" aria-live="polite" tabIndex={0} role="region" aria-label={english ? "Guideline preview. Swipe, or use arrow keys." : "가이드라인 미리보기. 좌우 스와이프 또는 방향키로 이동합니다."} onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onKeyDown={onPreviewKey}>
           {current ? <img className="bramer-engine-page" key={current.id + (english ? '-en' : '-ko')} src={selectedImage} alt={`${current.title} — ${current.subtitle}`} loading="eager" /> : (
             <p className="bramer-engine-loading" role="status">{sampleError ? (english ? 'The BRAMER sample could not be loaded.' : 'BRAMER 샘플을 불러오지 못했습니다.') : (english ? 'Generating BRAMER sample guideline…' : 'BRAMER 가이드라인을 생성하고 있습니다…')}</p>
           )}
         </div>
         {pages.length > 0 && <div className="bramer-engine-navigation">
-          <button type="button" onClick={() => { setPlaying(false); setIndex(previous => (previous - 1 + pages.length) % pages.length); }} aria-label={english ? 'Previous page' : '이전 페이지'}>‹</button>
+          <button type="button" onClick={() => changePage(index-1,pages.length)} aria-label={english ? 'Previous page' : '이전 페이지'}>‹</button>
           <span>{current.title}<small>{current.subtitle}</small></span>
-          <button type="button" onClick={() => { setPlaying(false); setIndex(previous => (previous + 1) % pages.length); }} aria-label={english ? 'Next page' : '다음 페이지'}>›</button>
+          <button type="button" onClick={() => changePage(index+1,pages.length)} aria-label={english ? 'Next page' : '다음 페이지'}>›</button>
+          <label className="bramer-engine-jump"><span>{english ? 'Page' : '페이지 이동'}</span><select aria-label={english ? 'Jump to page' : '페이지 바로 이동'} value={index} onChange={event => changePage(Number(event.target.value),pages.length)}>{pages.map((page,i)=><option value={i} key={page.id}>{String(i+1).padStart(2,'0')} · {page.title}</option>)}</select></label>
           <button className="bramer-engine-play" type="button" onClick={() => setPlaying(value => !value)} aria-pressed={playing}>{playing ? (english ? 'Pause' : '일시정지') : (english ? 'Auto play' : '자동 넘김')}</button>
         </div>}
-        {pages.length > 0 && <div className="bramer-engine-thumbnails" aria-label={english ? 'Guideline pages' : '가이드라인 페이지 목록'}>
-          {pages.map((page, i) => <button type="button" key={page.id} className={i === index ? 'active' : ''} aria-pressed={i === index} title={page.title} onClick={() => { setPlaying(false); setIndex(i); }}><span>{String(i+1).padStart(2,'0')}</span><small>{page.title}</small></button>)}
+        {pages.length > 0 && <div className="bramer-engine-thumbnails" ref={thumbStripRef} aria-label={english ? 'Guideline pages — drag to browse' : '가이드라인 페이지 목록 — 드래그하여 탐색'}
+          onPointerDown={event => {
+            if(event.pointerType==='mouse' && event.button===0) pointerStart.current={x:event.clientX,left:event.currentTarget.scrollLeft,dragged:false};
+          }}
+          onPointerMove={event => {
+            const start=pointerStart.current;
+            if (!start) return;
+            const dx=event.clientX-start.x;
+            if(Math.abs(dx)>5)start.dragged=true;
+            if(start.dragged)event.currentTarget.scrollLeft=start.left-dx;
+          }}
+          onPointerUp={() => {
+            if(pointerStart.current?.dragged){
+              suppressThumbnailClick.current=true;
+              window.setTimeout(()=>{suppressThumbnailClick.current=false;},0);
+            }
+            pointerStart.current=null;
+          }}
+          onPointerLeave={()=>{pointerStart.current=null;}}>
+          {pages.map((page, i) => <button type="button" key={page.id} className={i === index ? 'active' : ''} aria-pressed={i === index} title={page.title} onClick={event => {if(suppressThumbnailClick.current){event.preventDefault();return;}changePage(i,pages.length);}}><span>{String(i+1).padStart(2,'0')}</span><small>{page.title}</small></button>)}
         </div>}
+        <p className="bramer-engine-hint">{english ? 'Swipe the page or use ← → keys. Drag the page list or jump directly to a page.' : '페이지를 좌우로 밀거나 방향키로 이동하세요. 아래 목록을 드래그하거나 페이지를 바로 선택할 수 있습니다.'}</p>
       </div>
       <p className="bramer-preview-note">{english ? 'Generated using the same 17-item BRAMER guideline engine as the editor. This example uses the BRAMER logo and demonstration brand settings; sample contact information is fictional.' : '제작 프로그램과 동일한 17개 항목의 BRAMER 생성 엔진으로 만든 결과물입니다. BRAMER 로고와 예시 설정을 사용했으며, 명함과 서식의 연락처는 예시 데이터입니다.'}</p>
     </div>
