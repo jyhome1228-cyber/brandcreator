@@ -4,7 +4,7 @@ const JSZip=require('jszip');
 const fs=require('node:fs');
 const path=require('node:path');
 const os=require('node:os');
-const { spawn }=require('node:child_process');
+const { spawn,execFileSync }=require('node:child_process');
 const assert=require('node:assert/strict');
 
 const output=path.resolve('artifacts/browser-qa');
@@ -73,8 +73,18 @@ try{
  const zip=await JSZip.loadAsync(fs.readFileSync(dest));
  assert.equal(Object.keys(zip.files).filter(f=>f.endsWith('.svg')).length,26);
  pass('ZIP export contains all 26 pages');
- const pdf=await page.pdf({path:path.join(output,'guideline-output.pdf'),printBackground:true,preferCSSPageSize:true});
+ const pdfPath=path.join(output,'guideline-output.pdf');
+ const pdf=await page.pdf({path:pdfPath,printBackground:true,preferCSSPageSize:true});
  assert.ok(pdf.byteLength>20000);
+ try {
+   const info=execFileSync('pdfinfo',[pdfPath],{encoding:'utf8'});
+   const number=Number(info.match(/^Pages:\\s*(\\d+)/m)?.[1]);
+   assert.equal(number,26,'PDF export must contain exactly 26 A4 landscape pages');
+   pass('Chromium PDF contains exactly 26 pages');
+ } catch(error) {
+   if(error.code==='ENOENT')console.log('SKIP pdfinfo unavailable; PDF binary creation verified');
+   else throw error;
+ }
  pass('Chromium print creates nonempty PDF');
  await page.locator('.bramer-editor-global-menu .bramer-dash-nav').getByRole('button',{name:'내 프로젝트'}).click();
  await page.waitForURL('**/#/projects');
@@ -128,16 +138,29 @@ try{
  await mp.getByRole('dialog').waitFor();
  await mp.screenshot({path:path.join(output,'05-beta-mobile.png')});
  await mp.getByRole('button',{name:'닫기'}).click();
+ await mp.goto(url+'#/create',{waitUntil:'domcontentloaded'});
+ await mp.locator('input[placeholder="브랜드명"]').waitFor();
+ await mp.locator('input[placeholder="브랜드명"]').fill('모바일 검증 브랜드');
+ await mp.locator('input[placeholder="Brand name"]').fill('Mobile Brand QA');
+ await mp.locator('.step-nav-item').nth(2).click();
+ await mp.locator('.upload-zone input[type="file"]').setInputFiles({name:'mobile.svg',mimeType:'image/svg+xml',buffer:Buffer.from(logo)});
+ await mp.locator('.upload-zone.has-file').waitFor();
+ await mp.locator('.step-nav-item').nth(4).click();
+ await mp.getByRole('button',{name:'가이드라인 생성'}).waitFor();
+ await mp.screenshot({path:path.join(output,'06-create-mobile.png'),fullPage:true});
+ const createWidth=await mp.evaluate(()=>({screen:window.innerWidth,document:document.documentElement.scrollWidth}));
+ assert.ok(createWidth.document<=createWidth.screen+3,'Mobile create horizontal overflow '+JSON.stringify(createWidth));
+ pass('mobile creation wizard and SVG upload with no horizontal overflow');
  await mp.goto(url+'#/guide',{waitUntil:'domcontentloaded'});
  await mp.getByText('이 업종에서 특히 확인할 규칙').waitFor();
- await mp.screenshot({path:path.join(output,'06-guide-mobile.png'),fullPage:true});
+ await mp.screenshot({path:path.join(output,'07-guide-mobile.png'),fullPage:true});
  const menuLabels=['홈','내 프로젝트','업종별 가이드','사용 방법','새로 만들기'];
  for(const label of menuLabels)assert.equal(await mp.locator('.bramer-dash-nav').getByRole('button',{name:label}).count(),1);
  const width=await mp.evaluate(()=>({screen:window.innerWidth,document:document.documentElement.scrollWidth}));
  assert.ok(width.document<=width.screen+3,'Mobile guide horizontal overflow '+JSON.stringify(width));
  await mp.locator('.bramer-dash-nav').getByRole('button',{name:'사용 방법'}).click();
  await mp.waitForURL('**/#/help');
- await mp.screenshot({path:path.join(output,'07-help-mobile.png'),fullPage:true});
+ await mp.screenshot({path:path.join(output,'08-help-mobile.png'),fullPage:true});
  pass('mobile beta modal, guide, help, fixed 5 menu links and no page overflow');
  assert.deepEqual(errors,[],'Desktop uncaught exceptions: '+errors.join('; '));
  assert.deepEqual(mobileErrors,[],'Mobile uncaught exceptions: '+mobileErrors.join('; '));
