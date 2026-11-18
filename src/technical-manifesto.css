@@ -74,27 +74,6 @@
 .bramer-landing .bramer-process-graphic-grid{background-image:linear-gradient(to right,#4b4b4b55 1px,transparent 1px),linear-gradient(to bottom,#4b4b4b55 1px,transparent 1px)!important;background-size:21px 21px!important}
 .bramer-landing .bramer-home-process.bramer-is-visible .bramer-process-step:nth-child(2){animation-delay:.23s!important}
 .bramer-landing .bramer-home-process.bramer-is-visible .bramer-process-step:nth-child(3){animation-delay:.43s!important}
-/* BRAMER document navigation is an understated horizontal index, not another product's sidebar pattern. */
-.bramer-docs-shell{display:block!important;max-width:1160px!important}
-.bramer-docs-sidebar{position:sticky!important;top:66px!important;z-index:40!important;height:auto!important;max-height:none!important;width:100%!important;border-right:0!important;border-bottom:1px solid #ececec!important;background:rgba(255,255,255,.96)!important;backdrop-filter:blur(14px);padding:13px 24px!important;overflow:visible!important}
-.bramer-docs-side-head{display:none!important}
-.bramer-docs-sidebar nav{display:flex!important;align-items:center;justify-content:center;gap:5px!important;overflow-x:auto!important;scrollbar-width:none;white-space:nowrap}
-.bramer-docs-sidebar nav::-webkit-scrollbar{display:none}
-.bramer-docs-sidebar nav a{padding:9px 13px!important;border-radius:999px!important;white-space:nowrap!important;font-size:11px!important;min-height:36px!important;color:#818181!important}
-.bramer-docs-sidebar nav a.active{background:#f0f0f0!important;color:#111!important}
-.bramer-docs-side-bottom{display:none!important}
-.bramer-docs-main{max-width:950px!important;width:100%!important;margin:0 auto!important;padding:88px 32px 54px!important}
-.bramer-docs-hero{padding:0 0 105px!important}
-.bramer-docs-hero h1{font-size:clamp(32px,3.5vw,47px)!important;line-height:1.36!important;letter-spacing:-.06em!important;font-weight:650!important;max-width:850px!important;margin-bottom:37px!important}
-.bramer-docs-hero .bramer-docs-lead{font-size:17px!important;line-height:1.9!important;max-width:740px;color:#444!important}
-.bramer-docs-hero>p{font-size:14px!important;line-height:1.95!important;max-width:760px}
-.bramer-docs-kicker{font-size:11px!important;color:#999!important}
-.bramer-docs-metrics{margin-top:65px!important;padding-top:33px!important}
-.bramer-docs-section{padding:89px 0 96px!important}
-.bramer-docs-section h2{font-size:clamp(25px,2.7vw,33px)!important;max-width:800px;line-height:1.5!important}
-.bramer-docs-section>p{max-width:790px!important;line-height:1.95!important}
-.bramer-docs-principles article{background:#fff!important;border-color:#efefef!important}
-.bramer-docs-flow>div{background:#f8f8f8!important}
 @media(max-width:800px){
  .bramer-landing .bramer-engine-preview .bramer-engine-canvas{padding:12px!important;border-radius:8px!important}
  .bramer-landing .bramer-home-steps-section{padding:82px 18px 92px!important}
@@ -102,10 +81,31 @@
  .bramer-landing .bramer-process-step{grid-template-columns:48px minmax(0,1fr)!important;gap:14px!important;min-height:0!important;padding:18px 0!important}
  .bramer-landing .bramer-process-index>span{font-size:26px!important}
  .bramer-landing .bramer-process-graphic{grid-column:2!important;width:185px!important;height:104px!important;margin:9px 0 0!important;justify-self:start!important}
- .bramer-docs-sidebar{top:60px!important;padding:9px 16px!important}
- .bramer-docs-sidebar nav{justify-content:flex-start}
- .bramer-docs-main{padding:58px 22px 48px!important}
- .bramer-docs-hero h1{font-size:clamp(30px,5.8vw,40px)!important}
- .bramer-docs-section{padding:70px 0 75px!important}
 }
 @media(prefers-reduced-motion:reduce){.bramer-landing .bramer-process-step{animation:none!important;opacity:1!important;transform:none!important}}
+
+/* Preview controls belong beside the artwork; documentation retains its original left sidebar. */
+.bramer-landing .bramer-engine-side-controls{position:relative!important;overflow:visible!important;isolation:isolate}
+.bramer-landing .bramer-preview-side-button{
+ position:absolute;z-index:3;top:50%;transform:translateY(-50%);
+ display:flex;align-items:center;justify-content:center;
+ width:42px;height:42px;padding:0;border:1px solid #e6e6e6;
+ border-radius:50%;background:#fff;color:#202020;font:inherit;font-size:27px!important;
+ font-weight:350;line-height:1;cursor:pointer;
+ box-shadow:0 4px 20px rgba(0,0,0,.07);transition:background .2s,border-color .2s,box-shadow .2s;
+}
+.bramer-landing .bramer-preview-side-button:hover{background:#f7f7f7;border-color:#ccc;box-shadow:0 5px 25px rgba(0,0,0,.12)}
+.bramer-landing .bramer-preview-side-button:focus-visible{outline:2px solid #222;outline-offset:3px}
+.bramer-landing .bramer-preview-side-button.previous{left:12px}
+.bramer-landing .bramer-preview-side-button.next{right:12px}
+.bramer-landing .bramer-preview-page-select{display:flex;justify-content:center;align-items:center;margin-top:16px}
+.bramer-landing .bramer-preview-page-select .bramer-engine-jump select{
+ border:0;background:transparent;color:#777;font-size:12px!important;max-width:min(320px,70vw);
+ padding:8px 12px;text-align:center;cursor:pointer;
+}
+@media(max-width:800px){
+ .bramer-landing .bramer-preview-side-button{width:34px;height:34px;font-size:22px!important}
+ .bramer-landing .bramer-preview-side-button.previous{left:5px}
+ .bramer-landing .bramer-preview-side-button.next{right:5px}
+ .bramer-landing .bramer-preview-page-select{margin-top:9px}
+}
