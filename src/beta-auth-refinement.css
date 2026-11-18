@@ -1,0 +1,41 @@
+
+/* Clear decision-first beta flow; refined monochrome form and custom occupation picker */
+.bramer-landing .bramer-beta-dialog.bramer-beta-refined{width:min(100%,485px);max-width:485px;padding:36px 36px 28px!important;border-radius:16px!important;box-shadow:0 24px 90px rgba(0,0,0,.28)}
+.bramer-beta-refined .bramer-beta-label{font-size:10px!important;letter-spacing:.12em!important;color:#888;margin-bottom:22px}
+.bramer-landing .bramer-beta-refined h2{font-size:clamp(22px,2.1vw,27px)!important;letter-spacing:-.05em!important;font-weight:650;line-height:1.4;margin:0 38px 12px 0}
+.bramer-landing .bramer-beta-refined>p{font-size:12px!important;line-height:1.85!important;color:#777;margin:0 0 24px}
+.bramer-beta-choice{display:flex;flex-direction:column;gap:9px;margin-top:26px}
+.bramer-beta-choice>button{width:100%;display:flex;justify-content:space-between;align-items:center;gap:12px;text-align:left;border:1px solid #dedede;border-radius:10px;padding:21px 21px;background:#fff;color:#1b1b1b;cursor:pointer;transition:border-color .2s,background .2s}
+.bramer-beta-choice>button:first-child{background:#151515;color:#fff;border-color:#151515}
+.bramer-beta-choice>button:hover{border-color:#888}
+.bramer-beta-choice>button:first-child:hover{background:#292929}
+.bramer-beta-choice>button>span:first-child{display:flex;flex-direction:column;gap:7px;min-width:0}
+.bramer-beta-choice strong{font-size:15px;font-weight:650;letter-spacing:-.035em}
+.bramer-beta-choice small{font-size:11px;color:#888;line-height:1.55}
+.bramer-beta-choice>button:first-child small{color:#aaa}
+.bramer-beta-choice>button>span:last-child{font-size:19px;font-weight:350}
+.bramer-beta-footnote{font-size:11px!important;line-height:1.65;color:#999!important;margin:20px 0 0!important}
+.bramer-beta-refined .bramer-beta-field-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:17px;margin-top:4px}
+.bramer-beta-refined .bramer-beta-field-grid label{display:flex;flex-direction:column;gap:8px}
+.bramer-beta-refined .bramer-beta-field-grid label>span,.bramer-beta-refined .bramer-occupation-label{font-size:12px!important;font-weight:600;color:#444}
+.bramer-beta-refined .bramer-beta-field-grid input{height:47px;border-radius:8px!important;background:#fbfbfb!important;border:1px solid #e3e3e3!important;font-size:13px!important;padding:0 14px!important;outline:none}
+.bramer-beta-refined .bramer-beta-field-grid input:focus{background:#fff!important;border-color:#555!important;box-shadow:0 0 0 2px #11111114}
+.bramer-occupation-field{display:flex;flex-direction:column;gap:8px;position:relative;min-width:0}
+.bramer-occupation-trigger{display:flex;align-items:center;justify-content:space-between;width:100%;min-height:47px;padding:0 14px;background:#fbfbfb;color:#444;border:1px solid #e3e3e3;border-radius:8px;text-align:left;font-size:13px!important;cursor:pointer}
+.bramer-occupation-trigger.expanded{background:white;border-color:#777}
+.bramer-occupation-trigger>span{font-size:19px;color:#888;transform:translateY(-2px)}
+.bramer-occupation-list{position:absolute;top:calc(100% + 5px);left:0;right:0;z-index:10;display:flex;flex-direction:column;gap:0;background:#fff;border:1px solid #e5e5e5;border-radius:9px;box-shadow:0 12px 32px #00000015;padding:6px;max-height:275px;overflow-y:auto}
+.bramer-occupation-list>button{height:39px;flex:0 0 39px;padding:0 11px;background:white;border:0;border-radius:6px;color:#333;font-size:12px!important;text-align:left;cursor:pointer}
+.bramer-occupation-list>button:hover,.bramer-occupation-list>button[aria-selected=true]{background:#f2f2f2;color:#111}
+.bramer-beta-refined .bramer-beta-privacy{margin-top:22px;padding-top:18px}
+.bramer-beta-refined .bramer-beta-local-notice{font-size:11px!important;color:#999}
+.bramer-beta-refined .bramer-beta-primary{background:#151515!important;color:#fff;border:0!important;border-radius:8px!important;min-height:47px!important;font-size:13px!important;width:100%}
+.bramer-beta-refined .bramer-beta-primary:hover{background:#303030!important}
+.bramer-beta-refined .bramer-beta-primary:disabled{opacity:.55;cursor:wait}
+.bramer-beta-back{display:inline-block;margin-top:18px;border:0;background:transparent;color:#888;font-size:12px!important;padding:5px 0;cursor:pointer}
+.bramer-beta-back:hover{color:#111}
+@media(max-width:540px){
+ .bramer-landing .bramer-beta-dialog.bramer-beta-refined{padding:31px 23px 25px!important}
+ .bramer-beta-choice>button{padding:18px}
+ .bramer-beta-refined .bramer-beta-field-grid input{font-size:16px!important}
+}
