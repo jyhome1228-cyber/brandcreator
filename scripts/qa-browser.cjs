@@ -169,6 +169,10 @@ try{
  assert.ok(width.document<=width.screen+3,'Mobile guide horizontal overflow '+JSON.stringify(width));
  await mp.locator('.bramer-dash-nav').getByRole('button',{name:'사용 방법'}).click();
  await mp.waitForURL('**/#/help');
+ await mp.locator('.bramer-help-local-nav').getByRole('button',{name:'자주 묻는 질문'}).click();
+ await mp.waitForTimeout(500);
+ assert.ok((await mp.locator('#help-faq').boundingBox()).y < 850, 'FAQ anchor should scroll into viewport');
+ assert.ok(mp.url().endsWith('#/help'), 'Section TOC must not change the app route');
  await mp.screenshot({path:path.join(output,'08-help-mobile.png'),fullPage:true});
  pass('mobile beta modal, guide, help, fixed 5 menu links and no page overflow');
  assert.deepEqual(errors,[],'Desktop uncaught exceptions: '+errors.join('; '));
