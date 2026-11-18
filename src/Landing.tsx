@@ -6,7 +6,7 @@ import { localizeGuidelinePages } from './guideline-system/localizeGuideline';
 import type { BrandProject } from './types/guideline';
 import {registerLocalBeta,verifyLocalBeta} from './betaLocalAccess';
 
-type LandingProps = { onStart: (newRegistration?: boolean) => void };
+type LandingProps = { onStart: (newRegistration?: boolean) => void; onManifesto: () => void };
 type BetaForm = { name: string; phone: string; occupation: string };
 const initialBetaForm: BetaForm = { name: '', phone: '', occupation: '' };
 
@@ -164,7 +164,7 @@ function GuidelinePreview({ english }: { english: boolean }) {
   );
 }
 
-export default function Landing({ onStart }: LandingProps) {
+export default function Landing({ onStart, onManifesto }: LandingProps) {
   const rootRef = useRef<HTMLDivElement>(null);
   const [language, setLanguage] = useState<'ko' | 'en'>(() => { try { return localStorage.getItem('bramer-site-language') === 'en' ? 'en' : 'ko'; } catch { return 'ko'; } });
   const en = language === 'en';
@@ -172,8 +172,14 @@ export default function Landing({ onStart }: LandingProps) {
   const changeLanguage = (next: 'ko' | 'en') => { setLanguage(next); try { localStorage.setItem('bramer-site-language', next); } catch { /* optional preference */ } };
   const [audienceIndex, setAudienceIndex] = useState(0);
   const [rollPaused, setRollPaused] = useState(false);
-  const [betaOpen, setBetaOpen] = useState(false);
-  const [betaMode, setBetaMode] = useState<'choice'|'register'|'login'>('choice');
+  const [betaOpen, setBetaOpen] = useState(() => {
+    try {
+      const shouldOpen = sessionStorage.getItem('bramer-open-registration-v1') === '1';
+      if (shouldOpen) sessionStorage.removeItem('bramer-open-registration-v1');
+      return shouldOpen;
+    } catch { return false; }
+  });
+  const [betaMode, setBetaMode] = useState<'choice'|'register'|'login'>('register');
   const [occupationOpen,setOccupationOpen] = useState(false);
   const [loginForm,setLoginForm] = useState({name:'',phone:''});
   const [submitting,setSubmitting] = useState(false);
@@ -274,7 +280,7 @@ export default function Landing({ onStart }: LandingProps) {
           <a href="#preview">{tr("서비스 소개","Overview")}</a>
           <a href="#how">{tr("이용 방법","How it works")}</a>
           <a href="#/guide">{tr("업종별 가이드","Industry guide")}</a>
-          <a href="#help">{tr("도움말","Help")}</a>
+          <a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr("기술 소개","Technology")}</a>
         </nav>
         <div className="bramer-site-actions"><div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div><button type="button" className="bramer-site-start" onClick={event => openBeta(event,'choice')}>{tr("시작하기","Get started")}</button>
         </div>
@@ -307,6 +313,7 @@ export default function Landing({ onStart }: LandingProps) {
             </div>
           </div>
           <button type="button" className="bramer-home-primary" onClick={event => openBeta(event,'register')}>{tr("베타 무료 체험하기","Try the beta for free")}</button>
+          <button type="button" className="bramer-hero-tech-link" onClick={onManifesto}>{tr("BRAMER의 기술과 제작 원리","Explore the BRAMER technology")}</button>
         </div>
       </section>
 
@@ -398,13 +405,11 @@ export default function Landing({ onStart }: LandingProps) {
     </main>
     <footer className="bramer-home-footer">
       <div className="bramer-footer-inner">
-        <div className="bramer-footer-columns">
-          <div className="bramer-footer-col"><h3>Bramer</h3><a href="#top">{tr('서비스 소개','Overview')}</a><a href="#preview">{tr('결과물 미리보기','Guideline sample')}</a><a href="#how">{tr("이용 방법","How it works")}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('가이드라인','Guidelines')}</h3><a href="#/create">{tr('새 가이드라인 만들기','New guideline')}</a><a href="#/create">{tr('가이드라인 제작','Guideline editor')}</a><a href="#preview">{tr('샘플 가이드라인','Guideline samples')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('업종별 가이드','Industry guide')}</h3><a href="#/guide">{tr('업종별 추천 구성','Industry recommendations')}</a><a href="#/guide">{tr('필요한 가이드 항목','Guideline contents')}</a><a href="#/guide">{tr('자료 체크리스트','Asset checklist')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('자료 준비','Preparation')}</h3><a href="#resources">{tr('준비 자료 안내','Preparing assets')}</a><a href="#technology">{tr('SVG 업로드 안내','Uploading SVG')}</a><a href="#data-info">{tr('프로젝트 저장 안내','Saving projects')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('지원','Support')}</h3><a href="#help">{tr("도움말","Help")}</a><a href="#faq">{tr('자주 묻는 질문','FAQ')}</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">{tr('업데이트 내역','Updates')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('이용 안내','Information')}</h3><a href="#privacy-info">{tr('파일 이용 안내','File handling')}</a><a href="#data-info">{tr('저장 방식 안내','Storage options')}</a><a href="#technology">{tr('기술 및 제작 방식','Technology')}</a></div>
+        <div className="bramer-footer-columns bramer-footer-curated">
+          <div className="bramer-footer-col"><h3>BRAMER</h3><a href="#top">{tr('서비스 소개','Overview')}</a><a href="#preview">{tr('결과물 미리보기','Guideline preview')}</a><a href="#how">{tr('이용 방법','How it works')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('기술과 철학','Technology & principles')}</h3><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 소개','Technical documentation')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('브랜드 매니페스토','Brand manifesto')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('제작 원리와 검증','How it works & limitations')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('이용 안내','Resources')}</h3><a href="#resources">{tr('준비할 자료','Preparation')}</a><a href="#faq">{tr('자주 묻는 질문','FAQ')}</a><a href="#privacy-info">{tr('데이터 보관 안내','Data storage')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('시작하기','Get started')}</h3><a href="#top" onClick={event=>{event.preventDefault();window.scrollTo({top:0,behavior:'smooth'})}}>{tr('베타 무료 체험','Free beta')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('제작·운영 정보','Creator & operator')}</a><span className="bramer-footer-company">NINEWORKS · 박재영</span></div>
         </div>
         <div className="bramer-footer-bottom"><div><BramerLogo light /><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>{tr('현재 제공되는 기능을 기준으로 안내합니다.','Features described reflect the current beta version.')}</small></div>
       </div>
