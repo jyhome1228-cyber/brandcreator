@@ -126,6 +126,15 @@ try{
  await page.locator('input[placeholder="브랜드명"]').waitFor();
  assert.equal(await page.locator('input[placeholder="브랜드명"]').inputValue(),'건강미 테스트');
  pass('JSON backup restore roundtrip');
+ // An SVG-first workflow must also keep an untitled draft when no name is entered.
+ await page.locator('.bramer-dash-nav').getByRole('button',{name:'새로 만들기'}).click();
+ await page.locator('.step-nav-item').nth(2).click();
+ await page.locator('.upload-zone input[type="file"]').setInputFiles({name:'untitled.svg',mimeType:'image/svg+xml',buffer:Buffer.from(logo)});
+ await page.locator('.upload-zone.has-file').waitFor();
+ await page.locator('.bramer-dash-nav').getByRole('button',{name:'내 프로젝트'}).click();
+ await page.waitForURL('**/#/projects');
+ await page.getByText('이름 없는 프로젝트').first().waitFor();
+ pass('untitled SVG-first draft saved without phantom blank project');
  // Mobile viewport tests: global menus, beta modal and guide navigation.
  const mobile=await browser.newContext({viewport:{width:390,height:844},acceptDownloads:true,isMobile:true,deviceScaleFactor:1});
  const mp=await mobile.newPage();
