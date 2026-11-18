@@ -46,3 +46,33 @@
 .bramer-doc-language select{background:#fff;border:1px solid #d5d5d5;color:#171717;border-radius:5px;padding:8px 10px;font-size:12px;max-width:150px}
 @media(max-width:760px){.bramer-doc-language{font-size:11px}.bramer-doc-language select{padding:7px 6px;max-width:110px}}
 @media print{.bramer-doc-language{display:none!important}}
+
+/* Actual BRAMER guideline generator preview and robust single-row header. */
+.bramer-landing .bramer-site-header{position:sticky;top:0;z-index:80;width:100%;background:#101010}
+.bramer-landing .bramer-site-header-inner{
+  width:min(1320px,calc(100% - 48px));height:74px;min-height:74px;max-width:none;
+  margin-inline:auto;display:flex;align-items:center;justify-content:space-between;
+  flex-wrap:nowrap!important;gap:24px;
+}
+.bramer-landing .bramer-site-logo{flex:0 0 auto;margin:0;white-space:nowrap;}
+.bramer-landing .bramer-site-menu{display:flex;align-items:center;justify-content:center;gap:28px;flex:1 1 auto;min-width:0;margin:0;}
+.bramer-landing .bramer-site-menu a{white-space:nowrap;}
+.bramer-landing .bramer-site-actions{display:flex;flex:0 0 auto;align-items:center;justify-content:flex-end;gap:24px;margin:0;}
+.bramer-landing .bramer-language-switch{display:flex;align-items:center;gap:5px;flex:0 0 auto;margin:0;}
+.bramer-landing .bramer-site-start{display:inline-flex;align-items:center;justify-content:center;position:static;flex:0 0 auto;white-space:nowrap;margin:0!important;min-width:110px;padding:0 21px;transform:none!important;}
+.bramer-engine-preview .bramer-preview-window{padding:18px;background:#eaeaea;}
+.bramer-engine-preview .bramer-engine-canvas{padding:27px 35px;min-height:0;background:#ddd;display:flex;align-items:center;justify-content:center;}
+.bramer-engine-page{display:block;width:100%;max-width:850px;height:auto;aspect-ratio:297/210;object-fit:contain;box-shadow:0 9px 27px rgba(0,0,0,.1);background:#fff;animation:bramer-entire-hero-in .28s ease both;}
+.bramer-engine-loading{min-height:300px;display:grid;place-items:center;color:#555;font-size:13px;}
+.bramer-engine-navigation{display:flex;align-items:center;gap:12px;justify-content:center;padding:16px 2px 12px;}
+.bramer-engine-navigation>button{border:1px solid #cecece;background:#fff;min-width:35px;height:34px;color:#151515;font-size:19px;line-height:1;}
+.bramer-engine-navigation>span{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:150px;gap:2px;font-size:12px;font-weight:650;}
+.bramer-engine-navigation>span small{font-size:10px;font-weight:400;color:#777;}
+.bramer-engine-navigation .bramer-engine-play{font-size:11px;min-width:90px;margin-left:auto;}
+.bramer-engine-thumbnails{display:flex;gap:6px;overflow-x:auto;overscroll-behavior-x:contain;padding:7px 1px 10px;scrollbar-width:thin;}
+.bramer-engine-thumbnails button{display:flex;flex-direction:column;gap:6px;justify-content:center;min-width:91px;width:91px;height:61px;background:#fafafa;border:1px solid #d0d0d0;text-align:left;padding:9px;flex-shrink:0;color:#555;}
+.bramer-engine-thumbnails button.active{background:#171717;color:#fff;border-color:#171717;}
+.bramer-engine-thumbnails button span{font-size:10px;color:inherit;opacity:.7;}
+.bramer-engine-thumbnails button small{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;color:inherit;}
+@media(max-width:1020px){.bramer-landing .bramer-site-header-inner{width:calc(100% - 36px);gap:13px}.bramer-landing .bramer-site-menu{gap:16px}.bramer-landing .bramer-site-actions{gap:12px}.bramer-landing .bramer-site-menu a{font-size:12px!important}}
+@media(max-width:760px){.bramer-landing .bramer-site-header-inner{height:60px;min-height:60px;gap:10px}.bramer-landing .bramer-site-menu{display:none!important}.bramer-landing .bramer-site-actions{margin-left:auto;gap:9px}.bramer-landing .bramer-site-start{min-width:0;padding:0 13px}.bramer-engine-preview .bramer-preview-window{padding:10px}.bramer-engine-preview .bramer-engine-canvas{padding:14px 8px}.bramer-engine-navigation{gap:6px}.bramer-engine-navigation>span{min-width:100px}.bramer-engine-navigation .bramer-engine-play{margin-left:0;min-width:76px}.bramer-engine-thumbnails button{min-width:78px;width:78px;height:58px;padding:7px}.bramer-engine-loading{min-height:175px}}
