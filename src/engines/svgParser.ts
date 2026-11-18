@@ -182,7 +182,13 @@ function measureVisualGeometry(
 
     const graphics = Array.from(
       mounted.querySelectorAll<SVGGraphicsElement>('path,rect,circle,ellipse,line,polyline,polygon,text,use'),
-    );
+    ).filter((element) => !element.closest('defs,clipPath,mask,pattern,marker,symbol') &&
+      element.getAttribute('display') !== 'none' && element.getAttribute('visibility') !== 'hidden');
+    // getCTM includes the root SVG viewBox-to-viewport scaling. Convert every
+    // measured point back into root viewBox coordinates before using it for
+    // aspect ratio, clear-space and canvas occupancy recommendations.
+    const rootCTM = mounted.getCTM();
+    const rootInverse = rootCTM ? rootCTM.inverse() : null;
 
     let minX = Number.POSITIVE_INFINITY;
     let minY = Number.POSITIVE_INFINITY;
@@ -194,8 +200,9 @@ function measureVisualGeometry(
       try {
         const box = element.getBBox();
         if (!box.width && !box.height) return;
-        const matrix = element.getCTM();
-        if (!matrix) return;
+        const elementCTM = element.getCTM();
+        if (!elementCTM) return;
+        const matrix = rootInverse ? rootInverse.multiply(elementCTM) : elementCTM;
 
         const points = [
           transformPoint(box.x, box.y, matrix),
