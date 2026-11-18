@@ -1,0 +1,109 @@
+/* BRAMER single workspace alignment grid.
+   All inner pages share the same 228px navigation rail and 1096px
+   maximum reading/work area (1160px container minus 32px gutters).
+   This is loaded LAST to supersede legacy per-page width overrides. */
+.bramer-dash {
+  --bramer-sidebar-width: 228px;
+  --bramer-workspace-width: 1160px;
+  --bramer-workspace-gutter: 32px;
+}
+.bramer-dash .bramer-dash-layout,
+.bramer-help-page .bramer-dash-layout {
+  display: grid !important;
+  grid-template-columns: var(--bramer-sidebar-width) minmax(0, 1fr) !important;
+}
+.bramer-dash .bramer-dash-sidebar {
+  box-sizing: border-box;
+  width: var(--bramer-sidebar-width) !important;
+  min-width: 0;
+}
+.bramer-dash .bramer-dash-content,
+.bramer-create-shell .bramer-create-content,
+.bramer-help-page .bramer-dash-content,
+.bramer-dash .bramer-projects-content {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: var(--bramer-workspace-width) !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+  padding-left: var(--bramer-workspace-gutter) !important;
+  padding-right: var(--bramer-workspace-gutter) !important;
+  min-width: 0 !important;
+}
+.bramer-help-page .bramer-help-content { padding-top: 0 !important; }
+.bramer-help-page .bramer-help-document {
+  box-sizing: border-box;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0;
+  margin: 0 auto;
+}
+/* The setup wizard previously narrowed everything to a separate 930px grid. */
+.bramer-create-shell .setup-workspace {
+  --bramer-form-width: 100% !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin: 0 auto !important;
+}
+.bramer-create-shell .setup-step-nav,
+.bramer-create-shell .setup-main,
+.bramer-create-shell .bramer-workspace-heading,
+.bramer-create-shell .setup-module-stack,
+.bramer-create-shell .step-actions,
+.bramer-create-shell .setup-actions,
+.bramer-create-shell .setup-error,
+.bramer-create-shell .setup-preview-panel {
+  box-sizing: border-box !important;
+  width: 100% !important;
+  max-width: none !important;
+  min-width: 0 !important;
+  margin-left: auto !important;
+  margin-right: auto !important;
+}
+.bramer-create-shell .setup-main {
+  align-self: stretch !important;
+}
+/* Keep page-title and cards on exactly the same left/right edges. */
+.bramer-dash .bramer-dash-page-title,
+.bramer-dash .bramer-dash-section,
+.bramer-dash .bramer-guide-content,
+.bramer-dash .bramer-project-list,
+.bramer-dash .bramer-project-notice,
+.bramer-help-page .bramer-help-document {
+  width: 100%;
+  min-width: 0;
+}
+@media (max-width: 1040px) and (min-width: 761px) {
+  .bramer-dash { --bramer-sidebar-width: 190px; --bramer-workspace-gutter: 24px; }
+}
+@media (max-width: 760px) {
+  .bramer-dash { --bramer-workspace-gutter: 16px; }
+  .bramer-dash .bramer-dash-layout,
+  .bramer-help-page .bramer-dash-layout {
+    display: block !important;
+  }
+  .bramer-dash .bramer-dash-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    position: static !important;
+  }
+  .bramer-dash .bramer-dash-content,
+  .bramer-create-shell .bramer-create-content,
+  .bramer-help-page .bramer-dash-content,
+  .bramer-dash .bramer-projects-content {
+    max-width: 100% !important;
+    padding-left: var(--bramer-workspace-gutter) !important;
+    padding-right: var(--bramer-workspace-gutter) !important;
+  }
+  .bramer-create-shell .setup-step-nav,
+  .bramer-create-shell .setup-main,
+  .bramer-create-shell .bramer-workspace-heading,
+  .bramer-create-shell .setup-module-stack,
+  .bramer-create-shell .step-actions,
+  .bramer-create-shell .setup-actions,
+  .bramer-create-shell .setup-error,
+  .bramer-create-shell .setup-preview-panel {
+    max-width: 100% !important;
+  }
+}
