@@ -83,7 +83,7 @@ try{
  assert.ok(pdf.byteLength>20000);
  // Chrome PDF writes one /Type /Page object per printed page. Check count
  // even on runners without poppler's pdfinfo binary.
- const pdfObjects=pdf.toString('latin1').split('/Type /Page').length-1;
+ const pdfObjects=pdf.toString('latin1').split('/Type /Page').slice(1).filter(part=>!part.startsWith('s')).length;
  assert.equal(pdfObjects,26,'PDF must contain 26 A4 pages, not an extra blank page');
  pass('Chromium print creates exactly 26-page PDF');
  await page.locator('.bramer-editor-global-menu .bramer-dash-nav').getByRole('button',{name:'내 프로젝트'}).click();
