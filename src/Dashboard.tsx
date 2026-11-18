@@ -16,6 +16,8 @@ type DashboardProps = {
   onImport: (event: ChangeEvent<HTMLInputElement>) => void;
   currentProject?: string;
   currentIndustry?: IndustryId;
+  firstUseCoach?: boolean;
+  onDismissCoach?: () => void;
 };
 
 const commonDocuments = ['브랜드명 · 영문명', 'SVG 로고 파일', '브랜드 소개 및 슬로건', '브랜드 컬러', '제목·본문 서체', '담당자 연락처(명함)', '회사 정보·주소(서식·봉투)'];
@@ -26,7 +28,7 @@ const names: Record<string,string> = {
   verbal:'브랜드 메시지',application:'명함·스티커·문서 응용',
 };
 
-export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,onImport,onProjects,onHelp,currentProject,currentIndustry}:DashboardProps) {
+export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,onImport,onProjects,onHelp,currentProject,currentIndustry,firstUseCoach=false,onDismissCoach}:DashboardProps) {
   const [industry,setIndustry] = useState<IndustryId>(currentIndustry ?? 'beauty');
   const [checked,setChecked] = useState<Record<string,boolean>>({});
   const [search,setSearch] = useState('');
@@ -133,5 +135,17 @@ export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,on
         </>}
       </main>
     </div>
+    {view==='dashboard' && firstUseCoach ? <div className="bramer-coach-overlay" role="presentation">
+      <div className="bramer-coach-dialog" role="dialog" aria-modal="true" aria-labelledby="bramer-coach-title" aria-describedby="bramer-coach-description">
+        <div className="bramer-coach-label">FIRST STEP <span>BRAMER BETA</span></div>
+        <h2 id="bramer-coach-title">첫 번째 가이드라인을 만들어보세요.</h2>
+        <p id="bramer-coach-description">브랜드명과 SVG 로고만 준비해도 시작할 수 있어요. 정보를 등록하고, 로고의 사용 규칙을 검토한 뒤 완성된 가이드라인을 확인해 보세요.</p>
+        <div className="bramer-coach-check"><span>01</span><div><strong>먼저, 브랜드 정보와 로고를 등록해 보세요.</strong><small>나머지 정보는 제작 과정에서 언제든 수정할 수 있어요.</small></div></div>
+        <div className="bramer-coach-actions">
+          <button type="button" className="bramer-coach-later" onClick={onDismissCoach}>나중에 둘러볼게요</button>
+          <button type="button" className="bramer-coach-primary" onClick={()=>{onDismissCoach?.();onCreate();}}>첫 가이드라인 만들기</button>
+        </div>
+      </div>
+    </div> : null}
   </div>;
 }
