@@ -49,6 +49,21 @@ try{
  grayscale(await page.locator('.bramer-hero-rotation-slide h1 span').evaluate(el=>getComputedStyle(el).color),'Landing headline');
  grayscale(await page.locator('.bramer-hero-rotation .bramer-roller-controls button.active').evaluate(el=>getComputedStyle(el,'::before').backgroundColor),'Landing indicator');
  pass('landing hero typography and active indicator are grayscale');
+ const heroLayer=page.locator('.bramer-hero-image-layer');
+ await heroLayer.waitFor();
+ const heroStyles=await page.evaluate(()=>{
+   const left=getComputedStyle(document.querySelector('.bramer-hero-image-left'));
+   const right=getComputedStyle(document.querySelector('.bramer-hero-image-right'));
+   const layer=document.querySelector('.bramer-hero-image-layer').getBoundingClientRect();
+   return {left:left.backgroundImage,right:right.backgroundImage,leftOpacity:Number(left.opacity),rightOpacity:Number(right.opacity),height:layer.height};
+ });
+ assert.ok(heroStyles.left.includes('20261118-043848-')&&heroStyles.right.includes('20261118-043849-'),'Both supplied hero image URLs must be applied');
+ assert.ok(heroStyles.leftOpacity<=.22&&heroStyles.rightOpacity<=.22,'Hero images must remain subtly translucent');
+ assert.ok(heroStyles.height>450,'Hero background must cover section height');
+ const editorCards=await page.locator('.bramer-help-grid article').count();
+ assert.equal(editorCards,3,'Support section keeps three information cards');
+ assert.equal(await page.locator('.bramer-home-steps article').count(),3,'How it works retains three actionable steps');
+ pass('supplied hero imagery, low opacity and unified landing cards');
  await page.screenshot({path:path.join(output,'01-landing-desktop.png')});
  const trial=page.locator('.bramer-home-primary').first();
  await trial.click();
@@ -181,6 +196,10 @@ try{
  mp.on('pageerror',err=>mobileErrors.push(err.message));
  await mp.goto(url,{waitUntil:'domcontentloaded'});
  await mp.locator('.bramer-home-hero').waitFor();
+ const mobileArt=await mp.locator('.bramer-hero-image-right').evaluate(el=>getComputedStyle(el).display);
+ assert.equal(mobileArt,'none','Mobile hero must avoid crowded double-image composition');
+ const mobileLandingWidth=await mp.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
+ assert.ok(mobileLandingWidth.page<=mobileLandingWidth.screen+3,'Mobile landing overflow '+JSON.stringify(mobileLandingWidth));
  await mp.screenshot({path:path.join(output,'04-landing-mobile.png'),fullPage:true});
  await mp.locator('.bramer-site-start').click();
  await mp.getByRole('dialog').waitFor();
