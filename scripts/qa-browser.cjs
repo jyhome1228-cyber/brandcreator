@@ -54,7 +54,20 @@ try{
  await visitor.getByRole('dialog').waitFor();
  await visitor.getByRole('heading',{name:'브레이머를 무료로 체험하세요.'}).waitFor();
  await visitor.close();
- pass('public manifesto precedes beta registration and guards direct dashboard URL');
+ pass('public technology documentation precedes beta registration and guards direct dashboard URL');
+ const publicPages=await context.newPage();
+ await publicPages.goto(url,{waitUntil:'domcontentloaded'});
+ await publicPages.locator('.bramer-site-menu').getByRole('link',{name:'업종별 가이드'}).click();
+ await publicPages.waitForURL('**/#/guide');
+ await publicPages.getByRole('heading',{name:'우리 브랜드에는 어떤 기준이 필요할까요?'}).waitFor();
+ await publicPages.goto(url,{waitUntil:'domcontentloaded'});
+ await publicPages.locator('.bramer-site-menu').getByRole('link',{name:'기술 소개'}).click();
+ await publicPages.waitForURL('**/#/technology');
+ await publicPages.getByRole('heading',{name:/브랜드의 기준을/}).waitFor();
+ const links=await publicPages.locator('.bramer-docs-sidebar nav a').all();
+ assert.equal(links.length,8,'Technical navigation only displays current information sections');
+ await publicPages.close();
+ pass('header and documentation routes display the correct industry and technology pages');
  const grayscale = (color,label) => {
    const values=color.split(/[^0-9.]+/).filter(Boolean).slice(0,3).map(Number);
    assert.ok(values.length===3 && Math.max(...values)-Math.min(...values)<=2,label+' is not neutral gray: '+color);
