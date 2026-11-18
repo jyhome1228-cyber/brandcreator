@@ -32,6 +32,19 @@ jobs:
       - name: Typecheck
         run: npm run typecheck
 
+      - name: Setup Python for share image generation
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Generate BRAMER social preview PNG
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq fonts-noto-cjk
+          python -m pip install --quiet pillow cairosvg
+          python scripts/generate-og.py
+          test -s public/og-bramer.png
+
       - name: Build for GitHub Pages
         run: npx vite build --base=/
 
