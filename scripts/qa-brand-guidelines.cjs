@@ -142,7 +142,7 @@ try{
     assert.ok(page.includes('MONO #'));
     assert.ok(page.includes(':1'));
     assert.ok(page.includes('실제 컬러 원본 로고'));
-    assert.ok(page.includes('시각'));
+    assert.ok(page.includes('원본 로고'));
   });
   run('명함 SVG의 정확한 출력 규격과 최소 안전 여백',()=>{
     const p=fixture('wide');
