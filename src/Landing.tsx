@@ -1,4 +1,8 @@
-import { useEffect, useRef, useState, type FormEvent, type MouseEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent, type MouseEvent } from 'react';
+import { parseLogoSvg } from './engines/svgParser';
+import { generateV2Pages } from './guideline-system/v2Pages';
+import { localizeGuidelinePages } from './guideline-system/localizeGuideline';
+import type { BrandProject } from './types/guideline';
 
 type LandingProps = { onStart: () => void };
 type BetaForm = { name: string; phone: string; occupation: string };
@@ -23,47 +27,78 @@ const audiences = [
   },
 ] as const;
 
-const samplePages = ['cover', 'logo', 'clearspace', 'color', 'typography', 'application'] as const;
+const bramerSampleBase: BrandProject = {
+  name: '브레이머',
+  englishName: 'BRAMER',
+  description: 'BRAMER는 로고에서 시작해 일관된 브랜드 사용 기준을 만들어가는 브랜드 가이드라인 제작 솔루션입니다.',
+  slogan: 'From Logo to Brand Standards.',
+  year: '2026',
+  logo: null,
+  colors: { primary: '#231815', secondary: '#F1F1F1', accent: '#A6A6A6' },
+  typography: { title: 'Inter', body: 'Pretendard' },
+  rules: { clearSpace: 0.25, minimumPrintMm: 10, minimumDigitalPx: 40 },
+  contact: { personName: '', position: '', phone: '', email: '', website: '', company: 'BRAMER', address: '' },
+};
+
 function GuidelinePreview({ english }: { english: boolean }) {
+  const [sampleProject, setSampleProject] = useState<BrandProject | null>(null);
+  const [sampleError, setSampleError] = useState(false);
   const [index, setIndex] = useState(0);
-  const sampleLogoSrc = window.location.pathname.startsWith('/brandcreator/') ? '/brandcreator/bramer-sample-logo.svg' : '/bramer-sample-logo.svg';
-  const labels = english ? ['Cover', 'Logo', 'Clear space', 'Colors', 'Typography', 'Applications'] : ['표지', '로고', '보호 공간', '컬러', '서체', '응용'];
+  const [playing, setPlaying] = useState(false);
+  useEffect(() => {
+    let cancelled = false;
+    const source = window.location.pathname.startsWith("/brandcreator/") ? "/brandcreator/bramer-sample-logo.svg" : "/bramer-sample-logo.svg";
+    fetch(source)
+      .then(response => { if (!response.ok) throw new Error('Sample logo unavailable'); return response.text(); })
+      .then(svg => {
+        if (!cancelled) {
+          const logo = parseLogoSvg(svg, 'bramer-sample-logo.svg');
+          setSampleProject({
+            ...bramerSampleBase,
+            logo,
+            rules: {
+              clearSpace: logo.analysis.recommendation.clearSpace,
+              minimumPrintMm: logo.analysis.recommendation.minimumPrintMm,
+              minimumDigitalPx: logo.analysis.recommendation.minimumDigitalPx,
+            },
+          });
+        }
+      })
+      .catch(() => { if (!cancelled) setSampleError(true); });
+    return () => { cancelled = true; };
+  }, []);
+  const pages = useMemo(() => sampleProject ? localizeGuidelinePages(generateV2Pages(sampleProject), english ? 'en' : 'ko') : [], [sampleProject, english]);
+  useEffect(() => { if (index >= pages.length && pages.length) setIndex(0); }, [pages.length, index]);
+  useEffect(() => {
+    if (!playing || pages.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const timer = window.setInterval(() => setIndex(previous => (previous + 1) % pages.length), 5500);
+    return () => window.clearInterval(timer);
+  }, [playing, pages.length]);
+  const current = pages[index];
+  const selectedImage = useMemo(() => current ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(current.svg)}` : '', [current]);
   return (
-    <div className="bramer-preview bramer-real-preview" data-reveal>
+    <div className="bramer-preview bramer-engine-preview" data-reveal>
       <div className="bramer-preview-window">
         <div className="bramer-preview-toolbar">
-          <span className="bramer-preview-window-title">{english ? 'BRAMER Brand Guidelines · Sample' : 'BRAMER 브랜드 가이드라인 · 완성형 샘플'}</span>
-          <span>{index + 1} / {samplePages.length}</span>
+          <span className="bramer-preview-window-title">{english ? 'BRAMER · Generated Guideline' : 'BRAMER · 실제 생성된 가이드라인'}</span>
+          <span>{pages.length ? `${index + 1} / ${pages.length}` : '—'} {english ? 'pages · 17 core items' : '페이지 · 17개 제작 항목'}</span>
         </div>
-        <div className="bramer-preview-canvas">
-          <div className="bramer-real-sheet" key={index}>
-            <div className="bramer-real-top"><span>BRAMER.</span><span>BRAND GUIDELINES — 2026</span></div>
-            {index === 0 ? <div className="bramer-real-cover">
-              <img src={sampleLogoSrc} alt="BRAMER" />
-              <strong>Brand Guidelines</strong><p>Visual Identity Standards</p>
-            </div> : index === 1 ? <div className="bramer-real-body"><div className="bramer-real-kicker">01 — LOGO SYSTEM</div><h3>Primary Logo</h3>
-              <div className="bramer-real-logo-field"><img src={sampleLogoSrc} alt="BRAMER primary logo"/></div>
-              <p>{english ? 'Use the primary wordmark consistently across brand communication.' : '브랜드 커뮤니케이션 전반에 기본 워드마크를 일관되게 사용합니다.'}</p></div>
-            : index === 2 ? <div className="bramer-real-body"><div className="bramer-real-kicker">02 — LOGO SYSTEM</div><h3>Clear Space</h3>
-              <div className="bramer-real-clear-field"><div className="bramer-real-clear-border"><img src={sampleLogoSrc} alt="BRAMER clear space example" /></div></div>
-              <p>{english ? 'Keep a consistent protective area around the wordmark.' : '워드마크 주변에 일정한 보호 공간을 확보합니다.'}</p></div>
-            : index === 3 ? <div className="bramer-real-body"><div className="bramer-real-kicker">03 — COLOR SYSTEM</div><h3>Brand Colors</h3>
-              <div className="bramer-real-swatches"><div><span>PRIMARY</span><b>#231815</b></div><div><span>BLACK</span><b>#111111</b></div><div><span>WHITE</span><b>#FFFFFF</b></div></div>
-              <p>{english ? 'Primary color is drawn from the supplied BRAMER vector logo; supporting colors are sample recommendations.' : '기본 색상은 제공된 BRAMER 로고를 기준으로 했으며, 보조 컬러는 샘플 제안입니다.'}</p></div>
-            : index === 4 ? <div className="bramer-real-body"><div className="bramer-real-kicker">04 — TYPOGRAPHY</div><h3>Typography</h3>
-              <div className="bramer-real-type"><strong>Aa Bb Cc</strong><span>BRAMER. — Identity, consistency, clarity.</span><small>HEADLINE / BODY / CAPTION</small></div>
-              <p>{english ? 'A simple editorial hierarchy for brand communication.' : '명확한 정보 위계를 위한 타이포그래피 구성 예시입니다.'}</p></div>
-            : <div className="bramer-real-body"><div className="bramer-real-kicker">05 — APPLICATION</div><h3>Brand Applications</h3>
-              <div className="bramer-real-apps"><div><img src={sampleLogoSrc} alt="BRAMER stationery"/></div><div><img src={sampleLogoSrc} alt="BRAMER card"/></div></div>
-              <p>{english ? 'Example stationery and business card layouts using the supplied logo.' : '제공된 로고를 적용한 명함·서식 응용 예시입니다.'}</p></div>}
-            <div className="bramer-real-bottom"><span>BRAMER — VISUAL IDENTITY SYSTEM</span><span>{String(index+1).padStart(2,'0')}</span></div>
-          </div>
+        <div className="bramer-preview-canvas bramer-engine-canvas" aria-live="polite">
+          {current ? <img className="bramer-engine-page" key={current.id + (english ? '-en' : '-ko')} src={selectedImage} alt={`${current.title} — ${current.subtitle}`} loading="eager" /> : (
+            <p className="bramer-engine-loading" role="status">{sampleError ? (english ? 'The BRAMER sample could not be loaded.' : 'BRAMER 샘플을 불러오지 못했습니다.') : (english ? 'Generating BRAMER sample guideline…' : 'BRAMER 가이드라인을 생성하고 있습니다…')}</p>
+          )}
         </div>
-        <div className="bramer-preview-options bramer-real-tabs" aria-label={english ? 'Select sample page' : '샘플 페이지 선택'}>
-          {samplePages.map((page,i) => <button key={page} type="button" className={i===index?'active':''} aria-pressed={i===index} onClick={() => setIndex(i)}>{labels[i]}</button>)}
-        </div>
+        {pages.length > 0 && <div className="bramer-engine-navigation">
+          <button type="button" onClick={() => { setPlaying(false); setIndex(previous => (previous - 1 + pages.length) % pages.length); }} aria-label={english ? 'Previous page' : '이전 페이지'}>‹</button>
+          <span>{current.title}<small>{current.subtitle}</small></span>
+          <button type="button" onClick={() => { setPlaying(false); setIndex(previous => (previous + 1) % pages.length); }} aria-label={english ? 'Next page' : '다음 페이지'}>›</button>
+          <button className="bramer-engine-play" type="button" onClick={() => setPlaying(value => !value)} aria-pressed={playing}>{playing ? (english ? 'Pause' : '일시정지') : (english ? 'Auto play' : '자동 넘김')}</button>
+        </div>}
+        {pages.length > 0 && <div className="bramer-engine-thumbnails" aria-label={english ? 'Guideline pages' : '가이드라인 페이지 목록'}>
+          {pages.map((page, i) => <button type="button" key={page.id} className={i === index ? 'active' : ''} aria-pressed={i === index} title={page.title} onClick={() => { setPlaying(false); setIndex(i); }}><span>{String(i+1).padStart(2,'0')}</span><small>{page.title}</small></button>)}
+        </div>}
       </div>
-      <p className="bramer-preview-note">{english ? 'Design demonstration based on the provided BRAMER logo. Supporting layouts and colors are illustrative, not approved brand standards.' : '제공된 BRAMER 로고를 활용한 디자인 샘플입니다. 보조 색상과 응용 규정은 확정된 브랜드 규정이 아닌 예시입니다.'}</p>
+      <p className="bramer-preview-note">{english ? 'Generated using the same 17-item BRAMER guideline engine as the editor. This example uses the BRAMER logo and demonstration brand settings; contact fields are intentionally blank.' : '제작 프로그램과 동일한 17개 항목의 BRAMER 생성 엔진으로 만든 결과물입니다. BRAMER 로고와 예시 설정을 사용했으며, 연락처는 입력하지 않았습니다.'}</p>
     </div>
   );
 }
@@ -163,7 +198,7 @@ export default function Landing({ onStart }: LandingProps) {
           <a href="#/guide">{tr("업종별 가이드","Industry guide")}</a>
           <a href="#help">{tr("도움말","Help")}</a>
         </nav>
-        <div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div><button type="button" className="bramer-site-start" onClick={openBeta}>{tr("시작하기","Get started")}</button>
+        <div className="bramer-site-actions"><div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div><button type="button" className="bramer-site-start" onClick={openBeta}>{tr("시작하기","Get started")}</button>
       </div>
     </header>
 
