@@ -1,0 +1,174 @@
+
+/* BRAMER visual refinement: calm, precise, high-contrast editorial UI.
+   This is the final style layer so older landing and workspace rules remain functional. */
+:root{--bramer-ink:#111111;--bramer-copy:#565656;--bramer-muted:#868686;--bramer-hairline:#e8e8e8;--bramer-light:#f7f7f7}
+.bramer-welcome{background:#fff!important;color:#161616;-webkit-font-smoothing:antialiased}
+.bramer-welcome-header{height:76px!important;width:min(1080px,calc(100% - 56px))!important}
+.bramer-welcome-header strong{font-size:18px!important;font-weight:650!important;letter-spacing:-.055em!important}
+.bramer-welcome-header button{font-size:12px!important;color:#888!important}
+.bramer-welcome-header button:hover{color:#222!important}
+.bramer-welcome-body{
+ width:min(690px,calc(100% - 50px))!important;
+ max-width:690px!important;
+ min-height:0!important;
+ margin:auto!important;
+ padding:40px 0 65px!important;
+ align-items:center!important;
+ text-align:center!important;
+}
+.bramer-welcome-eyebrow{color:#888!important;letter-spacing:.075em!important;font-size:11px!important;margin:0 0 23px!important}
+.bramer-welcome-body h1{
+ width:100%;max-width:700px!important;
+ font-size:clamp(26px,2.65vw,36px)!important;
+ font-weight:650!important;line-height:1.4!important;
+ letter-spacing:-.052em!important;
+ margin:0 auto 19px!important;
+ text-align:center!important;word-break:keep-all;
+}
+.bramer-welcome-description{
+ max-width:600px!important;
+ color:#686868!important;
+ font-size:clamp(13px,1.1vw,15px)!important;
+ line-height:1.9!important;
+ letter-spacing:-.018em!important;
+ margin:0 auto!important;
+ text-align:center!important;
+ word-break:keep-all;
+}
+.bramer-welcome-caption{
+ font-size:11px!important;
+ color:#a0a0a0!important;
+ margin:23px auto 0!important;
+}
+.bramer-welcome-bottom{
+ width:min(590px,100%)!important;
+ margin:56px auto 0!important;
+ padding:22px 0 0!important;
+ border-top:1px solid #eaeaea!important;
+ gap:20px;
+ font-size:11px!important;
+}
+.bramer-welcome-next{
+ min-height:42px!important;border-radius:100px!important;
+ padding:0 19px!important;font-size:12px!important;
+ font-weight:550!important;gap:16px!important;
+ letter-spacing:-.015em;
+}
+.bramer-welcome-next span{font-size:15px!important}
+.bramer-welcome-steps{
+ width:100%;max-width:600px;
+ margin:16px auto 0!important;
+ text-align:left!important;
+}
+.bramer-welcome-steps article{
+ grid-template-columns:48px 1fr!important;
+ padding:18px 8px!important;
+ gap:10px!important;
+}
+.bramer-welcome-steps article>span{font-size:11px!important}
+.bramer-welcome-steps h2{
+ font-size:15px!important;
+ font-weight:600!important;
+ margin:0 0 5px!important;
+ letter-spacing:-.025em!important
+}
+.bramer-welcome-steps p{font-size:12px!important;line-height:1.75!important;color:#777!important}
+.bramer-welcome-mark{gap:17px!important;animation:bramer-mark-appear .75s cubic-bezier(.18,.76,.25,1) both}
+.bramer-welcome-mark img{
+ width:clamp(195px,27vw,300px)!important;
+ max-height:90px!important;
+ filter:brightness(0)!important;
+}
+.bramer-welcome-mark p{font-size:11px!important;color:#999!important;margin:0}
+.bramer-coach-dialog{
+ max-width:475px!important;
+ padding:34px 34px 28px!important;
+ border-radius:16px!important;
+ box-shadow:0 20px 80px rgba(0,0,0,.15)!important;
+}
+.bramer-coach-dialog h2{font-size:24px!important;line-height:1.4!important;letter-spacing:-.045em!important;font-weight:650!important}
+.bramer-coach-dialog>p{font-size:13px!important;line-height:1.85!important}
+.bramer-coach-check{background:#f7f7f7!important;border:1px solid #ededed!important;border-radius:9px!important}
+.bramer-coach-primary{border-radius:100px!important}
+.bramer-coach-later{font-size:12px!important}
+/* Site-wide typographic consistency: restrain oversized headings and excessive weight. */
+.bramer-landing,.bramer-dash,.bramer-create-shell{
+ -webkit-font-smoothing:antialiased;
+ text-rendering:optimizeLegibility;
+}
+.bramer-landing .bramer-home-section-heading h2{
+ font-size:clamp(25px,2.45vw,34px)!important;
+ letter-spacing:-.048em!important;
+ line-height:1.43!important;
+ font-weight:650!important;
+}
+.bramer-landing .bramer-home-section-heading p{
+ font-size:13px!important;
+ line-height:1.85!important;
+ letter-spacing:-.01em!important;
+}
+.bramer-landing .bramer-hero-rotation-slide h1{
+ font-size:clamp(33px,3.75vw,51px)!important;
+ font-weight:650!important;
+ letter-spacing:-.055em!important;
+ line-height:1.38!important;
+}
+.bramer-landing .bramer-hero-slide-description{font-size:13px!important;line-height:1.85!important}
+.bramer-landing .bramer-home-primary,
+.bramer-landing .bramer-site-start{
+ border-radius:100px!important;
+ font-weight:600!important;
+ letter-spacing:-.015em!important;
+ box-shadow:none!important;
+}
+.bramer-landing .bramer-preview-window{border-color:#e1e1e1!important}
+.bramer-landing .bramer-home-steps-section .bramer-home-section-heading h2{font-size:clamp(27px,2.6vw,36px)!important}
+.bramer-landing .bramer-process-copy h3{font-weight:620!important}
+.bramer-landing .bramer-home-last-section h2{font-size:clamp(26px,2.4vw,34px)!important;font-weight:650!important}
+.bramer-landing .bramer-help-section .bramer-home-section-heading h2{font-size:clamp(25px,2.45vw,34px)!important}
+.bramer-landing .bramer-site-menu a{font-weight:500!important;letter-spacing:-.015em}
+.bramer-landing .bramer-site-logo{font-weight:650!important}
+.bramer-dash-welcome h1,.bramer-dash-page-title h1{
+ font-size:clamp(24px,2.2vw,32px)!important;
+ line-height:1.35!important;
+ font-weight:650!important;
+ letter-spacing:-.052em!important;
+}
+.bramer-dash-welcome>p,.bramer-dash-page-title>p{line-height:1.8!important}
+.bramer-dash-section h2{font-weight:650!important;letter-spacing:-.035em!important}
+.bramer-dash .bramer-dash-header-start,
+.bramer-dash .bramer-dash-primary{border-radius:100px!important}
+.bramer-create-shell .module-heading h2,
+.bramer-create-shell .setup-panel .module-heading h2{
+ font-size:clamp(20px,2vw,26px)!important;
+ letter-spacing:-.04em!important;
+ line-height:1.35!important;
+ font-weight:650!important;
+}
+.bramer-create-shell .module-heading .module-description{
+ font-size:13px!important;
+ line-height:1.85!important;
+ color:#777!important;
+}
+.bramer-create-shell .setup-main{min-width:0}
+.bramer-create-shell input,.bramer-create-shell select,.bramer-dash input,.bramer-dash select{
+ border-radius:8px;
+}
+.bramer-create-shell .button.primary,.bramer-create-shell .bramer-dash-header-start{border-radius:100px!important}
+@media(max-width:760px){
+ .bramer-welcome-header{width:calc(100% - 34px)!important;height:66px!important}
+ .bramer-welcome-body{width:calc(100% - 40px)!important;padding:35px 0 60px!important}
+ .bramer-welcome-body h1{font-size:clamp(25px,5.5vw,32px)!important;line-height:1.45!important}
+ .bramer-welcome-description{font-size:13px!important;line-height:1.85!important}
+ .bramer-welcome-caption{font-size:11px!important}
+ .bramer-welcome-bottom{margin-top:38px!important}
+ .bramer-welcome-mark img{width:min(240px,60vw)!important}
+ .bramer-coach-dialog{padding:29px 22px 23px!important}
+ .bramer-landing .bramer-hero-rotation-slide h1{font-size:clamp(28px,6vw,39px)!important}
+ .bramer-landing .bramer-home-section-heading h2{font-size:clamp(24px,5vw,30px)!important}
+ .bramer-landing .bramer-home-steps-section .bramer-home-section-heading h2{font-size:clamp(25px,5vw,31px)!important}
+ .bramer-create-shell .module-heading h2,.bramer-create-shell .setup-panel .module-heading h2{font-size:21px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .bramer-welcome-mark,.bramer-welcome-body{animation:none!important}
+}
