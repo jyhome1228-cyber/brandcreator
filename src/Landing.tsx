@@ -8,14 +8,14 @@ const initialBetaForm: BetaForm = { name: '', userId: '', phone: '', occupation:
 
 const audiences = [
   {
-    key: 'brand', audience: '브랜드 운영 기업',
-    titleTop: '로고는 있는데,', titleBottom: '브랜드 기준이 없다면.',
-    description: '브랜드 운영에 필요한 로고 사용 규정, 컬러, 서체와 응용 기준을 쉽고 체계적으로 정리합니다.',
-  },
-  {
     key: 'designer', audience: '브랜드 디자이너',
     titleTop: '로고는 완성했는데,', titleBottom: '가이드라인 전달이 막막하다면.',
     description: '디자인 이후 가이드라인의 제작과 편집, 전달 과정을 더 편리하게 이어갈 수 있도록 돕습니다.',
+  },
+  {
+    key: 'brand', audience: '브랜드 운영 기업',
+    titleTop: '로고는 있는데,', titleBottom: '브랜드 기준이 없다면.',
+    description: '브랜드 운영에 필요한 로고 사용 규정, 컬러, 서체와 응용 기준을 쉽고 체계적으로 정리합니다.',
   },
 ] as const;
 
