@@ -172,3 +172,54 @@
 @media(prefers-reduced-motion:reduce){
  .bramer-welcome-mark,.bramer-welcome-body{animation:none!important}
 }
+
+
+/* Refined BRAMER welcome experience. Every element enters in a readable sequence. */
+.bramer-welcome{position:relative;isolation:isolate;overflow:hidden;--welcome-pointer-x:50%;--welcome-pointer-y:50%;--welcome-shift-x:0px;--welcome-shift-y:0px}
+.bramer-welcome::before{content:"";position:fixed;z-index:-1;inset:0;pointer-events:none;background:radial-gradient(480px circle at var(--welcome-pointer-x) var(--welcome-pointer-y),rgba(0,0,0,.028),transparent 75%);transition:background-position .25s ease}
+.bramer-welcome .bramer-welcome-body{width:min(920px,calc(100% - 48px))!important;max-width:920px!important;padding:35px 0 62px!important;align-items:center!important;justify-content:center!important;text-align:center!important;animation:none!important}
+.bramer-welcome .bramer-welcome-eyebrow{font-size:14px!important;font-weight:600!important;letter-spacing:.115em!important;color:#888!important;line-height:1.5!important;margin:0 0 24px!important;animation:bramer-rise-in .7s .04s cubic-bezier(.22,1,.36,1) both}
+.bramer-welcome .bramer-welcome-body h1{font-size:clamp(27px,2.65vw,36px)!important;line-height:1.42!important;font-weight:650!important;letter-spacing:-.055em!important;margin:0 auto 22px!important;text-align:center!important;max-width:820px!important;animation:bramer-rise-in .8s .18s cubic-bezier(.22,1,.36,1) both}
+.bramer-welcome .bramer-welcome-introduction{max-width:740px;width:100%;display:flex;flex-direction:column;align-items:center;text-align:center;transform:translate(var(--welcome-shift-x),var(--welcome-shift-y));transition:transform .65s cubic-bezier(.22,1,.36,1)}
+.bramer-welcome .bramer-welcome-description{max-width:610px!important;font-size:14px!important;line-height:1.93!important;letter-spacing:-.018em!important;animation:bramer-rise-in .83s .36s cubic-bezier(.22,1,.36,1) both}
+.bramer-welcome .bramer-welcome-caption{display:none!important}
+.bramer-welcome .bramer-welcome-bottom{width:100%!important;border:0!important;margin:42px auto 0!important;padding:0!important;display:flex!important;justify-content:center!important;align-items:center!important;animation:bramer-rise-in .7s .86s cubic-bezier(.22,1,.36,1) both}
+.bramer-welcome .bramer-welcome-bottom>span{display:none!important}
+.bramer-welcome .bramer-welcome-next{min-height:44px!important;padding:0 21px!important;gap:15px!important;border-radius:999px!important;font-size:12px!important;transition:background .2s ease,transform .35s cubic-bezier(.22,1,.36,1)!important}
+.bramer-welcome .bramer-welcome-next:hover{transform:translateY(-2px);background:#2c2c2c!important}
+.bramer-welcome .bramer-welcome-walkthrough{width:100%;max-width:880px;display:flex;flex-direction:column;align-items:center}
+.bramer-welcome .bramer-welcome-step-1 h1{font-size:clamp(25px,2.4vw,33px)!important;margin-bottom:34px!important}
+.bramer-welcome .bramer-welcome-steps{width:100%!important;max-width:880px!important;margin:5px auto 0!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;text-align:center!important}
+.bramer-welcome .bramer-welcome-step-card{display:flex!important;flex-direction:column!important;align-items:center!important;justify-content:flex-start!important;gap:0!important;text-align:center!important;padding:31px 19px 25px!important;border:1px solid #eaeaea!important;background:rgba(250,250,250,.72)!important;border-radius:14px!important;min-height:232px!important;transform:translateY(22px);opacity:0;transition:background .3s,border-color .3s,box-shadow .3s}
+.bramer-welcome .bramer-welcome-step-card:hover{background:#fff!important;border-color:#d6d6d6!important;box-shadow:0 14px 30px rgba(0,0,0,.045)}
+.bramer-welcome .bramer-welcome-step-card:nth-child(1){animation:bramer-rise-in .72s .4s cubic-bezier(.22,1,.36,1) forwards}
+.bramer-welcome .bramer-welcome-step-card:nth-child(2){animation:bramer-rise-in .72s .65s cubic-bezier(.22,1,.36,1) forwards}
+.bramer-welcome .bramer-welcome-step-card:nth-child(3){animation:bramer-rise-in .72s .9s cubic-bezier(.22,1,.36,1) forwards}
+.bramer-welcome .bramer-welcome-step-symbol{width:47px;height:47px;display:flex;align-items:center;justify-content:center;color:#171717;margin-bottom:13px}
+.bramer-welcome .bramer-welcome-step-symbol svg{width:38px;height:38px}
+.bramer-welcome .bramer-welcome-step-number{display:block!important;font-size:10px!important;letter-spacing:.08em!important;color:#a5a5a5!important;margin:0 0 13px!important}
+.bramer-welcome .bramer-welcome-step-card h2{font-size:15px!important;font-weight:650!important;letter-spacing:-.045em!important;line-height:1.5!important;margin:0 0 12px!important;max-width:100%}
+.bramer-welcome .bramer-welcome-step-card p{font-size:11.5px!important;line-height:1.75!important;color:#777!important;word-break:keep-all;max-width:220px}
+.bramer-welcome .bramer-welcome-step-1 .bramer-welcome-bottom{animation-delay:1.24s!important;margin-top:32px!important}
+.bramer-welcome .bramer-welcome-mark img{transform:translate(var(--welcome-shift-x),var(--welcome-shift-y));transition:transform .6s cubic-bezier(.22,1,.36,1)}
+@keyframes bramer-rise-in{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+@media(max-width:740px){
+ .bramer-welcome .bramer-welcome-body{width:calc(100% - 36px)!important;padding:34px 0 55px!important}
+ .bramer-welcome .bramer-welcome-eyebrow{font-size:12px!important;margin-bottom:21px!important}
+ .bramer-welcome .bramer-welcome-body h1{font-size:clamp(25px,5.5vw,32px)!important}
+ .bramer-welcome .bramer-welcome-description{font-size:13px!important;line-height:1.9!important}
+ .bramer-welcome .bramer-welcome-steps{grid-template-columns:1fr!important;max-width:430px!important;gap:10px!important}
+ .bramer-welcome .bramer-welcome-step-card{min-height:0!important;padding:18px!important}
+ .bramer-welcome .bramer-welcome-step-symbol{width:39px;height:39px;margin-bottom:7px}
+ .bramer-welcome .bramer-welcome-step-symbol svg{width:33px;height:33px}
+ .bramer-welcome .bramer-welcome-step-number{margin-bottom:7px!important}
+ .bramer-welcome .bramer-welcome-step-card h2{margin-bottom:6px!important;font-size:14px!important}
+ .bramer-welcome .bramer-welcome-step-card p{max-width:310px!important}
+ .bramer-welcome .bramer-welcome-bottom{margin-top:25px!important}
+ .bramer-welcome .bramer-welcome-step-1 .bramer-welcome-bottom{margin-top:24px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .bramer-welcome::before{display:none!important}
+ .bramer-welcome .bramer-welcome-body :is(.bramer-welcome-eyebrow,h1,.bramer-welcome-description,.bramer-welcome-bottom,.bramer-welcome-step-card){animation:none!important;opacity:1!important;transform:none!important}
+ .bramer-welcome .bramer-welcome-introduction,.bramer-welcome .bramer-welcome-mark img{transform:none!important;transition:none!important}
+}
