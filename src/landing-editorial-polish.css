@@ -287,3 +287,74 @@
 @media(prefers-reduced-motion:reduce){
   .bramer-landing .bramer-help-grid article{transition:none;}
 }
+
+/* Audience-specific hero art, one reference image per slide. */
+.bramer-landing .bramer-home-hero{
+  min-height:min(690px,calc(100svh - 74px))!important;
+  padding:65px 24px 90px!important;
+}
+.bramer-landing .bramer-home-hero-content{
+  transform:translateY(-24px);
+}
+.bramer-landing .bramer-home-overline{
+  margin:0 0 9px!important;
+}
+.bramer-landing .bramer-hero-rotation{
+  margin-bottom:22px!important;
+}
+.bramer-landing .bramer-hero-rotation-stage{
+  min-height:270px!important;
+}
+.bramer-landing .bramer-hero-image{
+  inset:0!important;
+  width:100%!important;
+  height:100%!important;
+  opacity:.52!important;
+  background-size:cover;
+  filter:grayscale(1) brightness(.9) contrast(1.04);
+  -webkit-mask-image:none!important;
+  mask-image:none!important;
+  animation:bramer-image-fade .65s ease both;
+}
+.bramer-landing .bramer-hero-image-left{background-position:50% 49%;}
+.bramer-landing .bramer-hero-image-right{
+  display:block!important;
+  background-position:50% 49%;
+}
+.bramer-landing .bramer-home-hero::before{
+  background:
+    linear-gradient(90deg,rgba(8,8,8,.36) 0%,rgba(8,8,8,.46) 32%,rgba(8,8,8,.55) 50%,rgba(8,8,8,.46) 68%,rgba(8,8,8,.36) 100%),
+    linear-gradient(180deg,rgba(8,8,8,.18),rgba(8,8,8,.36) 74%,rgba(8,8,8,.68))!important;
+}
+.bramer-landing .bramer-hero-rotation-slide h1{
+  text-shadow:0 2px 20px rgba(0,0,0,.75);
+}
+.bramer-landing .bramer-hero-slide-description{
+  text-shadow:0 2px 12px rgba(0,0,0,.85);
+}
+@keyframes bramer-image-fade{
+  from{opacity:0;}
+  to{opacity:.52;}
+}
+@media(max-width:760px){
+  .bramer-landing .bramer-home-hero{
+    min-height:590px!important;
+    padding:65px 18px 73px!important;
+  }
+  .bramer-landing .bramer-home-hero-content{
+    transform:translateY(-12px);
+  }
+  .bramer-landing .bramer-hero-rotation-stage{
+    min-height:295px!important;
+  }
+  .bramer-landing .bramer-hero-image{
+    opacity:.4!important;
+    background-position:center center;
+  }
+  .bramer-landing .bramer-home-hero::before{
+    background:linear-gradient(180deg,rgba(7,7,7,.5),rgba(7,7,7,.65) 76%,rgba(7,7,7,.77))!important;
+  }
+}
+@media(prefers-reduced-motion:reduce){
+  .bramer-landing .bramer-hero-image{animation:none;}
+}
