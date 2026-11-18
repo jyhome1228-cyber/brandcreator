@@ -46,19 +46,31 @@ const fittedText = (value:string,x:number,y:number,maxWidth:number,fontSize:numb
   const v=String(value||'').trim();
   if(!v) return '';
   const estimated=[...v].reduce((sum,ch)=>sum+(/[가-힣\u3040-\u30ff\u4e00-\u9fff]/u.test(ch)?1:/[A-Z0-9]/.test(ch)?.66:/\s/.test(ch)?.33:.53),0);
-  const size=Math.max(16,Math.min(fontSize,Math.floor(maxWidth/Math.max(1,estimated))));
+  const size=Math.max(10,Math.min(fontSize,Math.floor(maxWidth/Math.max(1,estimated*1.08))));
   return `<text x="${x}" y="${y}" font-family="Pretendard,Arial,sans-serif" font-size="${size}" font-weight="${weight}" fill="${fill}">${esc(v)}</text>`;
 };
 const wrapCopy = (value:string,maxUnits:number,maxLines:number):string[] => {
-  const chunks:string[]=[];
-  let line='',count=0;
-  for(const ch of [...String(value||'').trim()]){
-    const unit=/[가-힣\u3040-\u30ff\u4e00-\u9fff]/u.test(ch)?2:1;
-    if(count+unit>maxUnits && line){chunks.push(line.trim());line='';count=0;if(ch===' ')continue;}
-    line+=ch;count+=unit;
+  const content=String(value||'').trim().replace(/\\s+/g,' ');
+  if(!content)return [];
+  const units=(str:string)=>[...str].reduce((sum,ch)=>sum+(/[가-힣\\u3040-\\u30ff\\u4e00-\\u9fff]/u.test(ch)?2:1),0);
+  const result:string[]=[];
+  let current='';
+  const push=()=>{if(current.trim())result.push(current.trim());current='';};
+  for(const word of content.split(' ')){
+    const candidate=current?current+' '+word:word;
+    if(units(candidate)<=maxUnits){current=candidate;continue;}
+    if(current)push();
+    if(units(word)<=maxUnits){current=word;continue;}
+    // Break only when an individual token cannot fit within the text frame.
+    let part='';
+    for(const char of word){
+      if(part&&units(part+char)>maxUnits){current=part;push();part='';}
+      part+=char;
+    }
+    current=part;
   }
-  if(line.trim())chunks.push(line.trim());
-  return chunks.slice(0,maxLines);
+  push();
+  return result.slice(0,maxLines);
 };
 const guide = (project:BrandProject,title:string,subtitle:string,content:string):string => `<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 2970 2100"><rect width="2970" height="2100" fill="#fff"/>${fittedText(title,110,140,880,75,editorialInk(project.colors.primary),700)}${fittedText(subtitle,1120,140,1720,31,'#555555',500)}<path d="M110 215H2860" stroke="#D6D6D6" stroke-width="3"/>${content}<path d="M110 1900H2860" stroke="#D6D6D6" stroke-width="3"/>${fittedText(project.englishName || project.name,110,1965,1080,28,'#666666')}<text x="2860" y="1965" text-anchor="end" font-family="Arial,sans-serif" font-size="24" fill="#888">BRAMER · BRAND GUIDELINES</text></svg>`;
 function visibleLogoBox(asset: LogoAsset) {
@@ -94,8 +106,8 @@ const logo = (project:BrandProject,x:number,y:number,w:number,h:number,mono?:str
   const filter=effective?`<filter id="${filterId}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 ${effective==='#FFFFFF'?1:0} 0 0 0 0 ${effective==='#FFFFFF'?1:0} 0 0 0 0 ${effective==='#FFFFFF'?1:0} 0 0 0 1 0"/></filter>`:'';
   return `<svg x="${ox}" y="${oy}" width="${fitW}" height="${fitH}" viewBox="${v.x} ${v.y} ${v.width} ${v.height}" preserveAspectRatio="xMidYMid meet"><defs>${filter}</defs><g${effective?` filter="url(#${filterId})"`:''}>${asset.inner}</g></svg>`;
 };
-const lines = (items:Array<[string,string]>, x:number, y:number, gap=125):string => items.filter(([,value])=>value?.trim()).map(([key,value],i)=>`<text x="${x}" y="${y+i*gap}" fill="#777" font-size="24" font-family="Arial,sans-serif">${esc(key)}</text><text x="${x}" y="${y+42+i*gap}" fill="#171717" font-size="35" font-family="Arial,sans-serif">${esc(value.slice(0,75))}</text>`).join('');
-const note = (text:string,y=1700):string=>`<text x="110" y="${y}" fill="#777" font-family="Arial,sans-serif" font-size="29">${esc(text)}</text>`;
+const lines = (items:Array<[string,string]>, x:number, y:number, gap=125):string => items.filter(([,value])=>value?.trim()).map(([key,value],i)=>`${fittedText(key,x,y+i*gap,900,24,'#777')}${fittedText(value,x,y+42+i*gap,1250,35,'#171717')}`).join('');
+const note = (text:string,y=1700):string=>fittedText(text,110,y,2720,29,'#777');
 const missing = (text:string)=>`<text x="110" y="1770" fill="#B45A2A" font-size="28" font-family="Arial,sans-serif">추가 입력 필요: ${esc(text)}</text>`;
 const appPage=(id:string,name:string,subtitle:string,project:BrandProject,markup:string):GuidelinePage=>({id,section:'application',title:name,subtitle,svg:guide(project,name,subtitle,markup)});
 const baseCard=(project:BrandProject,reverse=false):string=>{
