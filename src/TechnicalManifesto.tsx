@@ -3,7 +3,7 @@ import BramerLogo from './components/BramerLogo';
 
 type Props={onHome:()=>void;onBeta:()=>void; english?:boolean};
 const chapters=[
- {id:'manifesto',label:'BRAMER 매니페스토'},
+ {id:'overview',label:'BRAMER 소개'},
  {id:'problem',label:'문제 정의'},
  {id:'principles',label:'설계 원칙'},
  {id:'architecture',label:'기술 구조'},
@@ -20,7 +20,7 @@ const core=[['Logo System','기본 로고, 그리드, 보호 공간, 최소 크�
  ['Brand Expression','브랜드 소개와 공식 슬로건, 핵심 메시지'],
  ['Applications','명함, 스티커, A4 서식, 소봉투·대봉투']];
 export default function TechnicalManifesto({onHome,onBeta}:Props){
- const [active,setActive]=useState('manifesto');
+ const [active,setActive]=useState('overview');
  useEffect(()=>{
    const observer=new IntersectionObserver(entries=>{
      entries.filter(e=>e.isIntersecting).sort((a,b)=>a.boundingClientRect.top-b.boundingClientRect.top).forEach(e=>setActive(e.target.id));
@@ -35,16 +35,16 @@ export default function TechnicalManifesto({onHome,onBeta}:Props){
    </header>
    <div className="bramer-docs-shell">
      <aside className="bramer-docs-sidebar" aria-label="문서 목차">
-       <div className="bramer-docs-side-head"><strong>기술 소개</strong><small>BRAMER / BETA 2026</small></div>
-       <nav>{chapters.map((item,i)=><a key={item.id} href={'#'+item.id} className={active===item.id?'active':''}><span>{String(i+1).padStart(2,'0')}</span>{item.label}</a>)}</nav>
-       <div className="bramer-docs-side-bottom"><p>로고에서 브랜드의 기준으로.</p><button type="button" onClick={onHome}>홈페이지로 돌아가기</button></div>
+       <div className="bramer-docs-side-head"><strong>BRAMER 기술 소개</strong></div>
+       <nav>{chapters.map((item,i)=><a key={item.id} href={'#'+item.id} className={active===item.id?'active':''}>{item.label}</a>)}</nav>
+       <div className="bramer-docs-side-bottom"><p>From Logo to Brand Standards.</p><button type="button" onClick={onHome}>홈페이지로 돌아가기</button></div>
      </aside>
      <main className="bramer-docs-main">
-       <section id="manifesto" className="bramer-docs-hero">
-         <div className="bramer-docs-kicker">BRAND IDENTITY GUIDELINE SYSTEM</div>
-         <h1>브랜드의 기준을,<br/>누구나 이해하고 활용할 수 있도록.</h1>
-         <p className="bramer-docs-lead">BRAMER는 로고를 완성한 이후부터 시작되는 디자인 운영의 문제를 다룹니다. 좋은 아이덴티티는 하나의 시안으로 완성되지 않습니다. 그것이 다양한 사람과 매체를 거치더라도 같은 의미와 질서를 유지할 때 비로소 브랜드의 자산이 됩니다.</p>
-         <p>우리는 브랜드 가이드라인을 단순한 납품 문서가 아니라, 디자이너의 의도와 운영자의 판단을 이어 주는 실행 가능한 규칙의 집합으로 바라봅니다. BRAMER는 그 규칙을 구성하고 검토하고 전달하는 과정을 더 구조적이고 접근하기 쉽게 만드는 제작 환경을 지향합니다.</p>
+       <section id="overview" className="bramer-docs-hero">
+         <div className="bramer-docs-kicker">BRAMER · BRAND GUIDELINE SYSTEM</div>
+         <h1>브랜드의 기준을,<br/>더 명확하게.</h1>
+         <p className="bramer-docs-lead">하나의 로고에서 일관된 브랜드 경험까지. BRAMER는 브랜드가 만들어진 이후의 운영 기준을 정리하는 디자인 도구입니다.</p>
+         <p>원본 SVG에서 브랜드의 사용 규칙을 구성하고, 명함과 서식까지 하나의 시스템으로 연결합니다. 설계의 기준은 분명하게, 제작 과정은 단순하게.</p>
          <div className="bramer-docs-metrics"><div><strong>17</strong><span>기본 제작 항목</span></div><div><strong>26</strong><span>현재 구성 페이지</span></div><div><strong>SVG / PDF</strong><span>주요 결과물 형식</span></div></div>
        </section>
        <section id="problem" className="bramer-docs-section">
