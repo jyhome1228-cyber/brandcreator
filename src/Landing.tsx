@@ -4,7 +4,7 @@ import { generateV2Pages } from './guideline-system/v2Pages';
 import { localizeGuidelinePages } from './guideline-system/localizeGuideline';
 import type { BrandProject } from './types/guideline';
 
-type LandingProps = { onStart: () => void };
+type LandingProps = { onStart: (newRegistration?: boolean) => void };
 type BetaForm = { name: string; phone: string; occupation: string };
 const REGISTRATION_KEY = 'bramer-beta-session-v1';
 const BETA_END = '2026년 12월 31일';
@@ -205,11 +205,11 @@ export default function Landing({ onStart }: LandingProps) {
     setSessionRegistered(true);
     setBetaError('');
     setBetaOpen(false);
-    onStart();
+    onStart(true);
   };
   const enterRegistered = () => {
     setBetaOpen(false);
-    onStart();
+    onStart(false);
   };
   useEffect(() => {
     if (rollPaused || betaOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
