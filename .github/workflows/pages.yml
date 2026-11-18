@@ -33,7 +33,7 @@ jobs:
         run: npm run typecheck
 
       - name: Build for GitHub Pages
-        run: npx vite build --base=/brandcreator/
+        run: npx vite build --base=/
 
       - name: Setup Pages
         uses: actions/configure-pages@v5
