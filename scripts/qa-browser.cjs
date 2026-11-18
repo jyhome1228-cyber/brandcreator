@@ -27,6 +27,7 @@ const logo='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 260"><path 
 let browser;
 let count=0;
 const pass=label=>{count++;console.log('PASS browser',label)};
+async function main(){
 try{
  await ready();
  browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
@@ -146,3 +147,6 @@ try{
  await browser?.close();
  vite.kill('SIGTERM');
 }
+
+}
+main().catch(error=>{console.error(error);process.exitCode=1;});
