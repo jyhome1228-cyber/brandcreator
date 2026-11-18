@@ -86,9 +86,13 @@ const logo = (project:BrandProject,x:number,y:number,w:number,h:number,mono?:str
   const ratio=v.width/v.height;
   const fitW=Math.min(w,h*ratio), fitH=fitW/ratio;
   const ox=x+(w-fitW)/2,oy=y+(h-fitH)/2;
-  const filterId=`bm-${Math.round(x)}-${Math.round(y)}`;
-  const filter=mono?`<filter id="${filterId}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 ${mono==='#FFFFFF'?1:0} 0 0 0 0 ${mono==='#FFFFFF'?1:0} 0 0 0 0 ${mono==='#FFFFFF'?1:0} 0 0 0 1 0"/></filter>`:'';
-  return `<svg x="${ox}" y="${oy}" width="${fitW}" height="${fitH}" viewBox="${v.x} ${v.y} ${v.width} ${v.height}" preserveAspectRatio="xMidYMid meet"><defs>${filter}</defs><g${mono?` filter="url(#${filterId})"`:''}>${asset.inner}</g></svg>`;
+  // Keep the original artwork on light pages unless every detected logo
+  // color is too pale to read there. Do not turn a multicolor logo monochrome
+  // merely because one secondary color is light.
+  const effective = mono || (asset.colors.length > 0 && asset.colors.every(color => contrastRatio(color,'#FFFFFF') < 3) ? '#111111' : undefined);
+  const filterId=`bm-${Math.round(x)}-${Math.round(y)}-${effective==='#FFFFFF'?'w':'b'}`;
+  const filter=effective?`<filter id="${filterId}" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 ${effective==='#FFFFFF'?1:0} 0 0 0 0 ${effective==='#FFFFFF'?1:0} 0 0 0 0 ${effective==='#FFFFFF'?1:0} 0 0 0 1 0"/></filter>`:'';
+  return `<svg x="${ox}" y="${oy}" width="${fitW}" height="${fitH}" viewBox="${v.x} ${v.y} ${v.width} ${v.height}" preserveAspectRatio="xMidYMid meet"><defs>${filter}</defs><g${effective?` filter="url(#${filterId})"`:''}>${asset.inner}</g></svg>`;
 };
 const lines = (items:Array<[string,string]>, x:number, y:number, gap=125):string => items.filter(([,value])=>value?.trim()).map(([key,value],i)=>`<text x="${x}" y="${y+i*gap}" fill="#777" font-size="24" font-family="Arial,sans-serif">${esc(key)}</text><text x="${x}" y="${y+42+i*gap}" fill="#171717" font-size="35" font-family="Arial,sans-serif">${esc(value.slice(0,75))}</text>`).join('');
 const note = (text:string,y=1700):string=>`<text x="110" y="${y}" fill="#777" font-family="Arial,sans-serif" font-size="29">${esc(text)}</text>`;
