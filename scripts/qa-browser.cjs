@@ -264,6 +264,8 @@ try{
  pass('all four workspace pages align to identical container, content and sidebar widths');
  // Mobile viewport tests: global menus, beta modal and guide navigation.
  const mobile=await browser.newContext({viewport:{width:390,height:844},acceptDownloads:true,isMobile:true,deviceScaleFactor:1});
+ // Mobile workspace layout is tested in an explicitly enrolled beta session.
+ await mobile.addInitScript(() => sessionStorage.setItem('bramer-beta-session-v1','active'));
  const mp=await mobile.newPage();
  const mobileErrors=[];
  mp.on('pageerror',err=>mobileErrors.push(err.message));
