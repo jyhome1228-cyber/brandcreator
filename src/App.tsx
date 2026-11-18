@@ -447,7 +447,7 @@ export default function App() {
   if (!hydrated && (mode==='setup' || mode==='editor')) return <div className="bramer-loading-project" role="status">저장된 프로젝트 확인 중...</div>;
   // This client-side guard prevents accidental pre-registration workspace access.
   // Browser-session access is not a substitute for backend authorization.
-  if (!hasBetaSession() && ['dashboard','setup','editor','projects','help'].includes(mode)) {
+  if (!hasBetaSession() && ['dashboard','setup','editor','projects'].includes(mode)) {
     return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
   }
   if (mode === 'manifesto') return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
@@ -463,9 +463,9 @@ export default function App() {
     view={mode}
     onNavigate={navigateWorkspace}
     onHome={goHome}
-    onProjects={()=>void openProjectLibrary()}
+    onProjects={()=>{if(!hasBetaSession()){enterBetaFromManifesto();return;}void openProjectLibrary();}}
     onHelp={openHelp}
-    onCreate={openCreate}
+    onCreate={(nextIndustry) => { if(!hasBetaSession()) {enterBetaFromManifesto();return;} openCreate(nextIndustry); }}
     onContinue={() => { window.location.hash = '/create'; setMode('setup'); }}
     onImport={event => void restoreProject(event)}
     currentProject={project.name.trim() || undefined}
