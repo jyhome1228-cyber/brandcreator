@@ -181,30 +181,54 @@ const embedApplication=(svg:string,x:number,y:number,width:number,height:number)
 const dimensionH=(x:number,y:number,w:number,labelText:string):string=>`<path d="M${x} ${y-11}v22M${x+w} ${y-11}v22M${x} ${y}H${x+w}" stroke="#909090" stroke-width="2" fill="none"/><text x="${x+w/2}" y="${y+40}" font-family="Arial,sans-serif" font-size="26" fill="#444" text-anchor="middle">${labelText}</text>`;
 const dimensionV=(x:number,y:number,h:number,labelText:string):string=>`<path d="M${x-11} ${y}h22M${x-11} ${y+h}h22M${x} ${y}V${y+h}" stroke="#909090" stroke-width="2" fill="none"/><text x="${x+18}" y="${y+h/2}" font-family="Arial,sans-serif" font-size="24" fill="#444">${labelText}</text>`;
 
+
 export function generateApplicationPages(project:BrandProject):GuidelinePage[] {
-  const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' };
-  const p=hex(project.colors.primary), fg=inkOn(p);
-  return [
-    appPage('v2-14-business-card','Business Card','명함 앞면 / 뒷면',project,
-      `<g transform="translate(170 480)">${baseCard(project)}</g>
-        <g transform="translate(1480 480)">${baseCard(project,true)}</g>
-        <text x="170" y="1050" fill="#777" font-family="Arial,sans-serif" font-size="27">FRONT · BRAND LOGO</text>
-        <text x="1480" y="1050" fill="#777" font-family="Arial,sans-serif" font-size="27">BACK · CONTACT INFORMATION</text>
-        <path d="M170 1200H2790" stroke="#E0E0E0" stroke-width="2"/>
-        ${fittedText('90 × 50 mm',170,1300,540,40,'#252525',600)}
-        ${fittedText(c.personName||'이름 미입력',170,1400,1100,34,'#252525')}
-        ${fittedText(c.position||'직책 미입력',170,1470,1100,28,'#666666')}
-        ${fittedText(c.phone||'연락처 미입력',1480,1370,1130,30,'#252525')}
-        ${fittedText(c.email||'이메일 미입력',1480,1450,1130,30,'#252525')}
-        ${note('SVG는 편집 가능한 디자인 원본입니다. 인쇄 전 재단·도련·서체 검수가 필요합니다.',1760)}`),
-    appPage('v2-15-logo-sticker','Logo Sticker','원형 / 사각형',project,
-      `<circle cx="830" cy="940" r="400" fill="${p}"/>${logo(project,520,810,620,260,fg)}<rect x="1610" y="540" width="800" height="800" fill="${p}"/>${logo(project,1700,810,620,260,fg)}<text x="630" y="1450" fill="#777" font-size="30">ROUND · 50mm</text><text x="1790" y="1450" fill="#777" font-size="30">SQUARE · 50mm</text>${note('스티커 SVG는 예시 규격입니다. 인쇄 전 도무송선 및 도련을 별도로 확인하세요.')}`),
-    appPage('v2-16-letterhead','Letterhead','A4 공식 서식',project,
-      `<rect x="780" y="315" width="1290" height="1430" fill="#fff" stroke="#D2D2D2" stroke-width="3"/>${logo(project,850,385,350,115)}<line x1="855" y1="560" x2="2000" y2="560" stroke="${p}" stroke-width="5"/><text x="855" y="690" font-size="46" font-family="Arial,sans-serif" fill="#171717">${esc(project.name)}</text><text x="855" y="770" font-size="26" font-family="Arial,sans-serif" fill="#777">Official document template</text><line x1="855" y1="1490" x2="2000" y2="1490" stroke="#ddd" stroke-width="3"/><text x="855" y="1545" font-size="22" font-family="Arial,sans-serif" fill="#555">${esc((c.company||project.name).slice(0,55))}</text><text x="855" y="1590" font-size="20" font-family="Arial,sans-serif" fill="#777">${esc((c.address||'주소 입력 필요').slice(0,75))}</text><text x="855" y="1635" font-size="20" font-family="Arial,sans-serif" fill="#777">${esc([c.phone,c.email].filter(Boolean).join(' · ').slice(0,85))}</text>${note('A4 210 × 297mm · 문서 본문은 실제 업무에 맞게 작성하세요.')}`),
-    appPage('v2-17-envelope','Envelope','소봉투 / 대봉투',project,
-      `<rect x="210" y="480" width="1060" height="560" fill="#fff" stroke="#ccc" stroke-width="3"/><path d="M210 480L740 790L1270 480" stroke="#DDD" stroke-width="3" fill="none"/>${logo(project,300,800,370,105)}<rect x="1430" y="470" width="1330" height="850" fill="#fff" stroke="#ccc" stroke-width="3"/><rect x="1430" y="470" width="1330" height="115" fill="${p}"/>${logo(project,1510,655,450,150)}<text x="1510" y="1000" fill="#333" font-size="31" font-family="Arial,sans-serif">${esc((c.company||project.name).slice(0,35))}</text><text x="1510" y="1070" fill="#777" font-size="25" font-family="Arial,sans-serif">${esc((c.address||'주소 입력 필요').slice(0,60))}</text><text x="290" y="1130" fill="#777" font-size="27">SMALL ENVELOPE · MOCKUP</text><text x="1510" y="1400" fill="#777" font-size="27">LARGE ENVELOPE · MOCKUP</text>${note('봉투는 배치 예시입니다. 실제 제작에서는 인쇄소 전개도 규격을 확인하세요.')}`)
-  ];
+ const c=contactInfo(project),p=hex(project.colors.primary),fg=inkOn(p);
+ const front=generateBusinessCardSvg(project),back=generateBusinessCardSvg(project,true);
+ const stationery=generateLetterheadSvg(project);
+ const smallEnvelope=generateEnvelopeSvg(project,'small'),largeEnvelope=generateEnvelopeSvg(project,'large');
+ return [
+ appPage('v2-14-business-card','Business Card','90 × 50 mm · front and back',project,
+  `${embedApplication(front,185,485,1195,664)}
+   ${embedApplication(back,1530,485,1195,664)}
+   ${dimensionH(185,1188,1195,'90 mm')}
+   ${dimensionV(1415,485,664,'50 mm')}
+   ${dimensionH(1530,1188,1195,'90 mm')}
+   ${dimensionV(2760,485,664,'50 mm')}
+   ${fittedText('FRONT · PRIMARY LOGO',185,1330,1200,36,'#444444',600)}
+   ${fittedText('BACK · CONTACT DETAILS',1530,1330,1150,36,'#444444',600)}
+   ${fittedText(c.personName||'이름 입력 필요',185,1440,1150,36,'#171717',650)}
+   ${fittedText(c.position||'',185,1500,1150,30,'#555555')}
+   ${fittedText(c.phone||'',1530,1440,1150,31,'#171717')}
+   ${fittedText(c.email||'',1530,1500,1150,31,'#171717')}
+   ${note('인쇄 규격 90 × 50 mm · 안전 여백 7 mm 이상 · 출력 전 도련 및 서체 검수 필요',1760)}`),
+ appPage('v2-15-logo-sticker','Logo Sticker','원형 / 사각형',project,
+   `<circle cx="830" cy="940" r="400" fill="${p}"/>${logo(project,520,810,620,260,fg)}<rect x="1610" y="540" width="800" height="800" fill="${p}"/>${logo(project,1700,810,620,260,fg)}<text x="630" y="1450" fill="#777" font-size="30">ROUND · 50mm</text><text x="1790" y="1450" fill="#777" font-size="30">SQUARE · 50mm</text>${note('스티커 SVG는 예시 규격입니다. 인쇄 전 도무송선 및 도련을 별도로 확인하세요.')}`),
+ appPage('v2-16-letterhead','Letterhead','A4 210 × 297 mm',project,
+  `${fittedText('A4 LETTERHEAD',220,430,680,54,'#171717',700)}
+   ${fittedText('Portrait stationery',220,495,700,30,'#777777')}
+   ${fittedText('Document body',220,665,700,30,'#666666')}
+   ${fittedText('Reserved writing area',220,725,700,26,'#888888')}
+   ${embedApplication(stationery,1070,320,850,1202)}
+   <rect x="1070" y="320" width="850" height="1202" fill="none" stroke="#CACACA" stroke-width="3"/>
+   ${dimensionH(1070,1585,850,'210 mm')}
+   ${dimensionV(1970,320,1202,'297 mm')}
+   ${note('A4 문서 규격 · 헤더/푸터는 안전 여백 내 배치, 본문 작성 영역 확보',1760)}`),
+ appPage('v2-17-envelope','Envelope','Small 220 × 105 mm / Large 330 × 245 mm',project,
+  `${fittedText('SMALL ENVELOPE',190,385,1110,43,'#333333',600)}
+   ${embedApplication(smallEnvelope,185,460,1220,582)}
+   <rect x="185" y="460" width="1220" height="582" fill="none" stroke="#D3D3D3" stroke-width="2"/>
+   ${dimensionH(185,1100,1220,'220 mm')}
+   ${dimensionV(1450,460,582,'105 mm')}
+   ${fittedText('LARGE ENVELOPE',1550,385,1160,43,'#333333',600)}
+   ${embedApplication(largeEnvelope,1535,465,1185,880)}
+   <rect x="1535" y="465" width="1185" height="880" fill="none" stroke="#D3D3D3" stroke-width="2"/>
+   ${dimensionH(1535,1400,1185,'330 mm')}
+   ${dimensionV(2755,465,880,'245 mm')}
+   ${note('제시 규격은 완성품 외형 기준입니다. 재단·접착 플랩 전개도는 인쇄소 기준에 맞춰 별도 검수하세요.',1740)}`)
+ ];
 }
+
 function reviewPage(project:BrandProject,title:string,description:string,body:string,section:GuidelinePage['section'],id:string):GuidelinePage {
  return {id,title,subtitle:description,section,svg:guide(project,title,description,body)};
 }
