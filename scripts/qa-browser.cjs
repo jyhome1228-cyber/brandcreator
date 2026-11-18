@@ -54,12 +54,12 @@ try{
  const firstImage=page.locator('.bramer-hero-image');
  assert.equal(await firstImage.count(),1,'Exactly one image for the current audience slide');
  const firstCss=await firstImage.evaluate(el=>({background:getComputedStyle(el).backgroundImage,opacity:Number(getComputedStyle(el).opacity)}));
- assert.ok(firstCss.background.includes('20261118-043848-'),'Company audience must use the first reference image');
+ assert.ok(firstCss.background.includes('20261118-043849-'),'Designer audience must use the first reference image');
  assert.ok(firstCss.opacity>=.38,'Hero photo should be clearly more visible');
  assert.equal(await page.locator('.bramer-hero-audience-label').count(),0,'Remove audience label');
  await page.locator('.bramer-roller-controls button').nth(1).click();
  const secondCss=await page.locator('.bramer-hero-image').evaluate(el=>({background:getComputedStyle(el).backgroundImage,opacity:Number(getComputedStyle(el).opacity)}));
- assert.ok(secondCss.background.includes('20261118-043849-'),'Designer audience must use second reference image');
+ assert.ok(secondCss.background.includes('20261118-043848-'),'Company audience must use the second reference image');
  assert.equal(await page.locator('.bramer-hero-image').count(),1,'Only one image after rotation');
  assert.ok(secondCss.opacity>=.38,'Second reference image should be clearly visible');
  await page.locator('.bramer-roller-controls button').first().click();
@@ -73,7 +73,6 @@ try{
  await trial.click();
  await page.getByRole('dialog').waitFor();
  await page.locator('.bramer-beta-form input[autocomplete="name"]').fill('테스트 담당자');
- await page.locator('.bramer-beta-form input[autocomplete="off"]').fill('bramerqa');
  await page.locator('.bramer-beta-form input[type="tel"]').fill('010-1234-5678');
  await page.locator('.bramer-beta-form select').selectOption('디자이너');
  await page.locator('.bramer-beta-consent input').check();
