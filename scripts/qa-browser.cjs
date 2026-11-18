@@ -42,6 +42,13 @@ try{
  const faviconResponse=await page.request.get('http://127.0.0.1:'+port+favicon);
  assert.ok(faviconResponse.ok(),'Favicon fetch must succeed at deployed path');
  pass('GitHub Pages base path and favicon work');
+ const grayscale = (color,label) => {
+   const values=color.split(/[^0-9.]+/).filter(Boolean).slice(0,3).map(Number);
+   assert.ok(values.length===3 && Math.max(...values)-Math.min(...values)<=2,label+' is not neutral gray: '+color);
+ };
+ grayscale(await page.locator('.bramer-hero-rotation-slide h1 span').evaluate(el=>getComputedStyle(el).color),'Landing headline');
+ grayscale(await page.locator('.bramer-hero-rotation .bramer-roller-controls button.active').evaluate(el=>getComputedStyle(el,'::before').backgroundColor),'Landing indicator');
+ pass('landing hero typography and active indicator are grayscale');
  await page.screenshot({path:path.join(output,'01-landing-desktop.png')});
  const trial=page.locator('.bramer-home-primary').first();
  await trial.click();
@@ -68,6 +75,8 @@ try{
  await page.getByRole('button',{name:'가이드라인 생성'}).click();
  await page.waitForURL('**/#/editor');
  assert.equal(await page.locator('.print-page').count(),26);
+ assert.ok(await page.locator('.print-pages').evaluate(el=>el.innerHTML.includes('#473A88')),
+   'Original user-supplied purple brand color must be preserved in the generated guideline');
  await page.screenshot({path:path.join(output,'03-editor-desktop.png')});
  pass('5-step creation + SVG upload + 26 page output');
  const downloadPromise=page.waitForEvent('download');
@@ -192,6 +201,7 @@ try{
  pass('mobile creation wizard and SVG upload with no horizontal overflow');
  await mp.goto(url+'#/guide',{waitUntil:'domcontentloaded'});
  await mp.getByText('이 업종에서 특히 확인할 규칙').waitFor();
+ grayscale(await mp.locator('.bramer-industry-research-disclaimer').evaluate(el=>getComputedStyle(el).borderLeftColor),'Guide research note');
  await mp.screenshot({path:path.join(output,'07-guide-mobile.png'),fullPage:true});
  const menuLabels=['홈','내 프로젝트','업종별 가이드','사용 방법','새로 만들기'];
  for(const label of menuLabels)assert.equal(await mp.locator('.bramer-dash-nav').getByRole('button',{name:label}).count(),1);
@@ -199,6 +209,7 @@ try{
  assert.ok(width.document<=width.screen+3,'Mobile guide horizontal overflow '+JSON.stringify(width));
  await mp.locator('.bramer-dash-nav').getByRole('button',{name:'사용 방법'}).click();
  await mp.waitForURL('**/#/help');
+ grayscale(await mp.locator('.bramer-help-chapter-heading>span').first().evaluate(el=>getComputedStyle(el).color),'Help chapter label');
  await mp.locator('.bramer-help-local-nav').getByRole('button',{name:'자주 묻는 질문'}).click();
  await mp.waitForTimeout(500);
  assert.ok((await mp.locator('#help-faq').boundingBox()).y < 850, 'FAQ anchor should scroll into viewport');

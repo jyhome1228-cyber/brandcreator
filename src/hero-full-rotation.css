@@ -25,7 +25,7 @@
   font-size:12px!important;
   line-height:1.6;
   font-weight:500;
-  color:#b6b2be;
+  color:#b6b6b6;
   margin:0 0 24px;
 }
 .bramer-landing .bramer-hero-rotation-slide h1 {
@@ -38,11 +38,11 @@
   text-align:center;
   word-break:keep-all;
 }
-.bramer-landing .bramer-hero-rotation-slide h1 span{color:#b7a7f7;}
+.bramer-landing .bramer-hero-rotation-slide h1 span{color:#f0f0f0;}
 .bramer-landing .bramer-hero-slide-description {
   max-width:640px;
   margin:25px auto 0;
-  color:#b2aeb9;
+  color:#b2b2b2;
   font-size:14px!important;
   line-height:1.85!important;
   word-break:keep-all;
@@ -50,7 +50,7 @@
 }
 .bramer-landing .bramer-hero-rotation .bramer-roller-controls{padding:8px 0 0;gap:9px;}
 .bramer-landing .bramer-hero-rotation .bramer-roller-controls button:focus-visible{
-  outline:2px solid #d0c3ff;outline-offset:3px;
+  outline:2px solid #d8d8d8;outline-offset:3px;
 }
 @keyframes bramer-entire-hero-in{
   from{opacity:0;transform:translateY(11px);}
