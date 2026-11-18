@@ -3,6 +3,8 @@ import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
 import Dashboard from './Dashboard';
 import ProjectLibrary from './ProjectLibrary';
+import HelpView from './HelpView';
+import WorkspaceNav from './components/WorkspaceNav';
 import { deleteLocalProject, listSavedProjects, newProjectId, saveLocalProject, type SavedBramerProject } from './engines/projectLibrary';
 import BramerSelect from './components/BramerSelect';
 import { INDUSTRY_RATIONALE } from './engines/industryRationale';
@@ -64,7 +66,7 @@ function isHex(value: string): boolean {
 
 export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
-  const [mode, setMode] = useState<'landing' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects'>(() => location.hash === '#/create' || location.hash === '#/editor' || location.hash === '#/dashboard' ? 'setup' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : 'landing');
+  const [mode, setMode] = useState<'landing' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/create' || location.hash === '#/editor' || location.hash === '#/dashboard' ? 'setup' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
   const enterWorkspace = () => {
     setSetupStep(1);
     window.location.hash = '/create';
@@ -101,6 +103,7 @@ export default function App() {
       if (window.location.hash === '#/dashboard') setMode('setup');
       else if (window.location.hash === '#/guide') setMode('guide');
       else if (window.location.hash === '#/projects') setMode('projects');
+      else if (window.location.hash === '#/help') setMode('help');
       else if (window.location.hash === '#/create') setMode('setup');
       else if (window.location.hash === '#/editor') setMode(previous => previous === 'editor' ? 'editor' : 'setup');
       else setMode('landing');
@@ -147,6 +150,16 @@ export default function App() {
     autosaveTimer.current = setTimeout(() => { void saveToBrowser(); }, 550);
     return () => { if (autosaveTimer.current) clearTimeout(autosaveTimer.current); };
   }, [project, projectId, industry, selectedCategories, enabled, setupStep]);
+  const openHelp = () => {
+    window.location.hash = '/help';
+    setMode('help');
+    window.scrollTo({top:0,behavior:'instant'});
+  };
+  const openGuide = () => {
+    window.location.hash = '/guide';
+    setMode('guide');
+    window.scrollTo({top:0,behavior:'instant'});
+  };
   const openProjectLibrary = async () => {
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
     if (project.name.trim() || project.englishName.trim()) await saveToBrowser();
@@ -353,12 +366,19 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
-  if (mode === 'projects') return <ProjectLibrary projects={savedProjects} onOpen={id => void resumeSavedProject(id)} onRemove={id => void removeSavedProject(id)} onNew={() => void createNewProject()} onBack={() => {window.location.hash='/create';setMode('setup');}} error={libraryError}/>;
+  if (mode === 'projects') return <ProjectLibrary projects={savedProjects}
+    onOpen={id=>void resumeSavedProject(id)} onRemove={id=>void removeSavedProject(id)}
+    onNew={()=>void createNewProject()} onBack={goHome} onGuide={openGuide} onHelp={openHelp}
+    error={libraryError}/>;
+  if (mode === 'help') return <HelpView onHome={goHome} onProjects={()=>void openProjectLibrary()}
+    onGuide={openGuide} onNew={()=>void createNewProject()} onHelp={openHelp}/>;setMode('setup');}} error={libraryError}/>;
   if (mode === 'landing') return <Landing onStart={enterWorkspace} />;
   if (mode === 'dashboard' || mode === 'guide') return <Dashboard
     view={mode}
     onNavigate={navigateWorkspace}
     onHome={goHome}
+    onProjects={()=>void openProjectLibrary()}
+    onHelp={openHelp}
     onCreate={openCreate}
     onContinue={() => { window.location.hash = '/create'; setMode('setup'); }}
     onImport={event => void restoreProject(event)}
@@ -380,15 +400,10 @@ export default function App() {
         </header>
         <div className="bramer-dash-layout">
           <aside className="bramer-dash-sidebar" aria-label="서비스 메뉴">
-            <div className="bramer-dash-nav">
-              <button type="button" onClick={() => navigateWorkspace('dashboard')}>홈</button>
-              <button type="button" onClick={() => void openProjectLibrary()}>내 프로젝트</button>
-              <button type="button" onClick={() => navigateWorkspace('guide')}>업종별 가이드</button>
-              <button type="button" className="active" aria-current="page" onClick={() => void createNewProject()}>새로 만들기</button>
-            </div>
+            <WorkspaceNav active="create" onHome={goHome} onProjects={()=>void openProjectLibrary()} onGuide={openGuide} onHelp={openHelp} onNew={()=>void createNewProject()}/>
             <div className="bramer-dash-sidebar-bottom">
               <p>브랜드 정보와 로고를 등록하고, 필요한 규칙을 선택하여 가이드라인을 만들어보세요.</p>
-              <button type="button" onClick={() => navigateWorkspace('dashboard')}>제작 화면으로 돌아가기</button>
+              <button type="button" onClick={openHelp}>사용 방법 보기</button>
             </div>
           </aside>
           <main className="bramer-dash-content bramer-create-content">
