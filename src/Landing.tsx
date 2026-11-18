@@ -3,11 +3,10 @@ import { parseLogoSvg } from './engines/svgParser';
 import { generateV2Pages } from './guideline-system/v2Pages';
 import { localizeGuidelinePages } from './guideline-system/localizeGuideline';
 import type { BrandProject } from './types/guideline';
+import {registerLocalBeta,verifyLocalBeta} from './betaLocalAccess';
 
 type LandingProps = { onStart: (newRegistration?: boolean) => void };
 type BetaForm = { name: string; phone: string; occupation: string };
-const REGISTRATION_KEY = 'bramer-beta-session-v1';
-const BETA_END = '2026년 12월 31일';
 const initialBetaForm: BetaForm = { name: '', phone: '', occupation: '' };
 
 const audiences = [
@@ -173,41 +172,58 @@ export default function Landing({ onStart }: LandingProps) {
   const [audienceIndex, setAudienceIndex] = useState(0);
   const [rollPaused, setRollPaused] = useState(false);
   const [betaOpen, setBetaOpen] = useState(false);
+  const [betaMode, setBetaMode] = useState<'choice'|'register'|'login'>('choice');
+  const [occupationOpen,setOccupationOpen] = useState(false);
+  const [loginForm,setLoginForm] = useState({name:'',phone:''});
+  const [submitting,setSubmitting] = useState(false);
   const [betaForm, setBetaForm] = useState<BetaForm>(initialBetaForm);
   const [agreed, setAgreed] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [betaError, setBetaError] = useState('');
-  const [sessionRegistered, setSessionRegistered] = useState(() => {
-    try { return sessionStorage.getItem(REGISTRATION_KEY) === 'active'; } catch { return false; }
-  });
   const dialogRef = useRef<HTMLDivElement>(null);
   const lastTrigger = useRef<HTMLElement | null>(null);
-  const openBeta = (event?: MouseEvent<HTMLButtonElement>) => {
+  const openBeta = (event?: MouseEvent<HTMLButtonElement>, mode:'choice'|'register'|'login'='choice') => {
     lastTrigger.current = event?.currentTarget ?? null;
     setBetaError('');
+    setOccupationOpen(false);
+    setBetaMode(mode);
     setBetaOpen(true);
   };
   const closeBeta = () => {
     setBetaOpen(false);
+    setOccupationOpen(false);
     requestAnimationFrame(() => lastTrigger.current?.focus());
   };
-  const tryBeta = (event: FormEvent<HTMLFormElement>) => {
+  const tryBeta = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (!betaForm.name.trim() || !/^[0-9+() -]{8,20}$/.test(betaForm.phone.trim()) || !betaForm.occupation) {
-      setBetaError(tr('성함, 연락처, 직업을 확인해 주세요.','Check your name, phone number, and occupation.'));
+    if (submitting) return;
+    if (!betaForm.name.trim() || !/^\\d{9,11}$/.test(betaForm.phone.replace(/\\D/g,'')) || !betaForm.occupation) {
+      setBetaError(tr('성함, 연락처, 직업을 확인해 주세요.','Please check your name, phone number and occupation.'));
       return;
     }
-    if (!agreed) { setBetaError('개인정보 이용 안내에 동의해야 진행할 수 있습니다.'); return; }
+    if (!agreed) { setBetaError(tr('개인정보 이용 안내에 동의해 주세요.','Please agree to the privacy notice.')); return; }
+    setSubmitting(true);
     try {
-      // No registration server exists. Do not persist phone/name on a public static site.
-      sessionStorage.setItem(REGISTRATION_KEY, 'active');
-    } catch { /* Session use remains possible even with restricted storage */ }
-    setSessionRegistered(true);
-    setBetaError('');
-    setBetaOpen(false);
-    onStart(true);
+      await registerLocalBeta(betaForm.name,betaForm.phone,betaForm.occupation);
+      setBetaOpen(false);
+      setBetaError('');
+      // Registration always presents the welcome sequence, even on a reused browser.
+      onStart(true);
+    } catch {
+      setBetaError(tr('이 브라우저에서 등록 정보를 저장할 수 없습니다. 브라우저 설정을 확인해 주세요.','Unable to save the registration on this browser.'));
+    } finally {setSubmitting(false);}
   };
-  const enterRegistered = () => {
+  const tryLogin = async (event:FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if(submitting)return;
+    if(!loginForm.name.trim()||!loginForm.phone.trim()){setBetaError(tr('성함과 연락처를 입력해 주세요.','Enter your name and phone number.'));return;}
+    setSubmitting(true);
+    const valid=await verifyLocalBeta(loginForm.name,loginForm.phone);
+    setSubmitting(false);
+    if(!valid){
+      setBetaError(tr('등록 정보와 일치하지 않습니다. 이 브라우저에서 처음 등록했는지 확인해 주세요.','The details do not match the registration saved in this browser.'));
+      return;
+    }
     setBetaOpen(false);
     onStart(false);
   };
@@ -259,7 +275,7 @@ export default function Landing({ onStart }: LandingProps) {
           <a href="#/guide">{tr("업종별 가이드","Industry guide")}</a>
           <a href="#help">{tr("도움말","Help")}</a>
         </nav>
-        <div className="bramer-site-actions"><div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div><button type="button" className="bramer-site-start" onClick={openBeta}>{tr("시작하기","Get started")}</button>
+        <div className="bramer-site-actions"><div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div><button type="button" className="bramer-site-start" onClick={event => openBeta(event,'choice')}>{tr("시작하기","Get started")}</button>
         </div>
       </div>
     </header>
@@ -289,7 +305,7 @@ export default function Landing({ onStart }: LandingProps) {
                 onClick={() => setAudienceIndex(index)}/>)}
             </div>
           </div>
-          <button type="button" className="bramer-home-primary" onClick={openBeta}>{tr("베타 무료 체험하기","Try the beta for free")}</button>
+          <button type="button" className="bramer-home-primary" onClick={event => openBeta(event,'register')}>{tr("베타 무료 체험하기","Try the beta for free")}</button>
         </div>
       </section>
 
@@ -392,36 +408,61 @@ export default function Landing({ onStart }: LandingProps) {
         <div className="bramer-footer-bottom"><div><strong>BRAMER.</strong><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>{tr('현재 제공되는 기능을 기준으로 안내합니다.','Features described reflect the current beta version.')}</small></div>
       </div>
     </footer>
-    {betaOpen ? <div className="bramer-beta-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) closeBeta(); }}>
-      <div className="bramer-beta-dialog" role="dialog" aria-modal="true" aria-labelledby="bramer-beta-title" aria-describedby="bramer-beta-description" ref={dialogRef} tabIndex={-1}>
+    {betaOpen ? <div className="bramer-beta-overlay" onMouseDown={event => {if(event.target===event.currentTarget)closeBeta();}}>
+      <div className="bramer-beta-dialog bramer-beta-refined" role="dialog" aria-modal="true" aria-labelledby="bramer-beta-title" aria-describedby="bramer-beta-description" ref={dialogRef} tabIndex={-1}>
         <button type="button" className="bramer-beta-close" aria-label={tr('닫기','Close')} onClick={closeBeta}>{tr('닫기','Close')}</button>
-        <span className="bramer-beta-label">BRAMER BETA</span>
-        <h2 id="bramer-beta-title">{tr("12월 31일까지, 자유롭게 체험하세요.","Explore BRAMER free through December 31.")}</h2>
-        <p id="bramer-beta-description">{tr("BRAMER는 2026년 12월 31일까지 무료 베타테스트를 진행합니다. 간단한 정보 입력 후 바로 가이드라인을 만들어볼 수 있어요.","BRAMER is in free beta until December 31, 2026. Enter a few details to start creating your guideline.")}</p>
-        {sessionRegistered ? <div className="bramer-beta-registered">
-          <p>{tr('이 브라우저에서 베타 체험을 시작했어요. 바로 제작 화면으로 이동할 수 있습니다.','You have started the beta on this browser. Continue to your workspace.')}</p>
-          <button className="bramer-beta-primary" type="button" onClick={enterRegistered}>{tr('체험 이어가기','Continue beta')}</button>
-        </div> : <form className="bramer-beta-form" onSubmit={tryBeta}>
-          <div className="bramer-beta-field-grid">
-            <label><span>{tr('성함','Name')}</span><input autoComplete="name" maxLength={40} value={betaForm.name} onChange={event => setBetaForm(previous => ({ ...previous, name: event.target.value }))} placeholder={tr('성함을 입력해 주세요','Enter your name')} required /></label>
-            
-            <label><span>{tr('연락처','Phone number')}</span><input autoComplete="tel" type="tel" maxLength={20} value={betaForm.phone} onChange={event => setBetaForm(previous => ({ ...previous, phone: event.target.value }))} placeholder={tr('연락처를 입력해 주세요','Enter your phone number')} required /></label>
-            <label><span>{tr('직업','Occupation')}</span><select value={betaForm.occupation} onChange={event => setBetaForm(previous => ({ ...previous, occupation: event.target.value }))} required><option value="">{tr('선택해 주세요','Select')}</option><option value="디자이너">{tr('디자이너','Designer')}</option><option value="기업 담당자">{tr('기업 담당자','Company representative')}</option><option value="브랜드 운영자">{tr('브랜드 운영자','Brand manager')}</option><option value="학생·연구자">{tr('학생·연구자','Student / researcher')}</option><option value="기타">{tr('기타','Other')}</option></select></label>
+        <div className="bramer-beta-label">BRAMER BETA</div>
+        {betaMode==='choice'?<>
+          <h2 id="bramer-beta-title">{tr('브레이머를 시작해 볼까요?','Let’s get started with BRAMER.')}</h2>
+          <p id="bramer-beta-description">{tr('새로운 가이드라인을 만들거나, 이 브라우저에 등록한 베타 정보를 이용해 다시 시작할 수 있습니다.','Create your first guideline or return using your beta registration on this browser.')}</p>
+          <div className="bramer-beta-choice">
+            <button type="button" onClick={()=>{setBetaError('');setBetaMode('register');}}><span><strong>{tr('새로 시작하기','Start new')}</strong><small>{tr('간단한 정보 등록 후 무료 체험','Register a few details to try it for free')}</small></span><span aria-hidden="true">→</span></button>
+            <button type="button" onClick={()=>{setBetaError('');setBetaMode('login');}}><span><strong>{tr('베타테스트 로그인','Beta login')}</strong><small>{tr('등록한 성함과 연락처로 다시 시작','Return with your registered name and phone')}</small></span><span aria-hidden="true">→</span></button>
           </div>
-          <div className="bramer-beta-privacy">
-            <label className="bramer-beta-consent"><input type="checkbox" checked={agreed} onChange={event => setAgreed(event.target.checked)} required /><span>{tr('개인정보처리방침(베타 체험 안내)에 동의합니다. (필수)','I agree to the beta privacy notice. (Required)')}</span></label>
-            <button type="button" className="bramer-beta-privacy-button" aria-expanded={privacyOpen} onClick={() => setPrivacyOpen(previous => !previous)}>{tr('개인정보처리방침','Privacy notice')} {privacyOpen ? tr('접기','Hide') : tr('보기','View')}</button>
-            {privacyOpen ? <div className="bramer-beta-privacy-text">
-              <strong>{tr('베타 체험 개인정보처리방침','Beta privacy notice')}</strong>
-              <p>{tr('입력 항목: 성함, 연락처, 직업. 목적: 베타 체험 등록 화면 확인 및 이용 의사 표시.','Fields: name, phone number, occupation. Used only for this beta registration interface.')}</p>
-              <p>{tr('현재 중앙 등록 서버는 연결되어 있지 않습니다. 입력한 개인정보는 서버로 전송·저장되지 않으며, 화면을 떠나면 입력값이 사라집니다. 브라우저 세션에는 체험 여부만 저장합니다. 연락처로 별도 연락하거나 사용자 계정을 생성하지 않습니다.','No central registration server is connected. Your personal details are not transmitted or stored; only a beta participation flag is saved in this browser session. No user account is created.')}</p>
-              <p>{tr('브라우저 세션의 체험 표시를 없애려면 브라우저의 해당 사이트 세션 데이터를 삭제하면 됩니다. 정식 회원 관리 및 개인정보처리방침은 서버 구축 후 별도 공지해야 합니다.','Clear the site session data to reset the beta participation flag. Formal account management and privacy policies will be published when the backend becomes available.')}</p>
-            </div> : null}
-          </div>
-          <p className="bramer-beta-local-notice">{tr('현재는 체험용 등록 화면입니다. 실제 회원 계정이나 서버 등록은 생성되지 않습니다.','This is a preview registration form. It does not create an account or server-side record.')}</p>
-          {betaError ? <p className="bramer-beta-error" role="alert">{betaError}</p> : null}
-          <button className="bramer-beta-primary" type="submit">{tr('등록하고 무료 체험하기','Register and try for free')}</button>
-        </form>}
+          <p className="bramer-beta-footnote">{tr('베타 로그인은 현재 등록에 사용한 브라우저에서만 지원됩니다.','Beta login works only on the browser where you registered.')}</p>
+        </>:betaMode==='login'?<>
+          <h2 id="bramer-beta-title">{tr('베타테스트 로그인','Beta login')}</h2>
+          <p id="bramer-beta-description">{tr('등록할 때 사용한 성함과 연락처를 입력해 주세요.','Enter the name and phone number used during registration.')}</p>
+          <form className="bramer-beta-form bramer-auth-fields" onSubmit={tryLogin}>
+            <div className="bramer-beta-field-grid">
+              <label><span>{tr('성함','Name')}</span><input autoComplete="name" value={loginForm.name} maxLength={40} onChange={e=>setLoginForm(p=>({...p,name:e.target.value}))} required placeholder={tr('등록한 성함','Registered name')}/></label>
+              <label><span>{tr('연락처','Phone number')}</span><input autoComplete="tel" type="tel" value={loginForm.phone} maxLength={20} onChange={e=>setLoginForm(p=>({...p,phone:e.target.value}))} required placeholder="010-1234-5678"/></label>
+            </div>
+            <p className="bramer-beta-local-notice">{tr('현재 서버 계정이 아닌 브라우저 내 베타 등록 정보 확인 방식입니다. 다른 기기에서는 로그인할 수 없습니다.','This checks beta registration saved in this browser, not a server account. Other devices are not supported.')}</p>
+            {betaError?<p className="bramer-beta-error" role="alert">{betaError}</p>:null}
+            <button type="submit" className="bramer-beta-primary" disabled={submitting}>{tr('로그인하고 계속하기','Login and continue')}</button>
+          </form>
+          <button type="button" className="bramer-beta-back" onClick={()=>{setBetaMode('choice');setBetaError('')}}>{tr('이전으로','Back')}</button>
+        </>:<>
+          <h2 id="bramer-beta-title">{tr('브레이머를 무료로 체험하세요.','Explore BRAMER for free.')}</h2>
+          <p id="bramer-beta-description">{tr('성함과 연락처, 직업만 입력하면 시작할 수 있습니다. 처음 등록한 분께는 짧은 사용 안내가 제공됩니다.','Enter your name, phone number and occupation to begin. First-time registration includes a short introduction.')}</p>
+          <form className="bramer-beta-form" onSubmit={tryBeta}>
+            <div className="bramer-beta-field-grid">
+              <label><span>{tr('성함','Name')}</span><input autoComplete="name" maxLength={40} value={betaForm.name} onChange={e=>setBetaForm(p=>({...p,name:e.target.value}))} placeholder={tr('성함을 입력해 주세요','Your name')} required/></label>
+              <label><span>{tr('연락처','Phone number')}</span><input autoComplete="tel" type="tel" maxLength={20} value={betaForm.phone} onChange={e=>setBetaForm(p=>({...p,phone:e.target.value}))} placeholder="010-1234-5678" required/></label>
+              <div className="bramer-occupation-field">
+                <span className="bramer-occupation-label">{tr('직업','Occupation')}</span>
+                <button type="button" className={'bramer-occupation-trigger'+(occupationOpen?' expanded':'')} aria-expanded={occupationOpen} aria-haspopup="listbox" onClick={()=>setOccupationOpen(v=>!v)}>{betaForm.occupation||tr('선택해 주세요','Select an occupation')}<span aria-hidden="true">⌄</span></button>
+                {occupationOpen?<div className="bramer-occupation-list" role="listbox" aria-label={tr('직업 선택','Choose occupation')}>
+                  {(['디자이너','기업 담당자','브랜드 운영자','학생·연구자','기타'] as const).map(v=><button role="option" aria-selected={betaForm.occupation===v} key={v} type="button" onClick={()=>{setBetaForm(p=>({...p,occupation:v}));setOccupationOpen(false)}}>{tr(v,({'디자이너':'Designer','기업 담당자':'Company representative','브랜드 운영자':'Brand manager','학생·연구자':'Student / researcher','기타':'Other'} as Record<string,string>)[v])}</button>)}
+                </div>:null}
+              </div>
+            </div>
+            <div className="bramer-beta-privacy">
+              <label className="bramer-beta-consent"><input type="checkbox" checked={agreed} onChange={e=>setAgreed(e.target.checked)} required/><span>{tr('개인정보 이용 안내에 동의합니다. (필수)','I agree to the privacy notice. (Required)')}</span></label>
+              <button type="button" className="bramer-beta-privacy-button" aria-expanded={privacyOpen} onClick={()=>setPrivacyOpen(v=>!v)}>{tr('이용 안내','Privacy details')} {privacyOpen?tr('접기','Hide'):tr('보기','View')}</button>
+              {privacyOpen?<div className="bramer-beta-privacy-text"><strong>{tr('베타 등록 및 보관 안내','Beta registration and storage')}</strong>
+                <p>{tr('입력 항목은 성함, 연락처, 직업입니다. 서버 계정이나 중앙 회원 데이터베이스는 아직 제공되지 않습니다.','Fields: name, phone number, occupation. There is no central registration server or user database.')}</p>
+                <p>{tr('성함과 연락처의 조합은 이 브라우저에서만 확인하도록 무작위 솔트를 더한 해시로 보관합니다. 연락처와 성함의 원문은 저장하지 않으며 직업 선택 정보만 별도로 브라우저에 저장합니다. 기기를 바꾸거나 브라우저 데이터를 삭제하면 로그인할 수 없습니다.','The name and phone combination is stored only as a salted hash in this browser, not as raw values. Occupation is kept locally. A different device or cleared browser data cannot log in.')}</p>
+                <p>{tr('베타 접근은 실제 본인 인증이 아니며 별도 클라우드 계정, 사용자 간 데이터 동기화 또는 계정 복구 기능은 없습니다.','Beta access is not identity verification. Cloud accounts, syncing and account recovery are not available.')}</p>
+              </div>:null}
+            </div>
+            <p className="bramer-beta-local-notice">{tr('현재는 브라우저 기반 베타 등록입니다. 다른 기기에서는 이어서 로그인할 수 없습니다.','This beta registration works only in this browser.')}</p>
+            {betaError?<p className="bramer-beta-error" role="alert">{betaError}</p>:null}
+            <button type="submit" className="bramer-beta-primary" disabled={submitting}>{tr('등록하고 무료 체험하기','Register and start free trial')}</button>
+          </form>
+          <button type="button" className="bramer-beta-back" onClick={()=>{setBetaMode('choice');setBetaError('')}}>{tr('이전으로','Back')}</button>
+        </>}
       </div>
     </div> : null}
   </div>;
