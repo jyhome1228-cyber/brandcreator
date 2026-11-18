@@ -115,9 +115,9 @@ function GuidelinePreview({ english }: { english: boolean }) {
             <p className="bramer-engine-loading" role="status">{sampleError?(english?'Preview unavailable':'미리보기를 불러올 수 없습니다.'):(english?'Preparing preview…':'미리보기를 준비하고 있습니다…')}</p>}
           {pages.length>0 && <>
             <button type="button" className="bramer-preview-side-button previous" onClick={()=>changePage(index-1,pages.length)}
-              aria-label={english?'Previous page':'이전 페이지'}>‹</button>
+              aria-label={english?'Previous page':'이전 페이지'}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" width="23" height="23"><path d="M14.5 5.5 8 12l6.5 6.5" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
             <button type="button" className="bramer-preview-side-button next" onClick={()=>changePage(index+1,pages.length)}
-              aria-label={english?'Next page':'다음 페이지'}>›</button>
+              aria-label={english?'Next page':'다음 페이지'}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" width="23" height="23"><path d="M9.5 5.5 16 12l-6.5 6.5" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
           </>}
         </div>
         {pages.length>0 && <div className="bramer-preview-page-select">
