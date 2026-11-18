@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
+import WelcomeExperience from './WelcomeExperience';
 import Dashboard from './Dashboard';
 import ProjectLibrary from './ProjectLibrary';
 import HelpView from './HelpView';
@@ -67,12 +68,31 @@ function isHex(value: string): boolean {
 
 export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
-  const [mode, setMode] = useState<'landing' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/create' || location.hash === '#/editor' || location.hash === '#/dashboard' ? 'setup' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
-  const enterWorkspace = () => {
-    setSetupStep(1);
-    window.location.hash = '/create';
-    setMode('setup');
-    window.scrollTo({ top: 0, behavior: 'instant' });
+  const [mode, setMode] = useState<'landing' | 'welcome' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/welcome' ? 'landing' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
+  const [showFirstCoach, setShowFirstCoach] = useState(false);
+  const [welcomeLanguage, setWelcomeLanguage] = useState<'ko'|'en'>(() => {
+    try { return localStorage.getItem('bramer-site-language')==='en'?'en':'ko'; } catch { return 'ko'; }
+  });
+  const goToDashboard = () => {
+    window.location.hash = '/dashboard';
+    setMode('dashboard');
+    window.scrollTo({top:0,behavior:'instant'});
+  };
+  const finishWelcome = () => {
+    try { localStorage.setItem('bramer-onboarding-v1','seen'); } catch { /* Optional preference */ }
+    setShowFirstCoach(true);
+    goToDashboard();
+  };
+  const enterWorkspace = (newRegistration = false) => {
+    const seen = (() => {try {return localStorage.getItem('bramer-onboarding-v1')==='seen';} catch {return false;}})();
+    if(newRegistration && !seen) {
+      try {setWelcomeLanguage(localStorage.getItem('bramer-site-language')==='en'?'en':'ko');} catch {setWelcomeLanguage('ko');}
+      window.location.hash = '/welcome';
+      setMode('welcome');
+      window.scrollTo({top:0,behavior:'instant'});
+      return;
+    }
+    goToDashboard();
   };
   const openCreate = (nextIndustry?: IndustryId) => {
     if (nextIndustry) {
@@ -101,7 +121,8 @@ export default function App() {
   };
   useEffect(() => {
     const syncRoute = () => {
-      if (window.location.hash === '#/dashboard') setMode('setup');
+      if (window.location.hash === '#/dashboard') setMode('dashboard');
+      else if (window.location.hash === '#/welcome') setMode(previous => previous === 'welcome' ? previous : 'landing');
       else if (window.location.hash === '#/guide') setMode('guide');
       else if (window.location.hash === '#/projects') setMode('projects');
       else if (window.location.hash === '#/help') setMode('help');
@@ -431,6 +452,7 @@ export default function App() {
   if (mode === 'help') return <HelpView onHome={goHome} onProjects={()=>void openProjectLibrary()}
     onGuide={openGuide} onNew={()=>void createNewProject()} onHelp={openHelp}/>;
   if (mode === 'landing') return <Landing onStart={enterWorkspace} />;
+  if (mode === 'welcome') return <WelcomeExperience onFinish={finishWelcome} english={welcomeLanguage==='en'}/>;
   if (mode === 'dashboard' || mode === 'guide') return <Dashboard
     view={mode}
     onNavigate={navigateWorkspace}
@@ -442,6 +464,8 @@ export default function App() {
     onImport={event => void restoreProject(event)}
     currentProject={project.name.trim() || undefined}
     currentIndustry={industry}
+    firstUseCoach={mode==='dashboard' && showFirstCoach}
+    onDismissCoach={()=>setShowFirstCoach(false)}
   />;
 
   if (mode === 'setup') {
