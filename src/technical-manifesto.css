@@ -272,3 +272,26 @@
   .bramer-docs-sidebar{padding:32px 13px!important}
   .bramer-docs-main{width:100%!important;max-width:none!important;margin:0!important;padding:60px 32px!important}
 }
+
+
+/* Documentation typography scale: quieter headings and consistent reading hierarchy. */
+.bramer-docs .bramer-docs-hero h1{
+ font-size:clamp(30px,2.5vw,40px)!important;
+ font-weight:650!important;
+ line-height:1.4!important;
+ letter-spacing:-.05em!important;
+ margin-bottom:30px!important;
+}
+.bramer-docs .bramer-docs-section h2{
+ font-size:clamp(23px,1.85vw,29px)!important;
+ line-height:1.5!important;
+ letter-spacing:-.04em!important;
+ font-weight:650!important;
+ margin-bottom:26px!important;
+}
+.bramer-docs .bramer-docs-section h3{font-size:16px!important}
+.bramer-docs .bramer-docs-metrics strong{font-size:22px!important}
+@media(max-width:680px){
+ .bramer-docs .bramer-docs-hero h1{font-size:clamp(27px,6vw,33px)!important}
+ .bramer-docs .bramer-docs-section h2{font-size:clamp(22px,5vw,26px)!important}
+}
