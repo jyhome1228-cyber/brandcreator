@@ -45,7 +45,7 @@ assert.ok(app.includes('<WorkspaceNav active="create"'));
 assert.ok(app.includes('className="bramer-editor-global-menu"'));
 assert.ok(app.includes("mode === 'help'"));
 assert.ok(app.includes("window.location.hash = '/help'"));
-assert.ok(help.includes('계정 및 클라우드 동기화 기능이 없습니다'));
+assert.ok(help.includes('클라우드 동기화 기능은 아직 제공하지 않습니다'));
 assert.ok(dash.includes('실무적 제안') || dash.includes('실무적 제안'));
 assert.ok(dash.includes('22개 브랜드 사례 분석'));
 console.log('PASS 8 industries with differentiated important/optional/beyond requirements');
