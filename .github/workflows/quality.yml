@@ -18,5 +18,7 @@ jobs:
         run: npm install --no-audit --no-fund
       - name: Phase 1 brand guideline regression QA
         run: npm run qa:guidelines
+      - name: Workspace navigation and industry guidance QA
+        run: node scripts/qa-workspace.cjs
       - name: Typecheck and production build
         run: npm run build
