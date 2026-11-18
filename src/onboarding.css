@@ -43,3 +43,5 @@
 .bramer-coach-primary:hover{background:#333}
 @media(max-width:650px){.bramer-welcome-header{height:72px;width:calc(100% - 34px)}.bramer-welcome-header strong{font-size:20px}.bramer-welcome-body{width:calc(100% - 38px);min-height:0;padding-top:65px}.bramer-welcome-body h1{font-size:36px}.bramer-welcome-description{font-size:14px}.bramer-welcome-bottom{margin-top:55px}.bramer-welcome-steps article{grid-template-columns:45px 1fr}.bramer-welcome-steps h2{font-size:16px}.bramer-welcome-steps p{font-size:12px}.bramer-coach-dialog{padding:30px 23px 23px}.bramer-coach-actions{align-items:stretch;flex-direction:column-reverse}.bramer-coach-actions button{width:100%}}
 @media(prefers-reduced-motion:reduce){.bramer-welcome-body,.bramer-welcome-mark{animation:none}}
+
+.bramer-welcome-mark img{display:block;width:min(680px,75vw);height:auto;max-height:180px;object-fit:contain;filter:brightness(0)}
