@@ -85,9 +85,17 @@ try{
  await page.locator('.bramer-beta-form select').selectOption('디자이너');
  await page.locator('.bramer-beta-consent input').check();
  await page.locator('.bramer-beta-primary[type="submit"]').click();
+ await page.waitForURL('**/#/welcome');
+ await page.getByRole('heading',{name:/브레이머를 소개합니다/}).waitFor();
+ await page.getByRole('button',{name:'사용 방법 알아보기'}).click();
+ await page.getByRole('heading',{name:/세 단계로 간단하게/}).waitFor();
+ await page.getByRole('button',{name:/이제 시작합니다/}).click();
+ await page.waitForURL('**/#/dashboard');
+ await page.getByRole('dialog',{name:'첫 번째 가이드라인을 만들어보세요.'}).waitFor();
+ await page.getByRole('button',{name:'첫 가이드라인 만들기'}).click();
  await page.waitForURL('**/#/create');
  await page.getByRole('heading',{name:'새 브랜드 가이드라인 만들기'}).waitFor();
- pass('landing → beta form validation → create');
+ pass('landing → beta registration → welcome → logo reveal → dashboard coach → create');
  await page.locator('input[placeholder="브랜드명"]').fill('건강미 테스트');
  await page.locator('input[placeholder="Brand name"]').fill('Healthy Me QA');
  await page.locator('.step-nav-item').nth(2).click();
