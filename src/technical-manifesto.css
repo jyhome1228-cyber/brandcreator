@@ -156,3 +156,16 @@
  .bramer-landing .bramer-preview-side-button.previous{left:-2px!important}
  .bramer-landing .bramer-preview-side-button.next{right:-2px!important}
 }
+
+/* Native text controls for genuine destinations; no duplicate or placeholder links. */
+.bramer-landing .bramer-help-link-button{
+ border:0;background:none;padding:0;color:#efefef;font-family:inherit;font-size:12px!important;
+ font-weight:600;line-height:1.6;cursor:pointer;text-decoration:underline;text-underline-offset:4px;
+ text-align:left;
+}
+.bramer-landing .bramer-help-link-button:hover{color:#fff}
+.bramer-landing .bramer-footer-link-button{
+ border:0;background:transparent;padding:0;color:#999;font:inherit;font-size:12px!important;
+ line-height:1.55;text-align:left;cursor:pointer;
+}
+.bramer-landing .bramer-footer-link-button:hover{color:#fff}
