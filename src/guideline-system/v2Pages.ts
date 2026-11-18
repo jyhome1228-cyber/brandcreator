@@ -28,11 +28,29 @@ const esc = (s:string) => String(s||'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':
 const hex = (s:string, fallback='#111111') => /^#[0-9a-f]{6}$/i.test(s||'') ? s : fallback;
 const inkOn = (color:string) => {const c=hex(color).slice(1);const r=parseInt(c.slice(0,2),16),g=parseInt(c.slice(2,4),16),b=parseInt(c.slice(4,6),16);return r*.299+g*.587+b*.114>155?'#111111':'#FFFFFF';};
 const guide = (project:BrandProject,title:string,subtitle:string,content:string):string => `<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 2970 2100"><rect width="2970" height="2100" fill="#fff"/><text x="110" y="138" font-family="Arial,sans-serif" font-size="75" font-weight="700" fill="${hex(project.colors.primary)}">${esc(title)}</text><text x="1120" y="140" font-family="Arial,sans-serif" font-size="31" fill="#555">${esc(subtitle)}</text><path d="M110 215H2860" stroke="#D6D6D6" stroke-width="3"/>${content}<path d="M110 1900H2860" stroke="#D6D6D6" stroke-width="3"/><text x="110" y="1965" font-family="Arial,sans-serif" font-size="28" fill="#666">${esc(project.englishName || project.name)}</text><text x="2860" y="1965" text-anchor="end" font-family="Arial,sans-serif" font-size="24" fill="#888">BRAMER · BRAND GUIDELINES</text></svg>`;
+function visibleLogoBox(asset: LogoAsset) {
+  const canvas = asset.viewBox;
+  const measured = asset.analysis?.geometry?.visualBounds;
+  if (!measured || !Number.isFinite(measured.width) || !Number.isFinite(measured.height) ||
+      measured.width <= 0 || measured.height <= 0) return canvas;
+  const epsilon = Math.max(canvas.width, canvas.height) * 0.002;
+  if (measured.x < canvas.x - epsilon || measured.y < canvas.y - epsilon ||
+      measured.x + measured.width > canvas.x + canvas.width + epsilon ||
+      measured.y + measured.height > canvas.y + canvas.height + epsilon) return canvas;
+  // Retain a small optical margin; remove only unnecessary source-artboard padding.
+  const pad = Math.max(measured.width, measured.height) * 0.025;
+  const left = Math.max(canvas.x, measured.x - pad);
+  const top = Math.max(canvas.y, measured.y - pad);
+  const right = Math.min(canvas.x + canvas.width, measured.x + measured.width + pad);
+  const bottom = Math.min(canvas.y + canvas.height, measured.y + measured.height + pad);
+  return { x: left, y: top, width: right - left, height: bottom - top };
+}
+
 const logo = (project:BrandProject,x:number,y:number,w:number,h:number,mono?:string):string => {
   const asset:LogoAsset|null=project.logo;
   if (!asset) return `<text x="${x+w/2}" y="${y+h/2}" text-anchor="middle" font-size="36" fill="#888">SVG 로고 업로드 필요</text>`;
-  const v=asset.viewBox;
-  const ratio=asset.aspectRatio||1;
+  const v=visibleLogoBox(asset);
+  const ratio=v.width/v.height;
   const fitW=Math.min(w,h*ratio), fitH=fitW/ratio;
   const ox=x+(w-fitW)/2,oy=y+(h-fitH)/2;
   const filterId=`bm-${Math.round(x)}-${Math.round(y)}`;
