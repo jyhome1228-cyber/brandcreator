@@ -223,3 +223,22 @@
  .bramer-welcome .bramer-welcome-body :is(.bramer-welcome-eyebrow,h1,.bramer-welcome-description,.bramer-welcome-bottom,.bramer-welcome-step-card){animation:none!important;opacity:1!important;transform:none!important}
  .bramer-welcome .bramer-welcome-introduction,.bramer-welcome .bramer-welcome-mark img{transform:none!important;transition:none!important}
 }
+
+/* Official BRAMER vector replaces all UI text marks. Original SVG shape is preserved. */
+.bramer-logo{display:block;width:auto;height:19px;max-width:100%;object-fit:contain;object-position:left center;flex:none;user-select:none}
+.bramer-logo.is-dark{filter:brightness(0)}
+.bramer-logo.is-light{filter:brightness(0) invert(1)}
+.bramer-landing .bramer-site-logo{display:inline-flex;align-items:center;flex-shrink:0;line-height:1}
+.bramer-landing .bramer-site-logo .bramer-logo{height:22px}
+.bramer-landing .bramer-footer-bottom .bramer-logo{height:24px;width:auto}
+.bramer-dash .bramer-dash-logo,.bramer-create-shell .bramer-dash-logo,.editor-topbar .bramer-brand-home{display:inline-flex;align-items:center;justify-content:flex-start;line-height:1;min-width:0;padding:0;flex-shrink:0}
+.bramer-dash .bramer-dash-logo .bramer-logo,.bramer-create-shell .bramer-dash-logo .bramer-logo,.editor-topbar .bramer-brand-home .bramer-logo{height:19px;width:auto}
+.bramer-welcome .bramer-welcome-header .bramer-logo{height:18px;width:auto}
+.bramer-welcome .bramer-welcome-mark .bramer-logo,.bramer-welcome .bramer-welcome-mark .bramer-intro-logo{height:auto!important;width:min(260px,55vw)!important;max-height:60px!important;object-fit:contain}
+.bramer-help-hero-brand{display:none!important}
+.bramer-help-document-footer span:first-child{font-size:12px}
+@media(max-width:760px){
+ .bramer-landing .bramer-site-logo .bramer-logo{height:19px}
+ .bramer-dash .bramer-dash-logo .bramer-logo{height:17px}
+ .bramer-welcome .bramer-welcome-header .bramer-logo{height:16px}
+}
