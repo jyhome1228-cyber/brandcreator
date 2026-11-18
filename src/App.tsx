@@ -84,8 +84,7 @@ export default function App() {
     goToDashboard();
   };
   const enterWorkspace = (newRegistration = false) => {
-    const seen = (() => {try {return localStorage.getItem('bramer-onboarding-v1')==='seen';} catch {return false;}})();
-    if(newRegistration && !seen) {
+    if(newRegistration) {
       try {setWelcomeLanguage(localStorage.getItem('bramer-site-language')==='en'?'en':'ko');} catch {setWelcomeLanguage('ko');}
       window.location.hash = '/welcome';
       setMode('welcome');
