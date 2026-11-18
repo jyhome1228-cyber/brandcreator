@@ -103,8 +103,7 @@ function GuidelinePreview({ english }: { english: boolean }) {
   return (
     <div className="bramer-preview bramer-engine-preview" data-reveal>
       <div className="bramer-preview-window">
-        <div className="bramer-preview-toolbar">
-          <span className="bramer-preview-window-title">{english ? 'Brand Guidelines' : '브랜드 가이드라인'}</span>
+        <div className="bramer-preview-toolbar" aria-label={english ? 'Guideline page number' : '가이드라인 페이지 번호'}>
           <span className="bramer-preview-page-count">{pages.length ? `${String(index+1).padStart(2,'0')} / ${String(pages.length).padStart(2,'0')}` : '—'}</span>
         </div>
         <div className="bramer-preview-canvas bramer-engine-canvas bramer-engine-side-controls" aria-live="polite" tabIndex={0} role="region"
