@@ -244,8 +244,8 @@ function gridDetailPage(project:BrandProject):GuidelinePage {
  const body=`${fittedText('VISUAL PROPORTION '+ratio.toFixed(2)+' : 1',160,495,820,47,'#242424',700)}
    ${fittedText('1X = visible logo height',160,585,800,33,'#555555')}
    ${fittedText('Measured from actual SVG bounds',160,655,810,27,'#777777')}
-   ${constructionGridArtwork(project,1070,375,1750,1230)}
-   ${note('그리드는 SVG 외곽의 실측 비율에 맞춘 참고선이며, 타이포그래피 세부 광학 보정은 별도 검토가 필요합니다.',1770)}`;
+   ${constructionGridArtwork(project,1070,375,1750,1230,'proportion')}
+   ${note('표시 비율은 SVG 시각 경계의 실측값입니다. 로고는 원본 비율로 재현하고, 세부 광학 정렬은 별도 검토합니다.',1770)}`;
  return reviewPage(project,'Logo Grid Detail','시각 영역 비율',body,'logo','06-grid-system-2');
 }
 function clearSpaceDetailPage(project:BrandProject):GuidelinePage {
