@@ -37,7 +37,7 @@ const bramerSampleBase: BrandProject = {
   colors: { primary: '#000000', secondary: '#FFFFFF', accent: '#777777' },
   typography: { title: 'Inter', body: 'Pretendard' },
   rules: { clearSpace: 0.25, minimumPrintMm: 10, minimumDigitalPx: 40 },
-  contact: { personName: '', position: '', phone: '', email: '', website: '', company: 'BRAMER', address: '' },
+  contact: { personName: '홍길동', position: 'Brand Designer', phone: '010-1234-5678', email: 'hello@bramer.kr', website: 'www.bramer.kr', company: 'BRAMER', address: '서울특별시 성동구 성수이로12길 8, 4층' },
 };
 
 function GuidelinePreview({ english }: { english: boolean }) {
@@ -109,7 +109,7 @@ function GuidelinePreview({ english }: { english: boolean }) {
           {pages.map((page, i) => <button type="button" key={page.id} className={i === index ? 'active' : ''} aria-pressed={i === index} title={page.title} onClick={() => { setPlaying(false); setIndex(i); }}><span>{String(i+1).padStart(2,'0')}</span><small>{page.title}</small></button>)}
         </div>}
       </div>
-      <p className="bramer-preview-note">{english ? 'Generated using the same 17-item BRAMER guideline engine as the editor. This example uses the BRAMER logo and demonstration brand settings; contact fields are intentionally blank.' : '제작 프로그램과 동일한 17개 항목의 BRAMER 생성 엔진으로 만든 결과물입니다. BRAMER 로고와 예시 설정을 사용했으며, 연락처는 입력하지 않았습니다.'}</p>
+      <p className="bramer-preview-note">{english ? 'Generated using the same 17-item BRAMER guideline engine as the editor. This example uses the BRAMER logo and demonstration brand settings; sample contact information is fictional.' : '제작 프로그램과 동일한 17개 항목의 BRAMER 생성 엔진으로 만든 결과물입니다. BRAMER 로고와 예시 설정을 사용했으며, 명함과 서식의 연락처는 예시 데이터입니다.'}</p>
     </div>
   );
 }
