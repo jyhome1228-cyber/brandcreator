@@ -1,0 +1,48 @@
+/* Consistent BRAMER workspace sidebar + evidence-aware industry guidance */
+.bramer-dash .bramer-dash-nav{display:grid;gap:5px}
+.bramer-dash .bramer-dash-nav button:not(.active){background:transparent!important;color:#62625f!important;font-weight:550!important}
+.bramer-dash .bramer-dash-nav button.active{background:#ececea!important;color:#191919!important;font-weight:700!important}
+.bramer-dash .bramer-dash-nav button:hover:not(.active){background:#f5f5f3!important;color:#222!important}
+.bramer-industry-research-disclaimer{border-left:3px solid #b7a7f7;background:#f7f6fa;color:#696575;font-size:12px;line-height:1.75;padding:14px 18px;margin:0 0 29px;word-break:keep-all}
+.bramer-industry-section-heading{margin-bottom:16px}
+.bramer-industry-section-heading h3,.bramer-industry-guidance-panel h3,.bramer-industry-final-check h3{font-size:16px!important;font-weight:650;letter-spacing:-.03em!important;margin:0 0 8px}
+.bramer-industry-section-heading p,.bramer-industry-guidance-intro{font-size:12px;color:#777;line-height:1.7;margin:0}
+.bramer-industry-priorities{margin-bottom:30px}
+.bramer-industry-priority-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.bramer-industry-priority-grid article{border:1px solid #e6e6e3;background:#fff;border-radius:8px;padding:20px;min-width:0}
+.bramer-industry-priority-grid article>span{display:block;color:#a59cc5;font-size:11px;font-weight:650;margin-bottom:13px}
+.bramer-industry-priority-grid article h4{font-size:14px!important;font-weight:650;margin:0 0 9px}
+.bramer-industry-priority-grid article p{font-size:12px;line-height:1.75;color:#686864;word-break:keep-all;margin:0 0 14px}
+.bramer-industry-priority-grid article small{display:block;border-top:1px solid #eee;padding-top:12px;color:#85827e;font-size:11px;line-height:1.6}
+.bramer-industry-guidance-columns{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px;margin:0 0 27px}
+.bramer-industry-guidance-panel{border:1px solid #e8e8e6;border-radius:9px;padding:22px 21px}
+.bramer-industry-guidance-panel .bramer-industry-guidance-intro{min-height:56px;margin-bottom:13px}
+.bramer-industry-guidance-row{padding:14px 0;border-top:1px solid #eaeae8}
+.bramer-industry-guidance-row strong{font-size:13px;color:#222;font-weight:620}
+.bramer-industry-guidance-row p{font-size:12px;line-height:1.7;color:#747470;margin:7px 0 0}
+.bramer-industry-final-check{padding:22px 24px;background:#f5f5f3;border-radius:9px;margin-bottom:34px}
+.bramer-industry-final-check p{display:flex;gap:15px;font-size:12px;color:#5e5e5b;line-height:1.7;margin:12px 0}
+.bramer-industry-final-check p span{color:#888;font-size:11px;flex:0 0 24px}
+.bramer-help-steps{padding:12px 28px 28px;margin-bottom:36px}
+.bramer-help-step{display:flex;gap:19px;padding:24px 0;border-bottom:1px solid #e8e8e5}
+.bramer-help-step>span{color:#999;font-size:12px;font-weight:650;min-width:28px}
+.bramer-help-step h2{font-size:15px!important;margin:0 0 8px;font-weight:650}
+.bramer-help-step p{font-size:13px;color:#777;line-height:1.8;word-break:keep-all;margin:0}
+.bramer-help-steps>.bramer-dash-primary{margin-top:25px}
+.bramer-help-faq h2{font-size:18px!important;margin:0 0 17px;font-weight:650}
+.bramer-help-faq details{border-bottom:1px solid #e4e4e0;background:#fff;padding:17px 20px}
+.bramer-help-faq summary{font-size:13px;font-weight:600;cursor:pointer}
+.bramer-help-faq details p{font-size:12px;color:#73736e;line-height:1.85;max-width:790px;margin:13px 0 0}
+.editor-mode .bramer-editor-global-menu{border-bottom:1px solid #e5e5e3;padding:0 0 18px;margin-bottom:22px}
+.editor-mode .bramer-editor-global-menu .bramer-dash-nav{display:grid;gap:4px}
+.editor-mode .bramer-editor-global-menu .bramer-dash-nav button{border:0;border-radius:7px;background:transparent;text-align:left;padding:11px 13px;min-height:39px;width:100%;font-size:12px!important;color:#62625f;cursor:pointer}
+.editor-mode .bramer-editor-global-menu .bramer-dash-nav button.active{background:#ececea;color:#191919;font-weight:700}
+.editor-mode .bramer-editor-global-menu .bramer-dash-nav button:hover:not(.active){background:#f4f4f2}
+@media(max-width:760px){
+ .bramer-dash .bramer-dash-nav{display:flex;overflow-x:auto;gap:4px}
+ .bramer-industry-priority-grid,.bramer-industry-guidance-columns{grid-template-columns:1fr}
+ .bramer-industry-guidance-panel .bramer-industry-guidance-intro{min-height:0}
+ .bramer-help-steps{padding:7px 17px 22px}
+ .editor-mode .bramer-editor-global-menu .bramer-dash-nav{display:flex;overflow-x:auto}
+ .editor-mode .bramer-editor-global-menu .bramer-dash-nav button{width:auto;white-space:nowrap;flex:0 0 auto}
+}

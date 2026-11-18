@@ -47,3 +47,5 @@ import './hero-full-rotation.css';
 import './project-library.css';
 
 import './bramer-v2.css';
+
+import './workspace-unified.css';
