@@ -44,11 +44,26 @@ function GuidelinePreview({ english }: { english: boolean }) {
   const [sampleProject, setSampleProject] = useState<BrandProject | null>(null);
   const [sampleError, setSampleError] = useState(false);
   const [index, setIndex] = useState(0);
+  const [outgoingSvg, setOutgoingSvg] = useState<string | null>(null);
+  const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward'>('forward');
+  const [transitionKey, setTransitionKey] = useState(0);
+  const leaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const touchStartX = useRef<number | null>(null);
   const changePage = (next: number, total: number) => {
     if (!total) return;
-    setIndex(((next % total) + total) % total);
+    const normalized = ((next % total) + total) % total;
+    if (normalized === index) return;
+    const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+    setTransitionDirection(next < index ? 'backward' : 'forward');
+    setOutgoingSvg(!reduceMotion && pages[index] ? pages[index].svg : null);
+    setTransitionKey(key => key + 1);
+    setIndex(normalized);
+    leaveTimer.current = setTimeout(() => setOutgoingSvg(null), 540);
   };
+  useEffect(() => () => {
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+  }, []);
   useEffect(() => {
     let cancelled = false;
     const source = window.location.pathname.startsWith("/brandcreator/") ? "/brandcreator/bramer-sample-logo.svg" : "/bramer-sample-logo.svg";
@@ -109,9 +124,14 @@ function GuidelinePreview({ english }: { english: boolean }) {
         <div className="bramer-preview-canvas bramer-engine-canvas bramer-engine-side-controls" aria-live="polite" tabIndex={0} role="region"
           aria-label={english ? 'Guideline sample, use arrow keys or swipe to change pages' : '가이드라인 미리보기, 방향키 또는 스와이프로 페이지 이동'}
           onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onKeyDown={onPreviewKey}>
-          {current ? <img className="bramer-engine-page" key={current.id+(english?'-en':'-ko')} src={selectedImage}
-            alt={`${current.title} — ${current.subtitle}`} loading="eager"/> :
-            <p className="bramer-engine-loading" role="status">{sampleError?(english?'Preview unavailable':'미리보기를 불러올 수 없습니다.'):(english?'Preparing preview…':'미리보기를 준비하고 있습니다…')}</p>}
+          <div className="bramer-preview-page-stage">
+            {outgoingSvg ? <img aria-hidden="true" alt="" className={`bramer-engine-exit-page ${transitionDirection}`}
+              src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(outgoingSvg)}`} /> : null}
+            {current ? <img className={`bramer-engine-page bramer-engine-enter-page ${transitionDirection}`}
+              key={current.id+'-'+transitionKey+(english?'-en':'-ko')} src={selectedImage}
+              alt={`${current.title} — ${current.subtitle}`} loading="eager"/> :
+              <p className="bramer-engine-loading" role="status">{sampleError?(english?'Preview unavailable':'미리보기를 불러올 수 없습니다.'):(english?'Preparing preview…':'미리보기를 준비하고 있습니다…')}</p>}
+          </div>
           {pages.length>0 && <>
             <button type="button" className="bramer-preview-side-button previous" onClick={()=>changePage(index-1,pages.length)}
               aria-label={english?'Previous page':'이전 페이지'}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" width="23" height="23"><path d="M14.5 5.5 8 12l6.5 6.5" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
