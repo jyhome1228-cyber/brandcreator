@@ -126,12 +126,20 @@ export default function App() {
   const currentSnapshot = (): SavedBramerProject => ({
     id: projectId, updatedAt: Date.now(), project, industry, selectedCategories, enabled, step: setupStep,
   });
+  const hasDraftContent = () => Boolean(
+    project.name.trim() || project.englishName.trim() || project.description.trim() ||
+    project.slogan.trim() || project.logo || setupStep > 1 ||
+    project.colors.primary !== initialProject.colors.primary ||
+    project.colors.secondary !== initialProject.colors.secondary ||
+    project.colors.accent !== initialProject.colors.accent ||
+    Object.values(project.contact ?? {}).some(value=>typeof value==='string' && value.trim())
+  );
   const refreshProjects = async () => {
     try { setSavedProjects(await listSavedProjects()); setLibraryError(''); }
     catch (e) { setLibraryError(e instanceof Error ? e.message : '저장된 프로젝트를 불러오지 못했습니다.'); }
   };
   const saveToBrowser = async (): Promise<boolean> => {
-    if (!project.name.trim() && !project.englishName.trim()) return false;
+    if (!hasDraftContent()) return false;
     setSaveStatus('saving');
     try {
       await saveLocalProject(currentSnapshot());
@@ -174,7 +182,7 @@ export default function App() {
     return () => { cancelled=true; };
   }, []);
   useEffect(() => {
-    if (!hydrated || (!project.name.trim() && !project.englishName.trim())) return;
+    if (!hydrated || !hasDraftContent()) return;
     setSaveStatus('saving');
     autosaveTimer.current = setTimeout(() => { void saveToBrowser(); }, 550);
     return () => { if (autosaveTimer.current) clearTimeout(autosaveTimer.current); };
@@ -184,7 +192,7 @@ export default function App() {
   useEffect(() => {
     if(!hydrated) return;
     const flush = () => {
-      if(document.visibilityState !== 'hidden' || (!project.name.trim() && !project.englishName.trim())) return;
+      if(document.visibilityState !== 'hidden' || !hasDraftContent()) return;
       if(autosaveTimer.current) clearTimeout(autosaveTimer.current);
       void saveLocalProject(currentSnapshot()).catch(() => {});
     };
@@ -203,7 +211,7 @@ export default function App() {
   };
   const openProjectLibrary = async () => {
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-    if (project.name.trim() || project.englishName.trim()) await saveToBrowser();
+    if (hasDraftContent()) await saveToBrowser();
     await refreshProjects();
     window.location.hash = '/projects';
     setMode('projects');
@@ -211,7 +219,7 @@ export default function App() {
   };
   const createNewProject = async () => {
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-    if (project.name.trim() || project.englishName.trim()) await saveToBrowser();
+    if (hasDraftContent()) await saveToBrowser();
     const nextId=newProjectId();
     try { localStorage.setItem('bramer-active-project-v1',nextId); } catch { /* unavailable */ }
     setProject({ ...initialProject, year: String(new Date().getFullYear()), contact:{...initialProject.contact!}, colors:{...initialProject.colors}, typography:{...initialProject.typography}, rules:{...initialProject.rules} });
