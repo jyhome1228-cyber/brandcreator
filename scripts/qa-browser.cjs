@@ -316,7 +316,7 @@ try{
  pass('mobile creation wizard and SVG upload with no horizontal overflow');
  await mp.goto(url+'#/guide',{waitUntil:'domcontentloaded'});
  await mp.getByText('이 업종에서 특히 확인할 규칙').waitFor();
- grayscale(await mp.locator('.bramer-industry-research-disclaimer').evaluate(el=>getComputedStyle(el).borderLeftColor),'Guide research note');
+ assert.equal(await mp.locator('.bramer-industry-research-disclaimer').count(),0,'Internal research note must not appear in public guide');
  await mp.screenshot({path:path.join(output,'07-guide-mobile.png'),fullPage:true});
  const menuLabels=['홈','내 프로젝트','업종별 가이드','사용 방법','새로 만들기'];
  for(const label of menuLabels)assert.equal(await mp.locator('.bramer-dash-nav').getByRole('button',{name:label}).count(),1);
