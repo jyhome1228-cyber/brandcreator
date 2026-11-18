@@ -35,7 +35,11 @@ const contrastRatio = (a:string,b:string):number => {
   const la=luminance(a), lb=luminance(b);
   return (Math.max(la,lb)+0.05)/(Math.min(la,lb)+0.05);
 };
-const inkOn = (color:string):string => contrastRatio(color,'#111111')>=contrastRatio(color,'#FFFFFF')?'#111111':'#FFFFFF';
+/** Keep light marks on dark brand fills, including mid-dark gray/purple surfaces. */
+const inkOn = (color:string):string => {
+  if (luminance(color) <= 0.25 && contrastRatio(color,'#FFFFFF') >= 3) return '#FFFFFF';
+  return contrastRatio(color,'#111111')>=contrastRatio(color,'#FFFFFF')?'#111111':'#FFFFFF';
+};
 const editorialInk = (primary:string):string => contrastRatio(primary,'#FFFFFF')>=3?hex(primary):'#242424';
 /** Fit a single label within its design box without changing the user's value. */
 const fittedText = (value:string,x:number,y:number,maxWidth:number,fontSize:number,fill:string,weight=400):string => {
