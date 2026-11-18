@@ -83,13 +83,14 @@ try{
  assert.equal(await page.locator('.bramer-process-graphic').count(),3,'All three process steps have distinct visuals');
  assert.equal(await page.locator('.bramer-home-footer').count(),1,'Footer remains a single section');
  pass('supplied hero imagery, low opacity and unified landing cards');
- await page.locator('.bramer-engine-thumbnails button').nth(25).waitFor();
- assert.equal(await page.locator('.bramer-engine-thumbnails button').count(),26,'Real BRAMER generator sample should contain 26 pages for 17 items');
+ await page.locator('.bramer-engine-jump select option').nth(25).waitFor();
+ assert.equal(await page.locator('.bramer-engine-jump select option').count(),26,'Real BRAMER generator sample should contain 26 selectable pages');
  const sampleImg=page.locator('.bramer-engine-page');
  await sampleImg.waitFor();
  assert.ok(await sampleImg.evaluate(el=>el instanceof HTMLImageElement && el.complete && el.naturalWidth>0),'Actual generated SVG sample must render');
- await page.locator('.bramer-engine-thumbnails button').nth(5).click();
+ await page.locator('.bramer-engine-jump select').selectOption('5');
  assert.ok((await sampleImg.getAttribute('alt'))?.length,'Sample page navigation changes the generated SVG');
+ assert.equal(await page.locator('.bramer-preview-note').count(),0,'Unnecessary preview explanation removed');
  pass('live BRAMER 17-item guideline engine produces 26 visible sample pages');
  await page.screenshot({path:path.join(output,'01-landing-desktop.png')});
  await page.locator('.bramer-site-start').click();
