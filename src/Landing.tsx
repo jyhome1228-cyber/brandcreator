@@ -161,6 +161,10 @@ export default function Landing({ onStart }: LandingProps) {
 
     <main id="top">
       <section className="bramer-home-hero">
+        <div className="bramer-hero-image-layer" aria-hidden="true">
+          <div className="bramer-hero-image bramer-hero-image-left"/>
+          <div className="bramer-hero-image bramer-hero-image-right"/>
+        </div>
         <div className="bramer-home-hero-content" data-reveal>
           <p className="bramer-home-overline">브랜드 가이드라인 제작 솔루션</p>
           <div className="bramer-hero-rotation" aria-label="기업과 디자이너를 위한 서비스 소개"
@@ -196,6 +200,7 @@ export default function Landing({ onStart }: LandingProps) {
 
       <section className="bramer-home-steps-section" id="how">
         <div className="bramer-home-section-heading" data-reveal>
+          <span className="bramer-section-eyebrow">HOW IT WORKS / 01</span>
           <h2>어렵지 않게, 순서대로.</h2>
           <p>브랜드 가이드라인을 처음 만드는 사람도<br className="bramer-desktop-break"/> 차근차근 따라 할 수 있도록 구성했습니다.</p>
         </div>
@@ -214,6 +219,7 @@ export default function Landing({ onStart }: LandingProps) {
 <section className="bramer-help-section" id="help" aria-labelledby="bramer-help-heading">
       <div className="bramer-help-inner">
         <div className="bramer-home-section-heading">
+          <span className="bramer-section-eyebrow">HELP & RESOURCES / 02</span>
           <h2 id="bramer-help-heading">이용하면서 궁금한 점이 있나요?</h2>
           <p>준비할 자료부터 파일 저장까지, 자주 묻는 내용을 모았어요.</p>
         </div>
@@ -235,6 +241,7 @@ export default function Landing({ onStart }: LandingProps) {
           </article>
         </div>
         <section className="bramer-tech-section" id="technology" aria-labelledby="bramer-tech-title">
+          <span className="bramer-section-eyebrow">SYSTEM OVERVIEW / 03</span>
           <h3 id="bramer-tech-title">Bramer는 이렇게 작동합니다.</h3>
           <p>브레이머는 업로드한 SVG 로고와 브랜드 정보를 바탕으로 기본적인 사용 규칙을 구성합니다. 로고의 비율과 컬러를 분석하고, 17개 기본 제작 항목에 따라 가이드라인 페이지를 생성합니다.</p>
           <div className="bramer-tech-grid">
