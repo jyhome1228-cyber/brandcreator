@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
+import BramerLogo from './components/BramerLogo';
 import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
 import WelcomeExperience from './WelcomeExperience';
@@ -471,12 +472,11 @@ export default function App() {
     return (
       <div className="bramer-dash bramer-create-shell setup-mode">
         <header className="bramer-dash-header">
-          <button type="button" className="bramer-dash-logo" onClick={goHome} aria-label="Bramer 서비스 소개로 이동">BRAMER.</button>
+          <button type="button" className="bramer-dash-logo" onClick={goHome} aria-label="Bramer 서비스 소개로 이동"><BramerLogo /></button>
           <span className="bramer-dash-product">브랜드 가이드라인 제작 <span className="bramer-save-state">{saveStatus === 'saving' ? '· 저장 중' : saveStatus === 'saved' ? '· 브라우저에 저장됨' : saveStatus === 'error' ? '· 저장 실패' : ''}</span></span>
           <div className="bramer-create-header-actions">
             <label className="bramer-create-import">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={event => void restoreProject(event)} /></label>
             <button type="button" className="bramer-dash-header-start" onClick={() => void saveToBrowser()}>브라우저 저장</button>
-            <button type="button" className="bramer-create-import" onClick={saveProject}>JSON 백업</button>
           </div>
         </header>
         <div className="bramer-dash-layout">
@@ -1017,14 +1017,13 @@ export default function App() {
           <div className="product-brand editor-product-brand">
             <span className="product-mark">g.</span>
             <div>
-              <button type="button" className="bramer-brand-home" onClick={goHome} aria-label="Bramer 홈으로 이동">BRAMER.</button>
+              <button type="button" className="bramer-brand-home" onClick={goHome} aria-label="Bramer 홈으로 이동"><BramerLogo /></button>
               <span className="project-name">{project.englishName} · {enabledPages.length} pages</span>
             </div>
           </div>
           <div className="header-actions"><label className="bramer-doc-language">결과물 언어 <select value={documentLanguage} onChange={event => selectDocumentLanguage(event.target.value as DocumentLanguage)} aria-label="가이드라인 출력 언어"><option value="ko">한국어 KO</option><option value="en">English EN</option></select></label><button className="button ghost" onClick={() => navigateWorkspace('dashboard')}>대시보드</button><span className="bramer-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
             <button className="button ghost" onClick={() => void saveToBrowser()}>브라우저 저장</button>
             <button className="button ghost" onClick={() => void openProjectLibrary()}>내 프로젝트</button>
-            <button className="button ghost" onClick={saveProject}>JSON 백업</button>
             <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); window.location.hash = '/create'; }}>구성 변경</button>
             <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
             <button className="button primary" onClick={() => window.print()}>PDF로 내보내기</button>
