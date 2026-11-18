@@ -70,7 +70,7 @@ function isHex(value: string): boolean {
 
 export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
-  const [mode, setMode] = useState<'landing' | 'manifesto' | 'welcome' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/manifesto' ? 'manifesto' : location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/welcome' ? 'landing' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
+  const [mode, setMode] = useState<'landing' | 'manifesto' | 'welcome' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/technology' ? 'manifesto' : location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/welcome' ? 'landing' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
   const [showFirstCoach, setShowFirstCoach] = useState(false);
   const [welcomeLanguage, setWelcomeLanguage] = useState<'ko'|'en'>(() => {
     try { return localStorage.getItem('bramer-site-language')==='en'?'en':'ko'; } catch { return 'ko'; }
@@ -137,7 +137,7 @@ export default function App() {
   };
   useEffect(() => {
     const syncRoute = () => {
-      if (window.location.hash === '#/manifesto') setMode('manifesto');
+      if (window.location.hash === '#/technology') setMode('manifesto');
       else if (window.location.hash === '#/dashboard') setMode('dashboard');
       else if (window.location.hash === '#/welcome') setMode(previous => previous === 'welcome' ? previous : 'landing');
       else if (window.location.hash === '#/guide') setMode('guide');
