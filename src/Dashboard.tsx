@@ -85,9 +85,6 @@ export default function Dashboard({view,onNavigate,onHome,onCreate,onContinue,on
               <p>{priorities.context}</p>
               <div>{INDUSTRY_GUIDANCE[industry].touchpoints.map(point=><span key={point}>{point}</span>)}</div>
             </div>
-            <div className="bramer-industry-research-disclaimer" role="note">
-              아래 우선순위는 업종별 사용 환경과 제작 가능성을 참고한 실무적 제안입니다. 진행 중인 22개 브랜드 사례 분석에서 통계적으로 검증된 ‘업종별 필수 표준’은 아닙니다. BRAMER의 기본 결과물 17개 항목은 모든 업종에 동일하게 적용돼요.
-            </div>
             <section className="bramer-industry-priorities" aria-label="업종별 우선 검토 항목">
               <div className="bramer-industry-section-heading">
                 <h3>이 업종에서 특히 확인할 규칙</h3>
