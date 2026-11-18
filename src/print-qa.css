@@ -47,9 +47,9 @@
     position: relative !important;
     box-sizing: border-box !important;
     width: 297mm !important;
-    height: 209.5mm !important;
+    height: 209mm !important;
     min-height: 0 !important;
-    max-height: 209.5mm !important;
+    max-height: 209mm !important;
     margin: 0 !important;
     padding: 0 !important;
     border: 0 !important;
@@ -58,12 +58,14 @@
     overflow: hidden !important;
     break-inside: avoid !important;
     page-break-inside: avoid !important;
-    break-after: page !important;
-    page-break-after: always !important;
-  }
-  .editor-mode .print-page:last-child {
     break-after: auto !important;
     page-break-after: auto !important;
+    break-before: page !important;
+    page-break-before: always !important;
+  }
+  .editor-mode .print-page:first-child {
+    break-before: auto !important;
+    page-break-before: auto !important;
   }
   .editor-mode .print-page > svg {
     display: block !important;
