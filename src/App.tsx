@@ -612,8 +612,7 @@ export default function App() {
                     </div>
                     <p className="module-description">기본 17개 항목은 모두 제작 문서에 포함됩니다. 명함·봉투 등에 필요한 연락처 정보는 마지막 단계에서 입력해 주세요. 로고 최소 크기와 인쇄 규격은 제작 전 검토가 필요합니다.</p>
                   </div>
-                  <p className="bramer-research-note">업종별 안내는 참고용이며 17개 기본 제작 항목은 모든 업종에서 동일합니다. 연구로 검증된 업종별 표준은 아닙니다.</p>
-                </div>
+                  </div>
               </section>
 
               <section className={`setup-module setup-panel ${setupStep === 3 ? 'active' : ''}`}>
