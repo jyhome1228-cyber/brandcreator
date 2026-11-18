@@ -371,7 +371,7 @@ export default function App() {
     onNew={()=>void createNewProject()} onBack={goHome} onGuide={openGuide} onHelp={openHelp}
     error={libraryError}/>;
   if (mode === 'help') return <HelpView onHome={goHome} onProjects={()=>void openProjectLibrary()}
-    onGuide={openGuide} onNew={()=>void createNewProject()} onHelp={openHelp}/>;setMode('setup');}} error={libraryError}/>;
+    onGuide={openGuide} onNew={()=>void createNewProject()} onHelp={openHelp}/>;
   if (mode === 'landing') return <Landing onStart={enterWorkspace} />;
   if (mode === 'dashboard' || mode === 'guide') return <Dashboard
     view={mode}
