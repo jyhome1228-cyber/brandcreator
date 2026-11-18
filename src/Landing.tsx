@@ -197,7 +197,7 @@ export default function Landing({ onStart }: LandingProps) {
   const tryBeta = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submitting) return;
-    if (!betaForm.name.trim() || !/^\\d{9,11}$/.test(betaForm.phone.replace(/\\D/g,'')) || !betaForm.occupation) {
+    if (!betaForm.name.trim() || !/^\d{9,11}$/.test(betaForm.phone.replace(/\D/g,'')) || !betaForm.occupation) {
       setBetaError(tr('성함, 연락처, 직업을 확인해 주세요.','Please check your name, phone number and occupation.'));
       return;
     }
