@@ -191,6 +191,52 @@ try{
     assert.ok(!page('03-logo-section').svg.includes('Logo variations'));
     assert.ok(pages.filter(x=>x.title==='Brand Colors').length===1);
   });
+  run('짙은 브랜드 배경에서 밝은 단색 로고 강제 사용',()=>{
+    const p=fixture('wide');p.colors.primary='#202020';
+    const pages=generateV2Pages(p);
+    const cover=pages.find(page=>page.id==='01-cover').svg;
+    const card=generateBusinessCardSvg(p);
+    const sticker=generateStickerSvg(p,'circle');
+    for(const svg of [cover,card,sticker]){
+      assert.ok(svg.includes('feColorMatrix'), 'Dark surface must use a true monochrome filter');
+      assert.ok(svg.includes('0 0 0 0 1'), 'Dark surface should have white logo channels');
+      assert.ok(svg.includes('filter="url(#'), 'White filter must apply to the actual logo');
+    }
+    assert.ok(card.includes('fill="#202020"'));
+  });
+  run('중간 명도의 어두운 브랜드 컬러에서도 검은 로고를 선택하지 않음',()=>{
+    const p=fixture('wide');p.colors.primary='#777777';
+    const card=generateBusinessCardSvg(p),sticker=generateStickerSvg(p,'square');
+    for(const svg of [card,sticker]){
+      assert.ok(svg.includes('0 0 0 0 1'), 'Dark gray branded surface must use a white mark');
+      assert.ok(svg.includes('filter="url(#'), 'White mark must not remain the original dark artwork');
+    }
+  });
+  run('밝은 브랜드 배경은 어두운 로고로 전환하고 어두운 배경에서 강제하지 않음',()=>{
+    const p=fixture('wide');p.colors.primary='#F5EECB';
+    const card=generateBusinessCardSvg(p),sticker=generateStickerSvg(p,'square');
+    for(const svg of [card,sticker]){
+      assert.ok(svg.includes('feColorMatrix'));
+      assert.ok(svg.includes('0 0 0 0 0'), 'Light surface should use a black logo');
+    }
+  });
+  run('화이트 원본 로고는 흰색 문서 면에서 사라지지 않음',()=>{
+    const p=fixture('white');p.colors.primary='#222222';
+    const pages=generateV2Pages(p);
+    const primary=pages.find(page=>page.id==='04-signature-logo').svg;
+    const grid=pages.find(page=>page.id==='05-grid-system-1').svg;
+    const detail=pages.find(page=>page.id==='06-grid-system-2').svg;
+    for(const svg of [primary,grid,detail]){
+      assert.ok(svg.includes('feColorMatrix'), 'White-only source requires dark fallback on light page');
+      assert.ok(svg.includes('0 0 0 0 0'), 'White-only source should use a black mark on white');
+    }
+  });
+  run('다색 원본의 흰 배경 표현은 무조건 검정화하지 않음',()=>{
+    const p=fixture('multi');
+    const page=generateV2Pages(p).find(page=>page.id==='06-grid-system-2').svg;
+    assert.ok(page.includes('#C13652') && page.includes('#3053BD'));
+    assert.ok(!page.includes('filter="url(#bm-'), 'Multicolor originals stay multicolor on suitable white surface');
+  });
   // Python stdlib XML parser checks XML well-formedness, namespace closure, ampersands and nested logos.
   execFileSync('python3',['-c',
     'import glob,sys,xml.etree.ElementTree as E; files=glob.glob(sys.argv[1]+"/*.svg"); [E.parse(p) for p in files]; print("PASS SVG XML",len(files))',

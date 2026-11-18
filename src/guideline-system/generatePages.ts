@@ -56,8 +56,21 @@ function contrastRatio(a: string, b: string): number {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+/** Prefer a white mark on genuinely dark surfaces, never a dark-on-dark logo. */
 function contrast(hex: string): string {
+  if (relativeLuminance(hex) <= 0.25 && contrastRatio(hex, WHITE) >= 3) return WHITE;
   return contrastRatio(hex, BLACK) >= contrastRatio(hex, WHITE) ? BLACK : WHITE;
+}
+function lightBackgroundLogoVariant(asset: LogoAsset | null): string | undefined {
+  // White-only/very pale original SVGs disappear on white guideline pages.
+  // Keep multi-color originals intact; only replace a wholly low-contrast asset.
+  return asset?.colors.length && asset.colors.every(color => contrastRatio(color, WHITE) < 3)
+    ? BLACK : undefined;
+}
+function safeLogoColor(background: string, proposed: string): string {
+  const bg = safeHex(background, WHITE);
+  const ink = safeHex(proposed, BLACK);
+  return contrastRatio(bg, ink) >= 3 ? ink : contrast(bg);
 }
 
 /**
@@ -151,17 +164,15 @@ function logo(asset: LogoAsset | null, x: number, y: number, width: number, heig
   if (!asset) {
     return `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="none" stroke="${LINE}" stroke-width="2"/><text x="${x + width / 2}" y="${y + height / 2}" fill="${MUTED}" font-size="34" text-anchor="middle">LOGO SVG</text>`;
   }
-  const normalized = color?.toUpperCase();
-  const monochrome = normalized === WHITE || normalized === BLACK;
-  const inner = color && !monochrome ? recolorInner(asset.inner, color) : asset.inner;
   const v = visibleLogoBox(asset);
-  // An SVG may define its fills in nested CSS classes, not only fill attributes.
-  // A color-matrix forces an exact monochrome variant while preserving opacity.
-  const id = `bramer-mono-${Math.round(x)}-${Math.round(y)}-${normalized === WHITE ? 'w' : 'b'}`;
-  const channel = normalized === WHITE ? 1 : 0;
-  const filter = monochrome ? `<defs><filter id="${id}" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 ${channel}  0 0 0 0 ${channel}  0 0 0 0 ${channel}  0 0 0 1 0"/></filter></defs>` : '';
-  const content = monochrome ? `<g filter="url(#${id})">${inner}</g>` : inner;
-  return `<svg x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${v.x} ${v.y} ${v.width} ${v.height}" preserveAspectRatio="xMidYMid meet">${filter}${content}</svg>`;
+  // Any explicitly requested solid mark (including non-black brand colors)
+  // must recolor class-based SVG fills reliably. The color matrix preserves alpha.
+  const requested = color ? safeHex(color, BLACK) : null;
+  const channel = requested ? hexRgb(requested).map(value => (value / 255).toFixed(6)) : [];
+  const id = `bramer-solid-${Math.round(x)}-${Math.round(y)}-${requested?.slice(1).toLowerCase() || 'raw'}`;
+  const filter = requested ? `<defs><filter id="${id}" x="-15%" y="-15%" width="130%" height="130%" color-interpolation-filters="sRGB"><feColorMatrix type="matrix" values="0 0 0 0 ${channel[0]}  0 0 0 0 ${channel[1]}  0 0 0 0 ${channel[2]}  0 0 0 1 0"/></filter></defs>` : '';
+  const inner = requested ? `<g filter="url(#${id})">${asset.inner}</g>` : asset.inner;
+  return `<svg x="${x}" y="${y}" width="${width}" height="${height}" viewBox="${v.x} ${v.y} ${v.width} ${v.height}" preserveAspectRatio="xMidYMid meet">${filter}${inner}</svg>`;
 }
 
 function fitLogo(asset: LogoAsset | null, x: number, y: number, width: number, height: number, padding = 0): { x: number; y: number; width: number; height: number } {
@@ -181,7 +192,7 @@ function fitLogo(asset: LogoAsset | null, x: number, y: number, width: number, h
 function footer(project: BrandProject, section: string, inverted = false): string {
   const color = inverted ? 'rgba(255,255,255,.72)' : MUTED;
   const line = inverted ? 'rgba(255,255,255,.28)' : LINE;
-  const logoColor = inverted ? WHITE : safeHex(project.colors.primary);
+  const logoColor = inverted ? WHITE : safeLogoColor(WHITE, project.colors.primary);
   return `<line x1="105" y1="1895" x2="2865" y2="1895" stroke="${line}" stroke-width="2"/>${logo(project.logo, 105, 1930, 150, 55, logoColor)}<text x="1485" y="1970" fill="${color}" font-size="22" text-anchor="middle">${esc(section)}</text><text x="2865" y="1970" fill="${color}" font-size="22" text-anchor="end">Brand Guidelines</text>`;
 }
 
@@ -222,7 +233,7 @@ function swatch(project: BrandProject, color: string, x: number, labelText: stri
 function colorCell(project: BrandProject, bg: string, logoColor: string, x: number, y: number, w: number, h: number, title: string): string {
   const safeBg = safeHex(bg, WHITE);
   const safeLogo = safeHex(logoColor, BLACK);
-  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${safeBg}"/>${label(title, x + 26, y + 44, surfaceInk(safeBg))}${logo(project.logo, x + 135, y + 78, w - 270, h - 130, safeLogo)}`;
+  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${safeBg}"/>${label(title, x + 26, y + 44, surfaceInk(safeBg))}${logo(project.logo, x + 135, y + 78, w - 270, h - 130, safeLogoColor(safeBg, safeLogo))}`;
 }
 
 function usageCell(project: BrandProject, bg: string, logoColor: string, x: number, y: number, w: number, h: number): string {
@@ -464,7 +475,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       `${leftMeta([['Role', 'Core brand asset'], ['Priority', 'Primary version first'], ['Rule', 'Do not redraw']])}
       ${panel(1035, 460, 1830, 720, WHITE, LINE)}
       ${label('PRIMARY LOGO', 1080, 520)}
-      ${logo(project.logo, 1390, 660, 1120, 310)}
+      ${logo(project.logo, 1390, 660, 1120, 310, lightBackgroundLogoVariant(project.logo))}
       ${panel(1035, 1215, 885, 330, primary)}
       ${label('REVERSE', 1075, 1270, contrast(primary))}
       ${logo(project.logo, 1240, 1330, 480, 140, contrast(primary))}
@@ -502,7 +513,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
         <line x1="1080" y1="1100" x2="2800" y2="1100" stroke="${GUIDE}" stroke-width="2"/>
         <line x1="1080" y1="1300" x2="2800" y2="1300" stroke="${GUIDE}" stroke-width="2"/>
       </g>
-      ${logo(project.logo, gridLogo.x, gridLogo.y, gridLogo.width, gridLogo.height)}
+      ${logo(project.logo, gridLogo.x, gridLogo.y, gridLogo.width, gridLogo.height, lightBackgroundLogoVariant(project.logo))}
       ${measurementLine(gridLogo.x, 1360, gridLogo.x + gridLogo.width, 1360, `${ratioText}X`, gridLogo.x + gridLogo.width / 2, 1420)}
       ${measurementLine(2740, gridLogo.y, 2740, gridLogo.y + gridLogo.height, '1X', 2780, gridLogo.y + gridLogo.height / 2)}
       <rect x="1035" y="1535" width="565" height="120" fill="${SOFT}"/>
@@ -524,7 +535,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       `${leftMeta([['Primary', 'Brand color'], ['Mono', 'Black / White'], ['Reverse', 'High contrast']])}
       ${panel(1035, 460, 885, 500, WHITE, LINE)}
       ${label('01 · PRIMARY', 1075, 520)}
-      ${logo(project.logo, 1220, 650, 520, 170, primary)}
+      ${logo(project.logo, 1220, 650, 520, 170, safeLogoColor(WHITE, primary))}
       ${panel(1955, 460, 910, 500, primary)}
       ${label('02 · REVERSE', 1995, 520, contrast(primary))}
       ${logo(project.logo, 2150, 650, 520, 170, contrast(primary))}
@@ -553,7 +564,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       ${panel(1035, 460, 1830, 1010, '#FAFAFA', LINE)}
       <rect x="${clearLogo.x - clearPx}" y="${clearLogo.y - clearPx}" width="${clearLogo.width + clearPx * 2}" height="${clearLogo.height + clearPx * 2}" fill="#EFEFEF" stroke="${GUIDE}" stroke-width="2" stroke-dasharray="12 9"/>
       <rect x="${clearLogo.x}" y="${clearLogo.y}" width="${clearLogo.width}" height="${clearLogo.height}" fill="#FFFFFF"/>
-      ${logo(project.logo, clearLogo.x, clearLogo.y, clearLogo.width, clearLogo.height)}
+      ${logo(project.logo, clearLogo.x, clearLogo.y, clearLogo.width, clearLogo.height, lightBackgroundLogoVariant(project.logo))}
       ${measurementLine(clearLogo.x - clearPx, clearLogo.y - clearPx - 38, clearLogo.x, clearLogo.y - clearPx - 38, `${clear}X`, clearLogo.x - clearPx / 2, clearLogo.y - clearPx - 55)}
       ${measurementLine(clearLogo.x + clearLogo.width, clearLogo.y - clearPx - 38, clearLogo.x + clearLogo.width + clearPx, clearLogo.y - clearPx - 38, `${clear}X`, clearLogo.x + clearLogo.width + clearPx / 2, clearLogo.y - clearPx - 55)}
       <text x="1070" y="1535" fill="${MUTED}" font-size="22">SAFE AREA</text>
@@ -597,7 +608,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       ${label('PRINT', 1080, 520)}
       <text x="1080" y="620" fill="${BLACK}" font-size="88" font-weight="700">${project.rules.minimumPrintMm} mm</text>
       <text x="1080" y="675" fill="${MUTED}" font-size="23">Minimum width for printed material</text>
-      ${logo(project.logo, 1195, 900, 565, 180)}
+      ${logo(project.logo, 1195, 900, 565, 180, lightBackgroundLogoVariant(project.logo))}
       <line x1="1195" y1="1135" x2="1760" y2="1135" stroke="${BLACK}" stroke-width="2"/>
       <text x="1478" y="1185" fill="${MUTED}" font-size="22" text-anchor="middle">${project.rules.minimumPrintMm} mm</text>
 
@@ -605,7 +616,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
       ${label('DIGITAL', 2000, 520)}
       <text x="2000" y="620" fill="${BLACK}" font-size="88" font-weight="700">${project.rules.minimumDigitalPx} px</text>
       <text x="2000" y="675" fill="${MUTED}" font-size="23">Minimum width for digital interface</text>
-      ${logo(project.logo, 2120, 900, 580, 180)}
+      ${logo(project.logo, 2120, 900, 580, 180, lightBackgroundLogoVariant(project.logo))}
       <line x1="2120" y1="1135" x2="2700" y2="1135" stroke="${BLACK}" stroke-width="2"/>
       <text x="2410" y="1185" fill="${MUTED}" font-size="22" text-anchor="middle">${project.rules.minimumDigitalPx} px</text>
 
@@ -674,7 +685,7 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
     svg: commonPage(project, 'COLOR', 'Combinations', copy.combination,
       `${leftMeta([['Rule', 'Contrast first'], ['Preferred', 'Primary / White'], ['Avoid', 'Low contrast']])}
       ${colorCell(project, primary, contrast(primary), 1035, 460, 885, 330, 'PRIMARY')}
-      ${colorCell(project, WHITE, primary, 1955, 460, 910, 330, 'WHITE')}
+      ${colorCell(project, WHITE, safeLogoColor(WHITE, primary), 1955, 460, 910, 330, 'WHITE')}
       ${colorCell(project, BLACK, WHITE, 1035, 825, 885, 330, 'BLACK')}
       ${colorCell(project, secondary, contrast(secondary), 1955, 825, 910, 330, 'SECONDARY')}
       ${colorCell(project, accent, contrast(accent), 1035, 1190, 885, 330, 'ACCENT')}
