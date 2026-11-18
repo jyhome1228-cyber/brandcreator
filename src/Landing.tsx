@@ -270,45 +270,45 @@ export default function Landing({ onStart }: LandingProps) {
     <footer className="bramer-home-footer">
       <div className="bramer-footer-inner">
         <div className="bramer-footer-columns">
-          <div className="bramer-footer-col"><h3>Bramer</h3><a href="#top">서비스 소개</a><a href="#preview">결과물 미리보기</a><a href="#how">이용 방법</a></div>
-          <div className="bramer-footer-col"><h3>가이드라인</h3><a href="#/create">새 가이드라인 만들기</a><a href="#/create">가이드라인 제작</a><a href="#preview">샘플 가이드라인</a></div>
-          <div className="bramer-footer-col"><h3>업종별 가이드</h3><a href="#/guide">업종별 추천 구성</a><a href="#/guide">필요한 가이드 항목</a><a href="#/guide">자료 체크리스트</a></div>
-          <div className="bramer-footer-col"><h3>자료 준비</h3><a href="#resources">준비 자료 안내</a><a href="#technology">SVG 업로드 안내</a><a href="#data-info">프로젝트 저장 안내</a></div>
-          <div className="bramer-footer-col"><h3>지원</h3><a href="#help">도움말</a><a href="#faq">자주 묻는 질문</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">업데이트 내역</a></div>
-          <div className="bramer-footer-col"><h3>이용 안내</h3><a href="#privacy-info">파일 이용 안내</a><a href="#data-info">저장 방식 안내</a><a href="#technology">기술 및 제작 방식</a></div>
+          <div className="bramer-footer-col"><h3>Bramer</h3><a href="#top">{tr('서비스 소개','Overview')}</a><a href="#preview">{tr('결과물 미리보기','Guideline sample')}</a><a href="#how">이용 방법</a></div>
+          <div className="bramer-footer-col"><h3>{tr('가이드라인','Guidelines')}</h3><a href="#/create">{tr('새 가이드라인 만들기','New guideline')}</a><a href="#/create">{tr('가이드라인 제작','Guideline editor')}</a><a href="#preview">{tr('샘플 가이드라인','Guideline samples')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('업종별 가이드','Industry guide')}</h3><a href="#/guide">{tr('업종별 추천 구성','Industry recommendations')}</a><a href="#/guide">{tr('필요한 가이드 항목','Guideline contents')}</a><a href="#/guide">{tr('자료 체크리스트','Asset checklist')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('자료 준비','Preparation')}</h3><a href="#resources">{tr('준비 자료 안내','Preparing assets')}</a><a href="#technology">{tr('SVG 업로드 안내','Uploading SVG')}</a><a href="#data-info">{tr('프로젝트 저장 안내','Saving projects')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('지원','Support')}</h3><a href="#help">도움말</a><a href="#faq">{tr('자주 묻는 질문','FAQ')}</a><a href="https://github.com/jyhome1228-cyber/brandcreator/commits/main" target="_blank" rel="noopener noreferrer">{tr('업데이트 내역','Updates')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('이용 안내','Information')}</h3><a href="#privacy-info">{tr('파일 이용 안내','File handling')}</a><a href="#data-info">{tr('저장 방식 안내','Storage options')}</a><a href="#technology">{tr('기술 및 제작 방식','Technology')}</a></div>
         </div>
         <div className="bramer-footer-bottom"><div><strong>BRAMER.</strong><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>{tr('현재 제공되는 기능을 기준으로 안내합니다.','Features described reflect the current beta version.')}</small></div>
       </div>
     </footer>
     {betaOpen ? <div className="bramer-beta-overlay" onMouseDown={(event) => { if (event.target === event.currentTarget) closeBeta(); }}>
       <div className="bramer-beta-dialog" role="dialog" aria-modal="true" aria-labelledby="bramer-beta-title" aria-describedby="bramer-beta-description" ref={dialogRef} tabIndex={-1}>
-        <button type="button" className="bramer-beta-close" aria-label="닫기" onClick={closeBeta}>닫기</button>
+        <button type="button" className="bramer-beta-close" aria-label={tr('닫기','Close')} onClick={closeBeta}>{tr('닫기','Close')}</button>
         <span className="bramer-beta-label">BRAMER BETA</span>
         <h2 id="bramer-beta-title">{tr("12월 31일까지, 자유롭게 체험하세요.","Explore BRAMER free through December 31.")}</h2>
         <p id="bramer-beta-description">{tr("BRAMER는 2026년 12월 31일까지 무료 베타테스트를 진행합니다. 간단한 정보 입력 후 바로 가이드라인을 만들어볼 수 있어요.","BRAMER is in free beta until December 31, 2026. Enter a few details to start creating your guideline.")}</p>
         {sessionRegistered ? <div className="bramer-beta-registered">
-          <p>이 브라우저에서 베타 체험을 시작했어요. 바로 제작 화면으로 이동할 수 있습니다.</p>
-          <button className="bramer-beta-primary" type="button" onClick={enterRegistered}>체험 이어가기</button>
+          <p>{tr('이 브라우저에서 베타 체험을 시작했어요. 바로 제작 화면으로 이동할 수 있습니다.','You have started the beta on this browser. Continue to your workspace.')}</p>
+          <button className="bramer-beta-primary" type="button" onClick={enterRegistered}>{tr('체험 이어가기','Continue beta')}</button>
         </div> : <form className="bramer-beta-form" onSubmit={tryBeta}>
           <div className="bramer-beta-field-grid">
-            <label><span>성함</span><input autoComplete="name" maxLength={40} value={betaForm.name} onChange={event => setBetaForm(previous => ({ ...previous, name: event.target.value }))} placeholder="성함을 입력해 주세요" required /></label>
-            <label><span>아이디</span><input autoComplete="off" maxLength={24} value={betaForm.userId} onChange={event => setBetaForm(previous => ({ ...previous, userId: event.target.value }))} placeholder="영문·숫자 4~24자" pattern="[a-zA-Z0-9_-]{4,24}" required /></label>
-            <label><span>연락처</span><input autoComplete="tel" type="tel" maxLength={20} value={betaForm.phone} onChange={event => setBetaForm(previous => ({ ...previous, phone: event.target.value }))} placeholder="연락처를 입력해 주세요" required /></label>
-            <label><span>직업</span><select value={betaForm.occupation} onChange={event => setBetaForm(previous => ({ ...previous, occupation: event.target.value }))} required><option value="">선택해 주세요</option><option value="디자이너">디자이너</option><option value="기업 담당자">기업 담당자</option><option value="브랜드 운영자">브랜드 운영자</option><option value="학생·연구자">학생·연구자</option><option value="기타">기타</option></select></label>
+            <label><span>{tr('성함','Name')}</span><input autoComplete="name" maxLength={40} value={betaForm.name} onChange={event => setBetaForm(previous => ({ ...previous, name: event.target.value }))} placeholder={tr('성함을 입력해 주세요','Enter your name')} required /></label>
+            <label><span>{tr('아이디','User ID')}</span><input autoComplete="off" maxLength={24} value={betaForm.userId} onChange={event => setBetaForm(previous => ({ ...previous, userId: event.target.value }))} placeholder={tr('영문·숫자 4~24자','4–24 letters or numbers')} pattern="[a-zA-Z0-9_-]{4,24}" required /></label>
+            <label><span>{tr('연락처','Phone number')}</span><input autoComplete="tel" type="tel" maxLength={20} value={betaForm.phone} onChange={event => setBetaForm(previous => ({ ...previous, phone: event.target.value }))} placeholder={tr('연락처를 입력해 주세요','Enter your phone number')} required /></label>
+            <label><span>{tr('직업','Occupation')}</span><select value={betaForm.occupation} onChange={event => setBetaForm(previous => ({ ...previous, occupation: event.target.value }))} required><option value="">{tr('선택해 주세요','Select')}</option><option value="디자이너">{tr('디자이너','Designer')}</option><option value="기업 담당자">{tr('기업 담당자','Company representative')}</option><option value="브랜드 운영자">{tr('브랜드 운영자','Brand manager')}</option><option value="학생·연구자">{tr('학생·연구자','Student / researcher')}</option><option value="기타">{tr('기타','Other')}</option></select></label>
           </div>
           <div className="bramer-beta-privacy">
-            <label className="bramer-beta-consent"><input type="checkbox" checked={agreed} onChange={event => setAgreed(event.target.checked)} required /><span>개인정보처리방침(베타 체험 안내)에 동의합니다. (필수)</span></label>
-            <button type="button" className="bramer-beta-privacy-button" aria-expanded={privacyOpen} onClick={() => setPrivacyOpen(previous => !previous)}>개인정보처리방침 {privacyOpen ? '접기' : '보기'}</button>
+            <label className="bramer-beta-consent"><input type="checkbox" checked={agreed} onChange={event => setAgreed(event.target.checked)} required /><span>{tr('개인정보처리방침(베타 체험 안내)에 동의합니다. (필수)','I agree to the beta privacy notice. (Required)')}</span></label>
+            <button type="button" className="bramer-beta-privacy-button" aria-expanded={privacyOpen} onClick={() => setPrivacyOpen(previous => !previous)}>{tr('개인정보처리방침','Privacy notice')} {privacyOpen ? tr('접기','Hide') : tr('보기','View')}</button>
             {privacyOpen ? <div className="bramer-beta-privacy-text">
-              <strong>베타 체험 개인정보처리방침</strong>
-              <p>입력 항목: 성함, 아이디, 연락처, 직업. 목적: 베타 체험 등록 화면 확인 및 이용 의사 표시.</p>
-              <p><strong>현재 중앙 등록 서버는 연결되어 있지 않습니다.</strong> 입력한 개인정보는 서버로 전송·저장되지 않으며, 화면을 떠나면 입력값이 사라집니다. 브라우저 세션에는 체험 여부만 저장합니다. 연락처로 별도 연락하거나 사용자 계정을 생성하지 않습니다.</p>
-              <p>브라우저 세션의 체험 표시를 없애려면 브라우저의 해당 사이트 세션 데이터를 삭제하면 됩니다. 정식 회원 관리 및 개인정보처리방침은 서버 구축 후 별도 공지해야 합니다.</p>
+              <strong>{tr('베타 체험 개인정보처리방침','Beta privacy notice')}</strong>
+              <p>{tr('입력 항목: 성함, 아이디, 연락처, 직업. 목적: 베타 체험 등록 화면 확인 및 이용 의사 표시.','Fields: name, user ID, phone number, occupation. Used only for this beta registration interface.')}</p>
+              <p>{tr('현재 중앙 등록 서버는 연결되어 있지 않습니다. 입력한 개인정보는 서버로 전송·저장되지 않으며, 화면을 떠나면 입력값이 사라집니다. 브라우저 세션에는 체험 여부만 저장합니다. 연락처로 별도 연락하거나 사용자 계정을 생성하지 않습니다.','No central registration server is connected. Your personal details are not transmitted or stored; only a beta participation flag is saved in this browser session. No user account is created.')}</p>
+              <p>{tr('브라우저 세션의 체험 표시를 없애려면 브라우저의 해당 사이트 세션 데이터를 삭제하면 됩니다. 정식 회원 관리 및 개인정보처리방침은 서버 구축 후 별도 공지해야 합니다.','Clear the site session data to reset the beta participation flag. Formal account management and privacy policies will be published when the backend becomes available.')}</p>
             </div> : null}
           </div>
-          <p className="bramer-beta-local-notice">현재는 체험용 등록 화면입니다. 실제 회원 계정이나 서버 등록은 생성되지 않습니다.</p>
+          <p className="bramer-beta-local-notice">{tr('현재는 체험용 등록 화면입니다. 실제 회원 계정이나 서버 등록은 생성되지 않습니다.','This is a preview registration form. It does not create an account or server-side record.')}</p>
           {betaError ? <p className="bramer-beta-error" role="alert">{betaError}</p> : null}
-          <button className="bramer-beta-primary" type="submit">등록하고 무료 체험하기</button>
+          <button className="bramer-beta-primary" type="submit">{tr('등록하고 무료 체험하기','Register and try for free')}</button>
         </form>}
       </div>
     </div> : null}
