@@ -76,3 +76,25 @@
 .bramer-engine-thumbnails button small{font-size:10px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%;color:inherit;}
 @media(max-width:1020px){.bramer-landing .bramer-site-header-inner{width:calc(100% - 36px);gap:13px}.bramer-landing .bramer-site-menu{gap:16px}.bramer-landing .bramer-site-actions{gap:12px}.bramer-landing .bramer-site-menu a{font-size:12px!important}}
 @media(max-width:760px){.bramer-landing .bramer-site-header-inner{height:60px;min-height:60px;gap:10px}.bramer-landing .bramer-site-menu{display:none!important}.bramer-landing .bramer-site-actions{margin-left:auto;gap:9px}.bramer-landing .bramer-site-start{min-width:0;padding:0 13px}.bramer-engine-preview .bramer-preview-window{padding:10px}.bramer-engine-preview .bramer-engine-canvas{padding:14px 8px}.bramer-engine-navigation{gap:6px}.bramer-engine-navigation>span{min-width:100px}.bramer-engine-navigation .bramer-engine-play{margin-left:0;min-width:76px}.bramer-engine-thumbnails button{min-width:78px;width:78px;height:58px;padding:7px}.bramer-engine-loading{min-height:175px}}
+
+/* Better sample navigation: swipe, keyboard, jump menu, draggable thumbnail list. */
+.bramer-engine-preview .bramer-engine-canvas{touch-action:pan-y;outline-offset:4px}
+.bramer-engine-preview .bramer-engine-canvas:focus-visible{outline:2px solid #363636}
+.bramer-engine-preview .bramer-engine-navigation{gap:10px;flex-wrap:wrap;justify-content:center}
+.bramer-engine-preview .bramer-engine-navigation>span{flex:1;min-width:160px;text-align:center}
+.bramer-engine-preview .bramer-engine-navigation>button:not(.bramer-engine-play){width:38px;height:38px;border-radius:3px;font-size:21px}
+.bramer-engine-preview .bramer-engine-jump{display:flex;align-items:center;gap:7px;font-size:11px;color:#555;white-space:nowrap}
+.bramer-engine-preview .bramer-engine-jump select{min-height:38px;max-width:220px;border:1px solid #c9c9c9;background:#fff;padding:0 8px;color:#222;font:inherit;font-size:11px;cursor:pointer}
+.bramer-engine-preview .bramer-engine-play{height:38px;margin-left:0;min-width:92px;padding:0 12px}
+.bramer-engine-preview .bramer-engine-thumbnails{cursor:grab;user-select:none;scroll-behavior:auto}
+.bramer-engine-preview .bramer-engine-thumbnails:active{cursor:grabbing}
+.bramer-engine-preview .bramer-engine-thumbnails button{cursor:pointer}
+.bramer-engine-preview .bramer-engine-hint{font-size:11px;color:#777;line-height:1.55;text-align:center;margin:3px 0 4px}
+@media(max-width:760px){
+ .bramer-engine-preview .bramer-engine-navigation{gap:7px}
+ .bramer-engine-preview .bramer-engine-navigation>span{order:-1;flex:1 0 100%;min-width:0;padding-bottom:4px}
+ .bramer-engine-preview .bramer-engine-jump{flex:1;min-width:0}
+ .bramer-engine-preview .bramer-engine-jump select{width:100%;min-width:0;max-width:none}
+ .bramer-engine-preview .bramer-engine-play{min-width:84px}
+ .bramer-engine-preview .bramer-engine-hint{font-size:10px}
+}
