@@ -240,3 +240,35 @@
  .bramer-landing .bramer-engine-preview .bramer-engine-canvas,
  .bramer-landing .bramer-engine-preview .bramer-engine-side-controls{padding:0 26px!important}
 }
+
+
+/* Documentation: align the sidebar and reading column to a shared 1240px layout grid.
+   Keep the established fixed sidebar navigation and reading content unchanged. */
+@media (min-width:951px){
+  .bramer-docs-header{padding-inline:max(24px,calc((100% - 1240px)/2))!important}
+  .bramer-docs-shell{
+    width:min(1240px,100%)!important;
+    max-width:1240px!important;
+    grid-template-columns:236px minmax(0,1fr)!important;
+    margin-inline:auto!important;
+  }
+  .bramer-docs-sidebar{
+    width:236px!important;
+    padding:43px 18px 26px 22px!important;
+  }
+  .bramer-docs-side-head{margin-left:10px!important;margin-bottom:24px!important}
+  .bramer-docs-sidebar nav{width:100%;min-width:0}
+  .bramer-docs-sidebar nav a{width:100%;padding-inline:11px!important}
+  .bramer-docs-main{
+    width:100%!important;
+    min-width:0!important;
+    max-width:1004px!important;
+    margin:0!important;
+    padding:76px 54px 54px!important;
+  }
+}
+@media (min-width:681px) and (max-width:950px){
+  .bramer-docs-shell{grid-template-columns:204px minmax(0,1fr)!important}
+  .bramer-docs-sidebar{padding:32px 13px!important}
+  .bramer-docs-main{width:100%!important;max-width:none!important;margin:0!important;padding:60px 32px!important}
+}
