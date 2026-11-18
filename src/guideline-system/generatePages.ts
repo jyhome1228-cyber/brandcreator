@@ -257,32 +257,37 @@ function typographySample(project: BrandProject, font: string, x: number, y: num
 
 
 /** Shared geometric grid: lines snap exactly to the visible SVG artwork bounds. */
-export function constructionGridArtwork(project:BrandProject,x:number,y:number,w:number,h:number):string {
+export function constructionGridArtwork(project:BrandProject,x:number,y:number,w:number,h:number,mode:'construction'|'proportion'='construction'):string {
  const visible=project.logo?visibleLogoBox(project.logo):null;
  const ratio=visible?visible.width/visible.height:1;
- const paddingX=w*.08,paddingY=h*.15;
+ const paddingX=w*.08,paddingY=h*.17;
  const availableW=w-2*paddingX,availableH=h-2*paddingY;
  const logoW=Math.min(availableW,availableH*ratio);
  const logoH=logoW/ratio;
  const bx=x+(w-logoW)/2,by=y+(h-logoH)/2;
- const vertical=Array.from({length:25},(_,i)=>{
-   const vx=bx+logoW*i/24;
-   return `<line x1="${vx.toFixed(2)}" y1="${(y+26).toFixed(2)}" x2="${vx.toFixed(2)}" y2="${(y+h-26).toFixed(2)}" stroke="#BDBDBD" stroke-width="${i===0||i===24?2.5:1.3}"/>`;
- }).join('');
- const horizontal=Array.from({length:9},(_,i)=>{
-   const hy=by+logoH*i/8;
-   return `<line x1="${(x+24).toFixed(2)}" y1="${hy.toFixed(2)}" x2="${(x+w-24).toFixed(2)}" y2="${hy.toFixed(2)}" stroke="#BDBDBD" stroke-width="${i===0||i===8?2.5:1.3}"/>`;
- }).join('');
- const corners=`<rect x="${bx}" y="${by}" width="${logoW}" height="${logoH}" fill="none" stroke="#595959" stroke-width="2.6"/>
-   <line x1="${bx+logoW/2}" y1="${y+16}" x2="${bx+logoW/2}" y2="${y+h-16}" stroke="#8C8C8C" stroke-dasharray="10 9" stroke-width="2"/>
-   <line x1="${x+16}" y1="${by+logoH/2}" x2="${x+w-16}" y2="${by+logoH/2}" stroke="#8C8C8C" stroke-dasharray="10 9" stroke-width="2"/>`;
- const measureY=y+h-36;
- const measures=`<path d="M${bx} ${measureY-9}v18M${bx+logoW} ${measureY-9}v18M${bx} ${measureY}H${bx+logoW}" stroke="#777" stroke-width="2" fill="none"/>
- <text x="${bx+logoW/2}" y="${measureY-12}" text-anchor="middle" font-size="24" fill="#555">${ratio.toFixed(2)}X</text>
- <path d="M${x+w-45} ${by}h14M${x+w-45} ${by+logoH}h14M${x+w-37} ${by}V${by+logoH}" stroke="#777" stroke-width="2" fill="none"/>
- <text x="${x+w-28}" y="${by+logoH/2}" font-size="24" fill="#555">1X</text>`;
+ const detailed=mode==='construction';
+ const vertical=detailed?Array.from({length:25},(_,i)=>{
+   const vx=bx+logoW*i/24,major=i%4===0;
+   return `<line x1="${vx.toFixed(2)}" y1="${(y+35).toFixed(2)}" x2="${vx.toFixed(2)}" y2="${(y+h-35).toFixed(2)}" stroke="${major?'#A8A8A8':'#E1E1E1'}" stroke-width="${major?2:1}"/>`;
+ }).join(''):'';
+ const horizontal=detailed?Array.from({length:9},(_,i)=>{
+   const hy=by+logoH*i/8,major=i%2===0;
+   return `<line x1="${(x+35).toFixed(2)}" y1="${hy.toFixed(2)}" x2="${(x+w-35).toFixed(2)}" y2="${hy.toFixed(2)}" stroke="${major?'#A8A8A8':'#E1E1E1'}" stroke-width="${major?2:1}"/>`;
+ }).join(''):'';
+ const box=`<rect x="${bx}" y="${by}" width="${logoW}" height="${logoH}" fill="none" stroke="#5B5B5B" stroke-width="2.8"/>`;
+ const guides=detailed?
+   `<line x1="${bx+logoW/2}" y1="${y+26}" x2="${bx+logoW/2}" y2="${y+h-26}" stroke="#8B8B8B" stroke-dasharray="10 10" stroke-width="1.8"/>`:
+   `<line x1="${bx}" y1="${by-100}" x2="${bx}" y2="${by+logoH+100}" stroke="#A0A0A0" stroke-dasharray="9 9" stroke-width="1.8"/>
+    <line x1="${bx+logoW}" y1="${by-100}" x2="${bx+logoW}" y2="${by+logoH+100}" stroke="#A0A0A0" stroke-dasharray="9 9" stroke-width="1.8"/>
+    <line x1="${bx-90}" y1="${by}" x2="${bx+logoW+90}" y2="${by}" stroke="#A0A0A0" stroke-dasharray="9 9" stroke-width="1.8"/>
+    <line x1="${bx-90}" y1="${by+logoH}" x2="${bx+logoW+90}" y2="${by+logoH}" stroke="#A0A0A0" stroke-dasharray="9 9" stroke-width="1.8"/>`;
+ const measureY=y+h-35;
+ const measures=`<path d="M${bx} ${measureY-10}v20M${bx+logoW} ${measureY-10}v20M${bx} ${measureY}H${bx+logoW}" stroke="#555" stroke-width="2" fill="none"/>
+ <text x="${bx+logoW/2}" y="${measureY-15}" text-anchor="middle" font-size="28" fill="#333">${ratio.toFixed(2)}X</text>
+ <path d="M${x+w-44} ${by}h15M${x+w-44} ${by+logoH}h15M${x+w-36} ${by}V${by+logoH}" stroke="#555" stroke-width="2" fill="none"/>
+ <text x="${x+w-24}" y="${by+logoH/2}" font-size="27" fill="#333">1X</text>`;
  return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#FAFAFA" stroke="#E2E2E2" stroke-width="2"/>
- <g opacity=".68">${vertical}${horizontal}</g>${corners}
+ <g>${vertical}${horizontal}</g>${guides}${box}
  ${logo(project.logo,bx,by,logoW,logoH,lightBackgroundLogoVariant(project.logo))}
  ${measures}`;
 }
