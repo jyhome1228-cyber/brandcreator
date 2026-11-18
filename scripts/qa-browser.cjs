@@ -29,7 +29,7 @@ let count=0;
 const pass=label=>{count++;console.log('PASS browser',label)};
 try{
  await ready();
- browser=await chromium.launch({headless:true,args:['--no-sandbox']});
+ browser=await chromium.launch({channel:'chrome',headless:true,args:['--no-sandbox']});
  const context=await browser.newContext({viewport:{width:1440,height:900},acceptDownloads:true});
  const page=await context.newPage();
  const errors=[];
