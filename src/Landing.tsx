@@ -107,22 +107,26 @@ function GuidelinePreview({ english }: { english: boolean }) {
           <span className="bramer-preview-window-title">{english ? 'Brand Guidelines' : '브랜드 가이드라인'}</span>
           <span className="bramer-preview-page-count">{pages.length ? `${String(index+1).padStart(2,'0')} / ${String(pages.length).padStart(2,'0')}` : '—'}</span>
         </div>
-        <div className="bramer-preview-canvas bramer-engine-canvas" aria-live="polite" tabIndex={0} role="region"
+        <div className="bramer-preview-canvas bramer-engine-canvas bramer-engine-side-controls" aria-live="polite" tabIndex={0} role="region"
           aria-label={english ? 'Guideline sample, use arrow keys or swipe to change pages' : '가이드라인 미리보기, 방향키 또는 스와이프로 페이지 이동'}
           onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onKeyDown={onPreviewKey}>
           {current ? <img className="bramer-engine-page" key={current.id+(english?'-en':'-ko')} src={selectedImage}
             alt={`${current.title} — ${current.subtitle}`} loading="eager"/> :
             <p className="bramer-engine-loading" role="status">{sampleError?(english?'Preview unavailable':'미리보기를 불러올 수 없습니다.'):(english?'Preparing preview…':'미리보기를 준비하고 있습니다…')}</p>}
+          {pages.length>0 && <>
+            <button type="button" className="bramer-preview-side-button previous" onClick={()=>changePage(index-1,pages.length)}
+              aria-label={english?'Previous page':'이전 페이지'}>‹</button>
+            <button type="button" className="bramer-preview-side-button next" onClick={()=>changePage(index+1,pages.length)}
+              aria-label={english?'Next page':'다음 페이지'}>›</button>
+          </>}
         </div>
-        {pages.length>0 && <div className="bramer-engine-navigation bramer-engine-navigation-minimal">
-          <button type="button" onClick={()=>changePage(index-1,pages.length)} aria-label={english?'Previous page':'이전 페이지'}>‹</button>
+        {pages.length>0 && <div className="bramer-preview-page-select">
           <label className="bramer-engine-jump"><span className="bramer-sr-only">{english?'Select page':'페이지 선택'}</span>
             <select aria-label={english?'Jump to page':'페이지 바로 이동'} value={index}
               onChange={event=>changePage(Number(event.target.value),pages.length)}>
               {pages.map((page,i)=><option value={i} key={page.id}>{String(i+1).padStart(2,'0')} · {page.title}</option>)}
             </select>
           </label>
-          <button type="button" onClick={()=>changePage(index+1,pages.length)} aria-label={english?'Next page':'다음 페이지'}>›</button>
         </div>}
       </div>
     </div>
