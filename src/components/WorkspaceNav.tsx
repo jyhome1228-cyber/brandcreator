@@ -1,4 +1,4 @@
-export type WorkspaceView = 'create' | 'projects' | 'guide' | 'help';
+export type WorkspaceView = 'home' | 'create' | 'projects' | 'guide' | 'help';
 export type WorkspaceNavProps = {
   active: WorkspaceView;
   onHome: () => void;
