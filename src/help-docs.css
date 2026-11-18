@@ -7,8 +7,8 @@
 .bramer-help-page .bramer-dash-nav button{font-size:12px!important;min-height:40px;padding:11px 13px}
 .bramer-help-local-nav{display:flex;flex-direction:column;align-items:stretch;border-top:1px solid #eaeae8;margin:29px 6px 0;padding:23px 0 0;gap:3px}
 .bramer-help-local-nav>span{font-weight:650;font-size:11px;color:#373737;margin:0 0 10px 10px}
-.bramer-help-local-nav a{font-size:12px;color:#73736f;text-decoration:none;border-radius:6px;line-height:1.5;padding:9px 10px;transition:background .18s,color .18s}
-.bramer-help-local-nav a:hover,.bramer-help-local-nav a:focus-visible{background:#f4f3f6;color:#4f3986}
+.bramer-help-local-nav button{font-size:12px;color:#73736f;text-decoration:none;border:0;background:transparent;text-align:left;cursor:pointer;border-radius:6px;line-height:1.5;padding:9px 10px;transition:background .18s,color .18s}
+.bramer-help-local-nav button:hover,.bramer-help-local-nav button:focus-visible{background:#f4f3f6;color:#4f3986}
 .bramer-help-page .bramer-dash-content{max-width:none;width:100%;padding:0 55px 100px!important}
 .bramer-help-document{max-width:840px;margin:0 auto;min-width:0}
 .bramer-help-document [id]{scroll-margin-top:102px}
@@ -68,7 +68,7 @@
  .bramer-help-page .bramer-dash-sidebar{position:static;height:auto;overflow:visible;padding:10px 14px 8px}
  .bramer-help-local-nav{display:flex;flex-direction:row;gap:2px;overflow-x:auto;padding:10px 0 0;margin:12px 0 0;white-space:nowrap}
  .bramer-help-local-nav>span{display:none}
- .bramer-help-local-nav a{flex:0 0 auto;font-size:11px;padding:9px 11px}
+ .bramer-help-local-nav button{flex:0 0 auto;font-size:11px;padding:9px 11px}
  .bramer-help-page .bramer-dash-content{padding:0 17px 72px!important}
  .bramer-help-intro{padding:35px 0 28px}
  .bramer-help-intro h1{font-size:29px!important}
