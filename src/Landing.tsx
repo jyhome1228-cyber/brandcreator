@@ -68,7 +68,17 @@ function GuidelinePreview({ english }: { english: boolean }) {
       .catch(() => { if (!cancelled) setSampleError(true); });
     return () => { cancelled = true; };
   }, []);
-  const pages = useMemo(() => sampleProject ? localizeGuidelinePages(generateV2Pages(sampleProject), english ? 'en' : 'ko') : [], [sampleProject, english]);
+  const pages = useMemo(() => {
+    if (!sampleProject) return [];
+    const generated = localizeGuidelinePages(generateV2Pages(sampleProject), english ? 'en' : 'ko');
+    // The BRAMER demo uses a strict monochrome presentation. Other brands
+    // retain the original guideline engine's guide and warning colors.
+    const monochrome = (svg: string) => svg.replace(
+      /#(?:5CC4D3|7297BD|91A9C1|93B7C8|B95151|B04343|E25555|B45A2A)/gi,
+      '#767676',
+    );
+    return generated.map(page => ({ ...page, svg: monochrome(page.svg) }));
+  }, [sampleProject, english]);
   useEffect(() => { if (index >= pages.length && pages.length) setIndex(0); }, [pages.length, index]);
   useEffect(() => {
     if (!playing || pages.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
