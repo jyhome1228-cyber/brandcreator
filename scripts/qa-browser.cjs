@@ -104,6 +104,16 @@ try{
  await page.getByRole('button',{name:/이제 시작합니다/}).click();
  await page.waitForURL('**/#/dashboard');
  await page.getByRole('dialog',{name:'첫 번째 가이드라인을 만들어보세요.'}).waitFor();
+ const returning=await context.newPage();
+ await returning.goto(url,{waitUntil:'domcontentloaded'});
+ await returning.locator('.bramer-site-start').click();
+ await returning.getByRole('button',{name:/베타테스트 로그인/}).click();
+ await returning.locator('.bramer-auth-fields input[autocomplete="name"]').fill('테스트 담당자');
+ await returning.locator('.bramer-auth-fields input[type="tel"]').fill('010-1234-5678');
+ await returning.getByRole('button',{name:'로그인하고 계속하기'}).click();
+ await returning.waitForURL('**/#/dashboard');
+ await returning.close();
+ pass('returning beta access verifies name and phone on the same browser');
  await page.getByRole('button',{name:'첫 가이드라인 만들기'}).click();
  await page.waitForURL('**/#/create');
  await page.getByRole('heading',{name:'새 브랜드 가이드라인 만들기'}).waitFor();
