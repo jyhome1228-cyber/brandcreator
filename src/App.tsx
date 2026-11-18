@@ -118,6 +118,7 @@ export default function App() {
   const [industry, setIndustry] = useState<IndustryId>('service');
   const [selectedCategories, setSelectedCategories] = useState<GuidelineCategory[]>(getDefaultSelection('service'));
   const [projectId, setProjectId] = useState(() => newProjectId());
+  const [hydrated, setHydrated] = useState(false);
   const [savedProjects, setSavedProjects] = useState<SavedBramerProject[]>([]);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [libraryError, setLibraryError] = useState('');
@@ -125,15 +126,24 @@ export default function App() {
   const currentSnapshot = (): SavedBramerProject => ({
     id: projectId, updatedAt: Date.now(), project, industry, selectedCategories, enabled, step: setupStep,
   });
+  const hasDraftContent = () => Boolean(
+    project.name.trim() || project.englishName.trim() || project.description.trim() ||
+    project.slogan.trim() || project.logo || setupStep > 1 ||
+    project.colors.primary !== initialProject.colors.primary ||
+    project.colors.secondary !== initialProject.colors.secondary ||
+    project.colors.accent !== initialProject.colors.accent ||
+    Object.values(project.contact ?? {}).some(value=>typeof value==='string' && value.trim())
+  );
   const refreshProjects = async () => {
     try { setSavedProjects(await listSavedProjects()); setLibraryError(''); }
     catch (e) { setLibraryError(e instanceof Error ? e.message : '저장된 프로젝트를 불러오지 못했습니다.'); }
   };
   const saveToBrowser = async (): Promise<boolean> => {
-    if (!project.name.trim() && !project.englishName.trim()) return false;
+    if (!hasDraftContent()) return false;
     setSaveStatus('saving');
     try {
       await saveLocalProject(currentSnapshot());
+      try { localStorage.setItem('bramer-active-project-v1',projectId); } catch { /* browser may block storage */ }
       setSaveStatus('saved');
       await refreshProjects();
       return true;
@@ -143,13 +153,52 @@ export default function App() {
       return false;
     }
   };
-  useEffect(() => { void refreshProjects(); }, []);
   useEffect(() => {
-    if (!project.name.trim() && !project.englishName.trim()) return;
+    let cancelled=false;
+    const restoreActive = async () => {
+      try {
+        const list=await listSavedProjects();
+        if(cancelled) return;
+        setSavedProjects(list);
+        let activeId: string | null = null;
+        try { activeId=localStorage.getItem('bramer-active-project-v1'); } catch { /* private browsing */ }
+        const current=list.find(item=>item.id===activeId) ?? (!activeId ? list[0] : undefined);
+        if(current && (window.location.hash==='#/create' || window.location.hash==='#/editor' || window.location.hash==='#/dashboard')) {
+          const restoredLogo=current.project.logo?.raw && current.project.logo.fileName
+            ? parseLogoSvg(current.project.logo.raw,current.project.logo.fileName) : null;
+          setProjectId(current.id);
+          setProject({...current.project,logo:restoredLogo});
+          setIndustry(current.industry);
+          setSelectedCategories(current.selectedCategories ?? getDefaultSelection(current.industry));
+          setEnabled(current.enabled ?? {});
+          setSetupStep(Math.max(1,Math.min(5,current.step)) as 1|2|3|4|5);
+          setCurrentId('01-cover');
+        }
+      } catch(e) {
+        if(!cancelled) setLibraryError(e instanceof Error ? e.message : '프로젝트 자동 복원에 실패했습니다. 내 프로젝트에서 다시 열어 주세요.');
+      } finally { if(!cancelled) setHydrated(true); }
+    };
+    void restoreActive();
+    return () => { cancelled=true; };
+  }, []);
+  useEffect(() => {
+    if (!hydrated || !hasDraftContent()) return;
     setSaveStatus('saving');
     autosaveTimer.current = setTimeout(() => { void saveToBrowser(); }, 550);
     return () => { if (autosaveTimer.current) clearTimeout(autosaveTimer.current); };
-  }, [project, projectId, industry, selectedCategories, enabled, setupStep]);
+  }, [hydrated, project, projectId, industry, selectedCategories, enabled, setupStep]);
+  // On tab backgrounding, commit the latest state immediately rather than
+  // waiting for the 550ms debounce. A browser may still terminate mid-write.
+  useEffect(() => {
+    if(!hydrated) return;
+    const flush = () => {
+      if(document.visibilityState !== 'hidden' || !hasDraftContent()) return;
+      if(autosaveTimer.current) clearTimeout(autosaveTimer.current);
+      void saveLocalProject(currentSnapshot()).catch(() => {});
+    };
+    document.addEventListener('visibilitychange',flush);
+    return () => document.removeEventListener('visibilitychange',flush);
+  },[hydrated,project,projectId,industry,selectedCategories,enabled,setupStep]);
   const openHelp = () => {
     window.location.hash = '/help';
     setMode('help');
@@ -162,7 +211,7 @@ export default function App() {
   };
   const openProjectLibrary = async () => {
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-    if (project.name.trim() || project.englishName.trim()) await saveToBrowser();
+    if (hasDraftContent()) await saveToBrowser();
     await refreshProjects();
     window.location.hash = '/projects';
     setMode('projects');
@@ -170,9 +219,11 @@ export default function App() {
   };
   const createNewProject = async () => {
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-    if (project.name.trim() || project.englishName.trim()) await saveToBrowser();
-    setProject({ ...initialProject, year: String(new Date().getFullYear()), colors:{...initialProject.colors}, typography:{...initialProject.typography}, rules:{...initialProject.rules} });
-    setProjectId(newProjectId()); setIndustry('service'); setSelectedCategories(getDefaultSelection('service'));
+    if (hasDraftContent()) await saveToBrowser();
+    const nextId=newProjectId();
+    try { localStorage.setItem('bramer-active-project-v1',nextId); } catch { /* unavailable */ }
+    setProject({ ...initialProject, year: String(new Date().getFullYear()), contact:{...initialProject.contact!}, colors:{...initialProject.colors}, typography:{...initialProject.typography}, rules:{...initialProject.rules} });
+    setProjectId(nextId); setIndustry('service'); setSelectedCategories(getDefaultSelection('service'));
     setEnabled({}); setCurrentId('01-cover'); setSetupStep(1); setError(''); setSaveStatus('idle');
     window.location.hash='/create'; setMode('setup');
     window.scrollTo({ top:0, behavior:'instant' });
@@ -185,6 +236,7 @@ export default function App() {
       const restoredLogo = item.project.logo?.raw && item.project.logo.fileName ?
         parseLogoSvg(item.project.logo.raw,item.project.logo.fileName) : null;
       setProjectId(item.id);
+      try { localStorage.setItem('bramer-active-project-v1',item.id); } catch { /* unavailable */ }
       setProject({...item.project,logo:restoredLogo});
       setIndustry(item.industry);
       setSelectedCategories(item.selectedCategories);
@@ -330,7 +382,9 @@ export default function App() {
         : null;
       setIndustry(restoredIndustry);
       setSelectedCategories(restoredModules);
-      setProjectId(newProjectId());
+      const importedId=newProjectId();
+      setProjectId(importedId);
+      try { localStorage.setItem('bramer-active-project-v1',importedId); } catch { /* unavailable */ }
       setProject({ ...saved, logo: safeLogo });
       setEnabled(snapshot.enabled || {});
       setCurrentId('01-cover');
@@ -359,13 +413,14 @@ export default function App() {
       return;
     }
     setError('');
-    setEnabled(Object.fromEntries(pages.map((page) => [page.id, true])));
+    setEnabled(previous=>Object.fromEntries(pages.map(page=>[page.id,previous[page.id]!==false])));
     setCurrentId(pages[0].id);
     setMode('editor');
     window.location.hash = '/editor';
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
 
+  if (!hydrated && (mode==='setup' || mode==='editor')) return <div className="bramer-loading-project" role="status">저장된 프로젝트 확인 중...</div>;
   if (mode === 'projects') return <ProjectLibrary projects={savedProjects}
     onOpen={id=>void resumeSavedProject(id)} onRemove={id=>void removeSavedProject(id)}
     onNew={()=>void createNewProject()} onBack={goHome} onGuide={openGuide} onHelp={openHelp}

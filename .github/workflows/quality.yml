@@ -22,3 +22,16 @@ jobs:
         run: node scripts/qa-workspace.cjs
       - name: Typecheck and production build
         run: npm run build
+      - name: Build with actual GitHub Pages base path
+        run: npx vite build --base=/brandcreator/
+      - name: Install browser QA runner
+        run: npm install --no-save --no-audit --no-fund playwright
+      - name: Real-browser workflow and responsive tests
+        run: node scripts/qa-browser.cjs
+      - name: Upload browser QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: bramer-browser-qa
+          path: artifacts/browser-qa/
+          retention-days: 7

@@ -9,7 +9,8 @@ function downloadBlob(blob: Blob, fileName: string): void {
   document.body.appendChild(anchor);
   anchor.click();
   anchor.remove();
-  URL.revokeObjectURL(url);
+  // A synchronous revoke can cancel a download on Safari and other browsers.
+  window.setTimeout(() => URL.revokeObjectURL(url), 4000);
 }
 
 export function slugify(value: string): string {
