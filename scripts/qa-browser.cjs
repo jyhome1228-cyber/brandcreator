@@ -140,7 +140,7 @@ try{
  for(const [route,selector,label] of [
    ['create','.bramer-create-shell .setup-main','create'],
    ['guide','.bramer-guide-content','guide'],
-   ['projects','.bramer-projects-content','projects'],
+   ['projects','.bramer-projects-content > .bramer-dash-page-title','projects'],
    ['help','.bramer-help-document','help'],
  ]){
    await page.goto(url+'#/'+route,{waitUntil:'domcontentloaded'});
