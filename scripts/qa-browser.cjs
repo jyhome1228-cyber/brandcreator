@@ -87,6 +87,8 @@ try{
  await page.locator('input[placeholder="브랜드명"]').waitFor();
  assert.equal(await page.locator('input[placeholder="브랜드명"]').inputValue(),'건강미 테스트');
  await page.reload();
+ await page.locator('.step-nav-item').first().waitFor();
+ await page.locator('.step-nav-item').first().click();
  await page.locator('input[placeholder="브랜드명"]').waitFor();
  assert.equal(await page.locator('input[placeholder="브랜드명"]').inputValue(),'건강미 테스트');
  await page.locator('.step-nav-item').nth(2).click();
