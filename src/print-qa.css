@@ -1,0 +1,77 @@
+/* BRAMER PDF export: print only the 26 SVG artboards, never editor chrome.
+ * At 96 CSS dpi, 210mm may round one pixel beyond a printed A4 sheet.
+ * A 0.5mm safety reduction avoids accidental overflow and blank pages.
+ */
+@media print {
+  @page { size: 297mm 210mm; margin: 0; }
+  html, body, #root {
+    margin: 0 !important;
+    padding: 0 !important;
+    width: 297mm !important;
+    min-width: 0 !important;
+    max-width: 297mm !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  body .app-shell.editor-mode {
+    display: block !important;
+    width: 297mm !important;
+    max-width: 297mm !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: visible !important;
+    background: #fff !important;
+  }
+  .editor-mode .topbar,
+  .editor-mode .bramer-editor-overview,
+  .editor-mode .editor-layout,
+  .editor-mode .page-sidebar,
+  .editor-mode .settings-panel,
+  .editor-mode .preview-area { display: none !important; }
+  .editor-mode .print-pages {
+    display: block !important;
+    position: static !important;
+    width: 297mm !important;
+    max-width: 297mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: #fff !important;
+    line-height: 0 !important;
+  }
+  .editor-mode .print-page {
+    display: block !important;
+    position: relative !important;
+    box-sizing: border-box !important;
+    width: 297mm !important;
+    height: 209.5mm !important;
+    min-height: 0 !important;
+    max-height: 209.5mm !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    outline: 0 !important;
+    box-shadow: none !important;
+    overflow: hidden !important;
+    break-inside: avoid !important;
+    page-break-inside: avoid !important;
+    break-after: page !important;
+    page-break-after: always !important;
+  }
+  .editor-mode .print-page:last-child {
+    break-after: auto !important;
+    page-break-after: auto !important;
+  }
+  .editor-mode .print-page > svg {
+    display: block !important;
+    width: 297mm !important;
+    height: 209.5mm !important;
+    max-width: none !important;
+    max-height: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+}
