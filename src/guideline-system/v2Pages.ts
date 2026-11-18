@@ -91,19 +91,34 @@ const note = (text:string,y=1700):string=>`<text x="110" y="${y}" fill="#777" fo
 const missing = (text:string)=>`<text x="110" y="1770" fill="#B45A2A" font-size="28" font-family="Arial,sans-serif">추가 입력 필요: ${esc(text)}</text>`;
 const appPage=(id:string,name:string,subtitle:string,project:BrandProject,markup:string):GuidelinePage=>({id,section:'application',title:name,subtitle,svg:guide(project,name,subtitle,markup)});
 const baseCard=(project:BrandProject,reverse=false):string=>{
-  const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' };
+  const c=project.contact;
   const bg=reverse?'#FFFFFF':hex(project.colors.primary);
   const fg=reverse?'#141414':inkOn(bg);
-  return `<rect width="900" height="500" rx="3" fill="${bg}" stroke="${reverse?'#ddd':'none'}"/>${reverse?
-    `<text x="70" y="100" font-family="Arial,sans-serif" font-size="35" font-weight="700" fill="${fg}">${esc(c.personName||'이름 미입력')}</text><text x="70" y="150" font-family="Arial,sans-serif" font-size="23" fill="#777">${esc(c.position||'직책 미입력')}</text>${lines([['PHONE',c.phone||''],['EMAIL',c.email||''],['WEB',c.website||'']],70,255,70).replace(/font-size="35"/g,'font-size="23"').replace(/font-size="24"/g,'font-size="18"')}`:
-    logo(project,80,145,740,195,fg)
-  }`;
+  if(!reverse) return `<rect width="900" height="500" rx="3" fill="${bg}"/>${logo(project,90,130,720,245,fg)}`;
+  const row=(label:string,value:string,y:number)=> value?.trim()
+    ? `${fittedText(label,70,y-28,130,18,'#777777',500)}${fittedText(value,70,y,770,25,'#242424')}`
+    : '';
+  return `<rect width="900" height="500" rx="3" fill="#FFFFFF" stroke="#DDDDDD"/>
+    ${fittedText(c?.personName||'이름 입력 필요',70,100,760,45,fg,650)}
+    ${fittedText(c?.position||'',70,150,760,26,'#777777')}
+    <path d="M70 198H830" stroke="#E6E6E6" stroke-width="2"/>
+    ${row('PHONE',c?.phone||'',280)}
+    ${row('EMAIL',c?.email||'',360)}
+    ${row('WEBSITE',c?.website||'',440)}`;
 };
 export function generateBusinessCardSvg(project:BrandProject,reverse=false):string {
-  const c: NonNullable<BrandProject['contact']> = project.contact ?? { personName:'',position:'',phone:'',email:'',website:'',company:'',address:'' },bg=reverse?'#FFFFFF':hex(project.colors.primary),fg=reverse?'#111111':inkOn(bg);
-  const label=(v:string,y:number,size=26)=>`<text x="70" y="${y}" font-size="${size}" fill="${fg}" font-family="Arial,sans-serif">${esc(v)}</text>`;
-  const front=logo(project,55,95,790,310,fg);
-  return `<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 900 500"><rect width="900" height="500" fill="${bg}"/>${reverse?`${label(c.personName||'이름 미입력',120,40)}${label(c.position||'',165,25)}${label(c.phone||'',325,26)}${label(c.email||'',365,26)}${label(c.website||'',405,26)}`:front}</svg>`;
+  const c=project.contact;
+  const bg=reverse?'#FFFFFF':hex(project.colors.primary), fg=reverse?'#111111':inkOn(bg);
+  const front=logo(project,95,110,710,280,fg);
+  const info=reverse
+    ? `${fittedText(c?.personName||'이름 입력 필요',70,110,760,46,'#191919',650)}
+       ${fittedText(c?.position||'',70,160,760,26,'#777777')}
+       <path d="M70 203H830" stroke="#DCDCDC" stroke-width="2"/>
+       ${fittedText(c?.phone||'',70,290,760,27,'#333333')}
+       ${fittedText(c?.email||'',70,355,760,27,'#333333')}
+       ${fittedText(c?.website||'',70,420,760,27,'#333333')}`
+    : front;
+  return `<svg xmlns="http://www.w3.org/2000/svg" width="90mm" height="50mm" viewBox="0 0 900 500"><rect width="900" height="500" fill="${bg}"/>${info}</svg>`;
 }
 export function generateStickerSvg(project:BrandProject,shape:'circle'|'square'):string {
   const primary=hex(project.colors.primary),fg=inkOn(primary);
@@ -139,7 +154,17 @@ export function generateApplicationPages(project:BrandProject):GuidelinePage[] {
   const p=hex(project.colors.primary), fg=inkOn(p);
   return [
     appPage('v2-14-business-card','Business Card','명함 앞면 / 뒷면',project,
-      `<g transform="translate(170 500)">${baseCard(project)}</g><g transform="translate(1470 500)">${baseCard(project,true)}</g><text x="170" y="1075" fill="#777" font-size="27">FRONT · LOGO</text><text x="1470" y="1075" fill="#777" font-size="27">BACK · CONTACT</text>${lines([['NAME',c.personName||'입력 필요'],['POSITION',c.position||'입력 필요'],['PHONE',c.phone||'입력 필요'],['EMAIL',c.email||'입력 필요']],170,1250,95)}${note('90 × 50 mm 예시 · 인쇄 전 재단·도련·폰트 확인이 필요합니다.',1775)}`),
+      `<g transform="translate(170 480)">${baseCard(project)}</g>
+        <g transform="translate(1480 480)">${baseCard(project,true)}</g>
+        <text x="170" y="1050" fill="#777" font-family="Arial,sans-serif" font-size="27">FRONT · BRAND LOGO</text>
+        <text x="1480" y="1050" fill="#777" font-family="Arial,sans-serif" font-size="27">BACK · CONTACT INFORMATION</text>
+        <path d="M170 1200H2790" stroke="#E0E0E0" stroke-width="2"/>
+        ${fittedText('90 × 50 mm',170,1300,540,40,'#252525',600)}
+        ${fittedText(c.personName||'이름 미입력',170,1400,1100,34,'#252525')}
+        ${fittedText(c.position||'직책 미입력',170,1470,1100,28,'#666666')}
+        ${fittedText(c.phone||'연락처 미입력',1480,1370,1130,30,'#252525')}
+        ${fittedText(c.email||'이메일 미입력',1480,1450,1130,30,'#252525')}
+        ${note('SVG는 편집 가능한 디자인 원본입니다. 인쇄 전 재단·도련·서체 검수가 필요합니다.',1760)}`),
     appPage('v2-15-logo-sticker','Logo Sticker','원형 / 사각형',project,
       `<circle cx="830" cy="940" r="400" fill="${p}"/>${logo(project,520,810,620,260,fg)}<rect x="1610" y="540" width="800" height="800" fill="${p}"/>${logo(project,1700,810,620,260,fg)}<text x="630" y="1450" fill="#777" font-size="30">ROUND · 50mm</text><text x="1790" y="1450" fill="#777" font-size="30">SQUARE · 50mm</text>${note('스티커 SVG는 예시 규격입니다. 인쇄 전 도무송선 및 도련을 별도로 확인하세요.')}`),
     appPage('v2-16-letterhead','Letterhead','A4 공식 서식',project,
