@@ -175,7 +175,11 @@ try{
     }
     assert.ok(pages.find(x=>x.id==='05-grid-system-1').svg.includes('1X'));
     assert.ok(pages.find(x=>x.id==='06-grid-system-2').svg.includes('1X'));
-    assert.ok((pages.find(x=>x.id==='06-grid-system-2').svg.match(/stroke="#BDBDBD"/g)||[]).length>=30,'Grid uses at least 30 aligned guide lines');
+    const construction=pages.find(x=>x.id==='05-grid-system-1').svg;
+    const proportion=pages.find(x=>x.id==='06-grid-system-2').svg;
+    assert.ok((construction.match(/stroke="#(?:A8A8A8|E1E1E1)"/g)||[]).length>=30,'Construction grid uses at least 30 guide lines');
+    assert.ok((proportion.match(/stroke="#(?:A8A8A8|E1E1E1)"/g)||[]).length<6,'Proportion page uses fewer reference lines than construction grid');
+    assert.ok(proportion.includes('VISUAL PROPORTION'),'Proportion page must explain the measured geometry');
   });
   run('17개 항목의 페이지 제목과 실제 시각 콘텐츠가 일치하는지 점검',()=>{
     const p=fixture('compact'),pages=generateV2Pages(p);
