@@ -176,6 +176,72 @@ export function generateApplicationPages(project:BrandProject):GuidelinePage[] {
 function reviewPage(project:BrandProject,title:string,description:string,body:string,section:GuidelinePage['section'],id:string):GuidelinePage {
  return {id,title,subtitle:description,section,svg:guide(project,title,description,body)};
 }
+/**
+ * V2-only examples. The legacy 26-page generator contains sections whose
+ * original IDs no longer match the 17-item program. Never relabel unrelated
+ * artwork: construct the intended page with a matching visual example.
+ */
+function gridDetailPage(project:BrandProject):GuidelinePage {
+  const bounds=project.logo?.analysis?.geometry?.visualBounds;
+  const ratio=bounds && bounds.height>0?bounds.width/bounds.height:project.logo?.aspectRatio||1;
+  const height=ratio>=1?285:650;
+  const width=Math.min(1270,height*ratio);
+  const actualHeight=Math.min(height,width/ratio);
+  const x=1490+(1270-width)/2,y=790+(650-actualHeight)/2;
+  const markup=`<rect x="1120" y="410" width="1690" height="1180" fill="#FAFAFA" stroke="#E4E4E4" stroke-width="2"/>
+    <path d="M1965 450V1540M1160 1000H2760" stroke="#91A9C1" stroke-dasharray="13 10" stroke-width="3"/>
+    <rect x="${x}" y="${y}" width="${width}" height="${actualHeight}" stroke="#7297BD" stroke-width="3" fill="none"/>
+    ${logo(project,x,y,width,actualHeight)}
+    <path d="M${x} ${y+actualHeight+65}H${x+width}" stroke="#7297BD" stroke-width="3"/>
+    ${fittedText('VISUAL PROPORTION  '+ratio.toFixed(2)+' : 1',150,585,830,42,'#242424',600)}
+    ${fittedText('Original artwork · original aspect ratio',150,705,790,29,'#666666')}
+    ${note('측정선은 SVG 시각 경계에 기반한 참고 표시입니다. 자간·세부 형태는 수동 검토하세요.',1750)}`;
+  return reviewPage(project,'Logo Grid Detail','시각 영역 비율',markup,'logo','06-grid-system-2');
+}
+function clearSpaceDetailPage(project:BrandProject):GuidelinePage {
+  const rule=Math.max(0.1,Math.min(2,project.rules.clearSpace||0.25));
+  const card=(x:number,y:number,blocked:boolean)=>{
+    const w=1120,h=655, logoW=690,logoH=210;
+    const lx=x+215,ly=y+175,space=rule*logoH;
+    return `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="#FAFAFA" stroke="#E3E3E3" stroke-width="3"/>
+      <rect x="${lx-space}" y="${ly-space}" width="${logoW+space*2}" height="${logoH+space*2}" fill="none" stroke="#93B7C8" stroke-dasharray="13 9" stroke-width="3"/>
+      ${logo(project,lx,ly,logoW,logoH)}
+      ${blocked?`<rect x="${lx+logoW+space-75}" y="${ly+80}" width="105" height="145" fill="#B95151" opacity=".8"/>`:''}
+      ${fittedText(blocked?'NOT ALLOWED · 침범':'ALLOWED · 여백 확보',x+45,y+h-65,1030,35,blocked?'#B95151':'#252525',600)}`;
+  };
+  return reviewPage(project,'Clear Space Detail','보호 공간 사용 예시',
+    card(235,500,false)+card(1590,500,true)+
+    `${fittedText('X = displayed logo height · clear space = '+rule.toFixed(2)+'X',235,1400,2100,45,'#222222',600)}
+      ${note('보호 공간은 사용자 설정값입니다. 실제 승인된 브랜드 기준과 대조하세요.',1700)}`,
+    'logo','08-clear-space-2');
+}
+function monochromePage(project:BrandProject):GuidelinePage {
+  const panel=(x:number,bg:string,fg:string,title:string)=>
+    `<rect x="${x}" y="490" width="1240" height="850" fill="${bg}" stroke="#DFDFDF" stroke-width="2"/>
+      ${logo(project,x+170,760,900,300,fg)}
+      ${fittedText(title,x+45,1250,1080,38,fg,600)}`;
+  return reviewPage(project,'Monochromatic','흑백 로고 적용',
+    panel(180,'#F7F7F7','#111111','BLACK ON LIGHT')+
+    panel(1560,'#151515','#FFFFFF','WHITE ON DARK')+
+    `${note('흑백 버전은 원본 구조를 유지한 단색 미리보기입니다. 최종 승인 및 획 가독성을 확인하세요.',1690)}`,
+    'logo','11-monochromatic');
+}
+function sectionIntroV2(project:BrandProject,title:string,index:string,items:string[],id:string,section:GuidelinePage['section']):GuidelinePage{
+  const bg=hex(project.colors.primary),foreground=inkOn(bg),muted=foreground==='#FFFFFF'?'#D1CFD9':'#5B5B5B';
+  const list=items.map((item,i)=>`${fittedText(String(i+1).padStart(2,'0'),2020,470+i*115,80,32,muted)}
+    ${fittedText(item,2140,470+i*115,680,44,foreground)}`).join('');
+  const svg=`<svg xmlns="http://www.w3.org/2000/svg" width="297mm" height="210mm" viewBox="0 0 2970 2100">
+    <rect width="2970" height="2100" fill="${bg}"/>
+    ${fittedText('BRAND IDENTITY SYSTEM · '+index,120,170,1550,30,muted,600)}
+    ${fittedText(title.toUpperCase(),120,1680,1830,190,foreground,700)}
+    <path d="M2000 300H2820" stroke="${foreground}" stroke-opacity=".3" stroke-width="3"/>
+    ${list}
+    <path d="M120 1880H2840" stroke="${foreground}" stroke-opacity=".3" stroke-width="2"/>
+    ${fittedText(project.englishName||project.name,120,1960,1200,29,foreground)}
+  </svg>`;
+  return {id,title:title+' System',subtitle:'챕터 구분',section,svg};
+}
+
 export function generateV2Pages(project:BrandProject):GuidelinePage[] {
   const old=generateGuidelinePages(project);
   const byId=(id:string)=>old.find(page=>page.id===id);
@@ -191,7 +257,20 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
       <text x="130" y="1280" font-size="29" fill="#666" font-family="Pretendard,Arial,sans-serif">브랜드가 공식적으로 사용하는 문구를 입력하고 검토하세요.</text>
       ${project.slogan?.trim()?'':missing('슬로건')}`, 'verbal','v2-13-brand-message');
   const incorrect=reviewPage(project,'Incorrect Usage','로고 사용 금지 사례',
-    `<rect x="130" y="410" width="1280" height="990" fill="#F8F8F8"/><rect x="1550" y="410" width="1280" height="990" fill="#F8F8F8"/>${logo(project,275,560,990,290)}${logo(project,1800,610,680,350)}<path d="M1750 540L2640 1210M2640 540L1750 1210" stroke="#D44" stroke-width="13" opacity=".6"/><text x="240" y="1150" font-size="38" fill="#252525">DO · 원본 비율 유지</text><text x="1690" y="1150" font-size="38" fill="#B33">DON'T · 임의 회전/변형 금지</text>${note('금지 예시는 편집 지침이며, 실제 로고의 금지 변형 전체를 포괄하지 않습니다.')}`,'logo','v2-05-incorrect-usage');
+    `<rect x="150" y="380" width="1220" height="590" fill="#FAFAFA" stroke="#E6E6E6" stroke-width="2"/>
+      <rect x="1580" y="380" width="1220" height="590" fill="#FAFAFA" stroke="#E6E6E6" stroke-width="2"/>
+      <rect x="150" y="1020" width="1220" height="590" fill="#FAFAFA" stroke="#E6E6E6" stroke-width="2"/>
+      <rect x="1580" y="1020" width="1220" height="590" fill="#E7E7E7" stroke="#D7D7D7" stroke-width="2"/>
+      ${logo(project,365,505,800,260)}
+      <g transform="rotate(14 2180 650)">${logo(project,1770,505,800,260)}</g>
+      <g transform="translate(-400 200) scale(1.55 .72)">${logo(project,365,1150,800,260)}</g>
+      ${logo(project,1770,1150,800,260,'#FFFFFF')}
+      ${fittedText('DO · KEEP ORIGINAL',195,875,1130,32,'#242424',600)}
+      ${fittedText("DON'T · ROTATE",1625,875,1130,32,'#B04343',600)}
+      ${fittedText("DON'T · DISTORT",195,1515,1130,32,'#B04343',600)}
+      ${fittedText("DON'T · LOW CONTRAST",1625,1515,1130,32,'#B04343',600)}
+      ${note('오른쪽·아래 예시는 의도적으로 잘못 적용한 로고입니다. 형태·비례·시인성을 점검하세요.',1770)}`,
+    'logo','v2-05-incorrect-usage');
   const contrastPage=reviewPage(project,'Color Contrast','배경 대비 확인',
     [project.colors.primary,project.colors.secondary,project.colors.accent,'#FFFFFF','#111111'].map((bg,i)=>{
       const safe=hex(bg),fg=inkOn(safe),x=140+(i%3)*925,y=440+Math.floor(i/3)*570;
@@ -205,20 +284,20 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
     ...withTitle('01-cover','Cover','표지','intro'),
     ...withTitle('02-index','Index','목차 · 17개 제작 항목','intro'),
     ...withTitle('03-brand-asset-notice','Brand Asset Notice','사용 전 확인 사항','intro'),
-    ...withTitle('03-logo-section','Logo System','로고 사용 규칙','logo'),
+    sectionIntroV2(project,'Logo','01',['Primary Logo','Logo Grid System','Clear Space','Minimum Size','Incorrect Usage','Monochromatic'],'03-logo-section','logo'),
     ...withTitle('04-signature-logo','Primary Logo','기본 로고','logo'),
     ...withTitle('05-grid-system-1','Logo Grid System','로고 구조 그리드','logo'),
-    ...withTitle('06-grid-system-2','Logo Grid Detail','비율 검토용 보조 페이지','logo'),
+    gridDetailPage(project),
     ...withTitle('07-clear-space-1','Clear Space','로고 보호 공간','logo'),
-    ...withTitle('08-clear-space-2','Clear Space Detail','보호 공간 검토용 보조 페이지','logo'),
+    clearSpaceDetailPage(project),
     ...withTitle('09-minimum-size','Minimum Size','최소 사용 크기','logo'),
     incorrect,
-    ...withTitle('11-monochromatic','Monochromatic','단색·흑백 로고','logo'),
-    ...withTitle('10-color-section','Color System','컬러 규칙','color'),
-    ...withTitle('12-brand-color','Brand Colors','브랜드 지정 색상','color'),
+    monochromePage(project),
+    sectionIntroV2(project,'Color','02',['Brand Colors','Color Combinations','Color Contrast'],'10-color-section','color'),
+    ...withTitle('11-monochromatic','Brand Colors','브랜드 지정 색상 · HEX/RGB/CMYK','color').map(page=>({...page,id:'v2-07-brand-colors'})),
     ...withTitle('13-color-combination','Color Combinations','컬러 조합','color'),
     contrastPage,
-    ...withTitle('15-typography-section','Typography','서체 규칙','typography'),
+    sectionIntroV2(project,'Typography','03',['Title Typography','Body Typography'],'15-typography-section','typography'),
     ...withTitle('16-title-typeface','Title Typography','제목 서체','typography'),
     ...withTitle('17-body-typeface','Body Typography','본문 서체','typography'),
     reviewPage(project,'Brand Overview','브랜드 소개',

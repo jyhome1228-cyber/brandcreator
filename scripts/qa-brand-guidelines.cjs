@@ -154,6 +154,43 @@ try{
     assert.ok(back.includes('x="70"'), 'Contact text should begin within a 7mm margin');
     assert.ok(!back.includes('x="7" '), 'The old 0.7mm unsafe margin must be removed');
   });
+  run('17개 항목의 페이지 제목과 실제 시각 콘텐츠가 일치하는지 점검',()=>{
+    const p=fixture('compact'),pages=generateV2Pages(p);
+    const page=(id)=>pages.find(x=>x.id===id);
+    assert.ok(page('06-grid-system-2').svg.includes('VISUAL PROPORTION'));
+    assert.ok(!page('06-grid-system-2').svg.includes('Logo variations'));
+    assert.ok(page('08-clear-space-2').svg.includes('ALLOWED'));
+    assert.ok(page('08-clear-space-2').svg.includes('NOT ALLOWED'));
+    assert.ok(!page('08-clear-space-2').svg.includes('Do not stretch'));
+    assert.ok(page('v2-05-incorrect-usage').svg.includes('rotate(14'));
+    assert.ok(page('v2-05-incorrect-usage').svg.includes('scale(1.55 .72)'));
+    assert.ok(page('v2-05-incorrect-usage').svg.includes('LOW CONTRAST'));
+    assert.ok(page('11-monochromatic').svg.includes('BLACK ON LIGHT'));
+    assert.ok(page('11-monochromatic').svg.includes('WHITE ON DARK'));
+    assert.ok(page('11-monochromatic').svg.includes('feColorMatrix'));
+    assert.ok(page('11-monochromatic').svg.includes('filter='));
+    assert.ok(page('11-monochromatic').section==='logo');
+    assert.ok(page('11-monochromatic').title==='Monochromatic');
+    assert.ok(page('11-monochromatic').svg.includes('<rect x="1560"'));
+    assert.ok(page('11-monochromatic').svg.includes('fill="#151515"'));
+    assert.ok(page('11-monochromatic').svg.includes('fill="#F7F7F7"'));
+    assert.ok(page('11-monochromatic').svg.includes('viewBox'));
+    assert.ok(page('11-monochromatic').svg.includes('흑백 버전'));
+    assert.ok(page('11-monochromatic').svg.includes('단색 미리보기'));
+    assert.ok(page('11-monochromatic').svg.includes('최종 승인'));
+    assert.ok(page('11-monochromatic').svg.includes('획 가독성'));
+    assert.ok(page('11-monochromatic').svg.includes('Monochromatic'));
+    assert.ok(page('11-monochromatic').svg.includes('흑백 로고'));
+    assert.ok(page('11-monochromatic').svg.includes('BRAMER · BRAND GUIDELINES'));
+    const colors=page('11-monochromatic'); // same legacy ID would collide if reused; assert unique separately
+    const brandColors=pages.find(x=>x.title==='Brand Colors');
+    assert.ok(brandColors.svg.includes('RGB'));
+    assert.ok(brandColors.svg.includes('CMYK'));
+    assert.ok(brandColors.svg.includes('#473A88'));
+    assert.ok(!pages.some(x=>x.title==='Color Distribution'), 'Unapproved 60/30/10 ratio should not appear as an official rule');
+    assert.ok(!page('03-logo-section').svg.includes('Logo variations'));
+    assert.ok(pages.filter(x=>x.title==='Brand Colors').length===1);
+  });
   // Python stdlib XML parser checks XML well-formedness, namespace closure, ampersands and nested logos.
   execFileSync('python3',['-c',
     'import glob,sys,xml.etree.ElementTree as E; files=glob.glob(sys.argv[1]+"/*.svg"); [E.parse(p) for p in files]; print("PASS SVG XML",len(files))',
