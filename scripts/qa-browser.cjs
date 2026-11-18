@@ -135,6 +135,36 @@ try{
  await page.waitForURL('**/#/projects');
  await page.getByText('이름 없는 프로젝트').first().waitFor();
  pass('untitled SVG-first draft saved without phantom blank project');
+ // The content column must not jump between create/guide/projects/help.
+ const workspaces=[];
+ for(const [route,selector,label] of [
+   ['create','.bramer-create-shell .setup-main','create'],
+   ['guide','.bramer-guide-content','guide'],
+   ['projects','.bramer-projects-content','projects'],
+   ['help','.bramer-help-document','help'],
+ ]){
+   await page.goto(url+'#/'+route,{waitUntil:'domcontentloaded'});
+   await page.locator(selector).waitFor();
+   const geometry=await page.evaluate((selector)=>{
+     const main=document.querySelector('.bramer-dash-content');
+     const inner=document.querySelector(selector);
+     const sidebar=document.querySelector('.bramer-dash-sidebar');
+     if(!main||!inner||!sidebar)throw Error('Missing workspace geometry '+selector);
+     const mr=main.getBoundingClientRect(),ir=inner.getBoundingClientRect(),sr=sidebar.getBoundingClientRect();
+     return {mainX:mr.x,mainW:mr.width,innerX:ir.x,innerW:ir.width,sidebarW:sr.width};
+   },selector);
+   workspaces.push({label,...geometry});
+   await page.screenshot({path:path.join(output,'workspace-width-'+label+'.png')});
+ }
+ const base=workspaces[0];
+ for(const item of workspaces){
+   assert.ok(Math.abs(item.mainX-base.mainX)<=2,'Main X drift '+JSON.stringify(workspaces));
+   assert.ok(Math.abs(item.mainW-base.mainW)<=2,'Main width drift '+JSON.stringify(workspaces));
+   assert.ok(Math.abs(item.innerX-base.innerX)<=2,'Inner X drift '+JSON.stringify(workspaces));
+   assert.ok(Math.abs(item.innerW-base.innerW)<=2,'Inner width drift '+JSON.stringify(workspaces));
+   assert.ok(Math.abs(item.sidebarW-base.sidebarW)<=2,'Sidebar width drift '+JSON.stringify(workspaces));
+ }
+ pass('all four workspace pages align to identical container, content and sidebar widths');
  // Mobile viewport tests: global menus, beta modal and guide navigation.
  const mobile=await browser.newContext({viewport:{width:390,height:844},acceptDownloads:true,isMobile:true,deviceScaleFactor:1});
  const mp=await mobile.newPage();
