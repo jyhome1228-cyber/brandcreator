@@ -99,29 +99,37 @@ function surfaceLine(hex: string): string {
   return surfaceInk(hex) === WHITE ? 'rgba(255,255,255,.28)' : LINE;
 }
 
-function wrap(text: string, max = 34): string[] {
-  const normalized = text.trim().replace(/\s+/g, ' ');
+/** Wrap SVG prose by approximate rendered glyph width, not raw character count.
+ * The description column is 850 SVG units wide; Korean glyphs consume
+ * roughly one font-size each, while Latin letters consume ~0.55.
+ * Keep single long tokens inside the column as well.
+ */
+function wrap(text: string, maxUnits = 23): string[] {
+  const normalized = text.trim().replace(/\\s+/g, ' ');
   if (!normalized) return [];
-  const words = normalized.split(' ');
   const lines: string[] = [];
   let current = '';
-  for (const word of words) {
-    const next = current ? `${current} ${word}` : word;
-    if ([...next].length > max && current) {
-      lines.push(current);
-      current = word;
+  let width = 0;
+  const unit = (character: string) => /[가-힣\\u3040-\\u30ff\\u4e00-\\u9fff]/u.test(character) ? 1 : /\\s/u.test(character) ? .3 : /[A-Z0-9]/u.test(character) ? .65 : .55;
+  for (const character of normalized) {
+    const nextWidth = width + unit(character);
+    if (nextWidth > maxUnits && current.trim()) {
+      lines.push(current.trim());
+      current = character.trimStart();
+      width = current ? unit(character) : 0;
     } else {
-      current = next;
+      current += character;
+      width = nextWidth;
     }
   }
-  if (current) lines.push(current);
-  return lines.slice(0, 6);
+  if (current.trim()) lines.push(current.trim());
+  return lines.slice(0, 9);
 }
 
-function textBlock(text: string, x: number, y: number, widthChars = 34, fill = BLACK): string {
-  const lines = wrap(text, widthChars);
-  return `<text x="${x}" y="${y}" fill="${fill}" font-size="35" font-weight="400">${lines
-    .map((line, index) => `<tspan x="${x}" dy="${index === 0 ? 0 : 56}">${esc(line)}</tspan>`)
+function textBlock(text: string, x: number, y: number, widthUnits = 23, fill = BLACK): string {
+  const lines = wrap(text, widthUnits);
+  return `<text x="${x}" y="${y}" fill="${fill}" font-size="33" font-weight="400">${lines
+    .map((line, index) => `<tspan x="${x}" dy="${index === 0 ? 0 : 57}">${esc(line)}</tspan>`)
     .join('')}</text>`;
 }
 
