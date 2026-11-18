@@ -68,6 +68,14 @@ try{
  assert.equal(editorCards,3,'Support section keeps three information cards');
  assert.equal(await page.locator('.bramer-home-steps article').count(),3,'How it works retains three actionable steps');
  pass('supplied hero imagery, low opacity and unified landing cards');
+ await page.locator('.bramer-engine-thumbnails button').nth(25).waitFor();
+ assert.equal(await page.locator('.bramer-engine-thumbnails button').count(),26,'Real BRAMER generator sample should contain 26 pages for 17 items');
+ const sampleImg=page.locator('.bramer-engine-page');
+ await sampleImg.waitFor();
+ assert.ok(await sampleImg.evaluate(el=>el instanceof HTMLImageElement && el.complete && el.naturalWidth>0),'Actual generated SVG sample must render');
+ await page.locator('.bramer-engine-thumbnails button').nth(5).click();
+ assert.ok((await sampleImg.getAttribute('alt'))?.length,'Sample page navigation changes the generated SVG');
+ pass('live BRAMER 17-item guideline engine produces 26 visible sample pages');
  await page.screenshot({path:path.join(output,'01-landing-desktop.png')});
  const trial=page.locator('.bramer-home-primary').first();
  await trial.click();
@@ -201,7 +209,7 @@ try{
  await mp.locator('.bramer-home-hero').waitFor();
  assert.equal(await mp.locator('.bramer-hero-image').count(),1,'Mobile hero uses one image per slide');
  await mp.locator('.bramer-roller-controls button').nth(1).click();
- assert.ok((await mp.locator('.bramer-hero-image').evaluate(el=>getComputedStyle(el).backgroundImage)).includes('20261118-043849-'),'Mobile second slide uses second image');
+ assert.ok((await mp.locator('.bramer-hero-image').evaluate(el=>getComputedStyle(el).backgroundImage)).includes('20261118-043848-'),'Mobile second slide uses company reference image');
  const mobileLandingWidth=await mp.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
  assert.ok(mobileLandingWidth.page<=mobileLandingWidth.screen+3,'Mobile landing overflow '+JSON.stringify(mobileLandingWidth));
  await mp.screenshot({path:path.join(output,'04-landing-mobile.png'),fullPage:true});
