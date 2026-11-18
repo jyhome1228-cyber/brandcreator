@@ -46,11 +46,11 @@ assert.ok(app.includes('className="bramer-editor-global-menu"'));
 assert.ok(app.includes("mode === 'help'"));
 assert.ok(app.includes("window.location.hash = '/help'"));
 assert.ok(help.includes('클라우드 동기화 기능은 아직 제공하지 않습니다'));
-assert.ok(dash.includes('실무적 제안') || dash.includes('실무적 제안'));
-assert.ok(dash.includes('22개 브랜드 사례 분석'));
+assert.ok(dash.includes('bramer-industry-priorities'),'Industry priorities remain available');
+assert.ok(!dash.includes('22개 브랜드 사례 분석'),'Internal research status should not appear in the public guide');
 console.log('PASS 8 industries with differentiated important/optional/beyond requirements');
 console.log('PASS consistent workspace menus on creation, guide, project list, help and editor');
-console.log('PASS how-to routing, local-storage disclosure and research evidence disclaimer');
+console.log('PASS how-to routing, local-storage disclosure and streamlined industry guidance');
 assert.ok(help.includes('bramer-help-document'),'Help page should provide a document reading column');
 assert.ok(help.includes('bramer-help-local-nav'),'Help page should provide a sectional table of contents');
 for(const section of ['help-overview','help-steps','help-files','help-output','help-faq']){
