@@ -129,6 +129,24 @@ function recolorInner(inner: string, color: string): string {
     .replace(/stroke\s*:\s*(?!none|transparent|url\()[^;"']+/gi, `stroke:${color}`);
 }
 
+function visibleLogoBox(asset: LogoAsset) {
+  const canvas = asset.viewBox;
+  const measured = asset.analysis?.geometry?.visualBounds;
+  if (!measured || !Number.isFinite(measured.width) || !Number.isFinite(measured.height) ||
+      measured.width <= 0 || measured.height <= 0) return canvas;
+  const epsilon = Math.max(canvas.width, canvas.height) * 0.002;
+  if (measured.x < canvas.x - epsilon || measured.y < canvas.y - epsilon ||
+      measured.x + measured.width > canvas.x + canvas.width + epsilon ||
+      measured.y + measured.height > canvas.y + canvas.height + epsilon) return canvas;
+  // Retain a small optical margin; remove only unnecessary source-artboard padding.
+  const pad = Math.max(measured.width, measured.height) * 0.025;
+  const left = Math.max(canvas.x, measured.x - pad);
+  const top = Math.max(canvas.y, measured.y - pad);
+  const right = Math.min(canvas.x + canvas.width, measured.x + measured.width + pad);
+  const bottom = Math.min(canvas.y + canvas.height, measured.y + measured.height + pad);
+  return { x: left, y: top, width: right - left, height: bottom - top };
+}
+
 function logo(asset: LogoAsset | null, x: number, y: number, width: number, height: number, color?: string): string {
   if (!asset) {
     return `<rect x="${x}" y="${y}" width="${width}" height="${height}" fill="none" stroke="${LINE}" stroke-width="2"/><text x="${x + width / 2}" y="${y + height / 2}" fill="${MUTED}" font-size="34" text-anchor="middle">LOGO SVG</text>`;
@@ -136,7 +154,7 @@ function logo(asset: LogoAsset | null, x: number, y: number, width: number, heig
   const normalized = color?.toUpperCase();
   const monochrome = normalized === WHITE || normalized === BLACK;
   const inner = color && !monochrome ? recolorInner(asset.inner, color) : asset.inner;
-  const v = asset.viewBox;
+  const v = visibleLogoBox(asset);
   // An SVG may define its fills in nested CSS classes, not only fill attributes.
   // A color-matrix forces an exact monochrome variant while preserving opacity.
   const id = `bramer-mono-${Math.round(x)}-${Math.round(y)}-${normalized === WHITE ? 'w' : 'b'}`;
@@ -149,7 +167,8 @@ function logo(asset: LogoAsset | null, x: number, y: number, width: number, heig
 function fitLogo(asset: LogoAsset | null, x: number, y: number, width: number, height: number, padding = 0): { x: number; y: number; width: number; height: number } {
   const innerW = Math.max(1, width - padding * 2);
   const innerH = Math.max(1, height - padding * 2);
-  const ratio = asset?.aspectRatio && asset.aspectRatio > 0 ? asset.aspectRatio : 1;
+  const frame = asset ? visibleLogoBox(asset) : null;
+  const ratio = frame ? frame.width / frame.height : 1;
   let renderedW = innerW;
   let renderedH = renderedW / ratio;
   if (renderedH > innerH) {
@@ -226,7 +245,8 @@ export function generateGuidelinePages(project: BrandProject): GuidelinePage[] {
   const coverLine = surfaceLine(primary);
   const brandName = project.name || project.englishName || 'Brand';
   const englishName = project.englishName || brandName;
-  const ratio = project.logo?.aspectRatio && project.logo.aspectRatio > 0 ? project.logo.aspectRatio : 1;
+  const visibleBox = project.logo ? visibleLogoBox(project.logo) : null;
+  const ratio = visibleBox ? visibleBox.width / visibleBox.height : 1;
   const ratioText = ratio.toFixed(2);
   const clear = Math.max(0.1, Math.min(2, project.rules.clearSpace || 0.25));
   const brandDescription = project.description.trim() || `${brandName}는 일관된 시각 언어를 통해 브랜드의 태도와 가치를 명확하게 전달합니다. 본 가이드라인은 모든 접점에서 동일한 인상을 유지하기 위한 기본 원칙과 적용 기준을 정의합니다.`;
