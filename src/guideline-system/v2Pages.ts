@@ -1,5 +1,5 @@
 import type { BrandProject, GuidelinePage, LogoAsset } from '../types/guideline';
-import { generateGuidelinePages } from './generatePages';
+import { generateGuidelinePages, constructionGridArtwork } from './generatePages';
 
 export const CORE_ITEMS = [
   ['Primary Logo','기본 로고와 사용 원칙'],
@@ -237,22 +237,16 @@ function reviewPage(project:BrandProject,title:string,description:string,body:st
  * original IDs no longer match the 17-item program. Never relabel unrelated
  * artwork: construct the intended page with a matching visual example.
  */
+
 function gridDetailPage(project:BrandProject):GuidelinePage {
-  const bounds=project.logo?.analysis?.geometry?.visualBounds;
-  const ratio=bounds && bounds.height>0?bounds.width/bounds.height:project.logo?.aspectRatio||1;
-  const height=ratio>=1?285:650;
-  const width=Math.min(1270,height*ratio);
-  const actualHeight=Math.min(height,width/ratio);
-  const x=1490+(1270-width)/2,y=790+(650-actualHeight)/2;
-  const markup=`<rect x="1120" y="410" width="1690" height="1180" fill="#FAFAFA" stroke="#E4E4E4" stroke-width="2"/>
-    <path d="M1965 450V1540M1160 1000H2760" stroke="#91A9C1" stroke-dasharray="13 10" stroke-width="3"/>
-    <rect x="${x}" y="${y}" width="${width}" height="${actualHeight}" stroke="#7297BD" stroke-width="3" fill="none"/>
-    ${logo(project,x,y,width,actualHeight)}
-    <path d="M${x} ${y+actualHeight+65}H${x+width}" stroke="#7297BD" stroke-width="3"/>
-    ${fittedText('VISUAL PROPORTION  '+ratio.toFixed(2)+' : 1',150,585,830,42,'#242424',600)}
-    ${fittedText('Original artwork · original aspect ratio',150,705,790,29,'#666666')}
-    ${note('측정선은 SVG 시각 경계에 기반한 참고 표시입니다. 자간·세부 형태는 수동 검토하세요.',1750)}`;
-  return reviewPage(project,'Logo Grid Detail','시각 영역 비율',markup,'logo','06-grid-system-2');
+ const bounds=project.logo?.analysis?.geometry?.visualBounds;
+ const ratio=bounds&&bounds.height>0?bounds.width/bounds.height:project.logo?.aspectRatio||1;
+ const body=`${fittedText('VISUAL PROPORTION '+ratio.toFixed(2)+' : 1',160,495,820,47,'#242424',700)}
+   ${fittedText('1X = visible logo height',160,585,800,33,'#555555')}
+   ${fittedText('Measured from actual SVG bounds',160,655,810,27,'#777777')}
+   ${constructionGridArtwork(project,1070,375,1750,1230)}
+   ${note('그리드는 SVG 외곽의 실측 비율에 맞춘 참고선이며, 타이포그래피 세부 광학 보정은 별도 검토가 필요합니다.',1770)}`;
+ return reviewPage(project,'Logo Grid Detail','시각 영역 비율',body,'logo','06-grid-system-2');
 }
 function clearSpaceDetailPage(project:BrandProject):GuidelinePage {
   const rule=Math.max(0.1,Math.min(2,project.rules.clearSpace||0.25));
