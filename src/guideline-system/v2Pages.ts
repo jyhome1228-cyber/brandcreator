@@ -185,14 +185,22 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
   };
   const important=project.slogan?.trim()||'슬로건을 입력해 주세요.';
   const message=reviewPage(project,'Brand Message','브랜드 슬로건과 메시지',
-    `<text x="130" y="500" font-size="35" fill="#777" font-family="Arial,sans-serif">BRAND SLOGAN</text><text x="130" y="675" font-size="72" font-weight="700" fill="${hex(project.colors.primary)}" font-family="Arial,sans-serif">${esc(important.slice(0,65))}</text><text x="130" y="840" font-size="31" fill="#666" font-family="Arial,sans-serif">브랜드가 공식적으로 사용하는 문구를 입력하고 검토하세요.</text>${project.slogan?.trim()?'':missing('슬로건')}`, 'verbal','v2-13-brand-message');
+    `<text x="130" y="480" font-size="31" fill="#777" font-family="Pretendard,Arial,sans-serif">BRAND SLOGAN</text>
+      ${wrapCopy(important,53,3).map((line,i)=>fittedText(line,130,670+i*116,2610,78,editorialInk(project.colors.primary),650)).join('')}
+      <path d="M130 1160H2830" stroke="#DFDFDF" stroke-width="3"/>
+      <text x="130" y="1280" font-size="29" fill="#666" font-family="Pretendard,Arial,sans-serif">브랜드가 공식적으로 사용하는 문구를 입력하고 검토하세요.</text>
+      ${project.slogan?.trim()?'':missing('슬로건')}`, 'verbal','v2-13-brand-message');
   const incorrect=reviewPage(project,'Incorrect Usage','로고 사용 금지 사례',
     `<rect x="130" y="410" width="1280" height="990" fill="#F8F8F8"/><rect x="1550" y="410" width="1280" height="990" fill="#F8F8F8"/>${logo(project,275,560,990,290)}${logo(project,1800,610,680,350)}<path d="M1750 540L2640 1210M2640 540L1750 1210" stroke="#D44" stroke-width="13" opacity=".6"/><text x="240" y="1150" font-size="38" fill="#252525">DO · 원본 비율 유지</text><text x="1690" y="1150" font-size="38" fill="#B33">DON'T · 임의 회전/변형 금지</text>${note('금지 예시는 편집 지침이며, 실제 로고의 금지 변형 전체를 포괄하지 않습니다.')}`,'logo','v2-05-incorrect-usage');
   const contrastPage=reviewPage(project,'Color Contrast','배경 대비 확인',
     [project.colors.primary,project.colors.secondary,project.colors.accent,'#FFFFFF','#111111'].map((bg,i)=>{
       const safe=hex(bg),fg=inkOn(safe),x=140+(i%3)*925,y=440+Math.floor(i/3)*570;
-      return `<rect x="${x}" y="${y}" width="825" height="470" fill="${safe}" stroke="#DDD" stroke-width="2"/>${logo(project,x+130,y+95,565,245,fg)}<text x="${x+30}" y="${y+420}" fill="${fg}" font-family="Arial,sans-serif" font-size="27">${esc(safe)} · 시각적 검토 필요</text>`;
-    }).join('')+`${note('명도 기반 색상 선택은 참고용이며 실제 로고 형태의 시인성은 직접 확인해야 합니다.',1765)}`,'color','v2-09-color-contrast');
+      const ratio=contrastRatio(safe,fg);
+      return `<rect x="${x}" y="${y}" width="825" height="470" fill="${safe}" stroke="#DDD" stroke-width="2"/>
+        ${logo(project,x+130,y+95,565,245,fg)}
+        ${fittedText(safe,x+25,y+390,250,27,fg,650)}
+        ${fittedText('MONO ' + fg + ' · ' + ratio.toFixed(1) + ':1',x+280,y+390,520,25,fg)}`;
+    }).join('')+`${note('비율은 단색 로고와 배경의 계산값입니다. 실제 컬러 원본 로고의 적합성은 별도 검수하세요.',1765)}`,'color','v2-09-color-contrast');
   const main:GuidelinePage[]=[
     ...withTitle('01-cover','Cover','표지','intro'),
     ...withTitle('02-index','Index','목차 · 17개 제작 항목','intro'),
@@ -214,10 +222,11 @@ export function generateV2Pages(project:BrandProject):GuidelinePage[] {
     ...withTitle('16-title-typeface','Title Typography','제목 서체','typography'),
     ...withTitle('17-body-typeface','Body Typography','본문 서체','typography'),
     reviewPage(project,'Brand Overview','브랜드 소개',
-      `<text x="130" y="450" fill="#777" font-size="32" font-family="Arial,sans-serif">BRAND PROFILE</text>
-      <text x="130" y="600" fill="${hex(project.colors.primary)}" font-size="82" font-family="Arial,sans-serif" font-weight="700">${esc((project.name||project.englishName).slice(0,35))}</text>
-      <text x="130" y="750" fill="#555" font-size="33" font-family="Arial,sans-serif">${esc((project.englishName||'').slice(0,60))}</text>
-      ${(project.description?.trim()||'브랜드 설명을 입력해 주세요.').match(/.{1,54}/gu)?.slice(0,7).map((line,i)=>`<text x="130" y="${980+i*83}" font-size="37" font-family="Arial,sans-serif" fill="#222">${esc(line)}</text>`).join('')||''}
+      `<text x="130" y="455" fill="#777" font-size="31" font-family="Pretendard,Arial,sans-serif">BRAND PROFILE</text>
+      ${fittedText(project.name||project.englishName,130,610,2600,88,editorialInk(project.colors.primary),700)}
+      ${fittedText(project.englishName||'',130,705,2600,33,'#777777')}
+      <path d="M130 810H2830" stroke="#E2E2E2" stroke-width="3"/>
+      ${wrapCopy(project.description?.trim()||'브랜드 설명을 입력해 주세요.',66,7).map((line,i)=>fittedText(line,130,930+i*94,2600,39,'#242424')).join('')}
       ${project.description?.trim()?'':missing('브랜드 소개')}`, 'intro','v2-12-brand-overview'),
     message,
     ...generateApplicationPages(project),
