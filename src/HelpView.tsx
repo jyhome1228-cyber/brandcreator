@@ -1,4 +1,5 @@
 import WorkspaceNav from './components/WorkspaceNav';
+import BramerLogo from './components/BramerLogo';
 
 type Props = {
   onHome:()=>void;
@@ -27,7 +28,7 @@ const questions = [
 export default function HelpView({onHome,onProjects,onGuide,onNew,onHelp}:Props) {
  return <div className="bramer-dash bramer-help-page">
   <header className="bramer-dash-header">
-    <button type="button" className="bramer-dash-logo" onClick={onHome}>BRAMER.</button>
+    <button type="button" className="bramer-dash-logo" onClick={onHome} aria-label="BRAMER 홈"><BramerLogo /></button>
     <span className="bramer-dash-product">브랜드 가이드라인 제작</span>
     <button type="button" className="bramer-dash-header-start" onClick={onNew}>새 가이드라인 만들기</button>
   </header>
@@ -60,7 +61,6 @@ export default function HelpView({onHome,onProjects,onGuide,onNew,onHelp}:Props)
 
         <section className="bramer-help-hero-graphic" aria-label="BRAMER 제작 흐름">
           <div className="bramer-help-hero-brand">
-            <span>BRAMER.</span>
             <small>Brand Identity Guidelines</small>
           </div>
           <div className="bramer-help-graphic-steps">
@@ -106,7 +106,7 @@ export default function HelpView({onHome,onProjects,onGuide,onNew,onHelp}:Props)
           <div className="bramer-help-chapter-heading"><span>04 / SUPPORT</span><h2>자주 묻는 질문</h2><p>작업 중 자주 발생하는 궁금증을 정리했습니다.</p></div>
           {questions.map(item=><details key={item.title}><summary>{item.title}</summary><p>{item.answer}</p></details>)}
         </section>
-        <footer className="bramer-help-document-footer"><span>BRAMER.</span><span>브랜드 가이드라인 제작 안내</span></footer>
+        <footer className="bramer-help-document-footer"><span>브랜드 가이드라인 제작 안내</span></footer>
       </div>
     </main>
   </div>
