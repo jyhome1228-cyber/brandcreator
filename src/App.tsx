@@ -595,6 +595,10 @@ export default function App() {
                     </div>
                     <span className="module-state">{project.logo ? 'Detected' : 'Required'}</span>
                   </div>
+                  <div className="bramer-logo-beta-notice" role="note">
+                    <strong>캐릭터형·일러스트형 로고 지원 안내</strong>
+                    <p>캐릭터처럼 형태가 복잡하거나 여러 색상·마스크·효과가 포함된 SVG 로고는 분석 및 가이드라인 생성 정확도를 개선하고 있습니다. 현재도 업로드와 기본 제작은 가능하지만, 로고 보호 공간·최소 크기·단색 변환 및 응용 디자인을 직접 확인한 후 사용해 주세요.</p>
+                  </div>
                   <div className="bramer-svg-requirement" role="note">
                     <strong>업로드 가능: SVG 파일만</strong>
                     <p><strong>AI 파일은 직접 업로드할 수 없습니다.</strong> Adobe Illustrator에서 AI 파일을 연 뒤, <b>파일 → 다른 이름으로 저장 → SVG</b>로 저장하고 업로드해 주세요.</p>
