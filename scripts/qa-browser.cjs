@@ -173,15 +173,30 @@ try{
  await page.locator('.step-nav-item').nth(2).click();
  await page.locator('.upload-zone.has-file').waitFor();
  pass('IndexedDB save and reload restore brand and SVG');
- const jsonPromise=page.waitForEvent('download');
- await page.getByRole('button',{name:'JSON 백업'}).click();
- const jsonDownload=await jsonPromise;
+ const savedRecord=await page.evaluate(async()=>{
+   const db=await new Promise((resolve,reject)=>{
+     const req=indexedDB.open('bramer-project-library',1);
+     req.onsuccess=()=>resolve(req.result);
+     req.onerror=()=>reject(req.error);
+   });
+   try {
+     const entries=await new Promise((resolve,reject)=>{
+       const request=db.transaction('projects','readonly').objectStore('projects').getAll();
+       request.onsuccess=()=>resolve(request.result);
+       request.onerror=()=>reject(request.error);
+     });
+     return entries.find(entry=>entry.project?.name==='건강미 테스트');
+   } finally {db.close();}
+ });
+ assert.ok(savedRecord?.project?.logo?.raw?.includes('<svg'),'Saved browser project retains source SVG');
  const jsonPath=path.join(output,'project-backup.json');
- await jsonDownload.saveAs(jsonPath);
- const backup=JSON.parse(fs.readFileSync(jsonPath,'utf8'));
- assert.equal(backup.project.name,'건강미 테스트');
- assert.ok(backup.project.logo.raw.includes('<svg'));
- pass('JSON backup preserves project SVG');
+ fs.writeFileSync(jsonPath,JSON.stringify({
+   version:1,product:'bramer',industry:savedRecord.industry,
+   selectedCategories:savedRecord.selectedCategories,project:savedRecord.project,
+   enabled:savedRecord.enabled,
+ }));
+ assert.equal(await page.getByRole('button',{name:'JSON 백업'}).count(),0,'Removed JSON backup UI');
+ pass('Browser-saved project retains logo, without redundant JSON backup buttons');
  await page.locator('.bramer-dash-nav').getByRole('button',{name:'새로 만들기'}).click();
  await page.locator('input[placeholder="브랜드명"]').fill('별도 브랜드');
  await page.locator('input[placeholder="Brand name"]').fill('Other Brand');
