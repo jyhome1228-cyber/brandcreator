@@ -34,7 +34,7 @@ export default function TechnicalManifesto({onHome,onBeta}:Props){
    <div className="bramer-docs-shell">
      <aside className="bramer-docs-sidebar" aria-label="문서 목차">
        <div className="bramer-docs-side-head"><strong>BRAMER 기술 소개</strong></div>
-       <nav>{chapters.map((item,i)=><a key={item.id} href={'#'+item.id} className={active===item.id?'active':''}>{item.label}</a>)}</nav>
+       <nav>{chapters.map(item=><a key={item.id} href={'#'+item.id} className={active===item.id?'active':''} onClick={event=>{event.preventDefault();document.getElementById(item.id)?.scrollIntoView({behavior:'smooth',block:'start'});setActive(item.id);}}>{item.label}</a>)}</nav>
        <div className="bramer-docs-side-bottom"><p>From Logo to Brand Standards.</p><button type="button" onClick={onHome}>홈페이지로 돌아가기</button></div>
      </aside>
      <main className="bramer-docs-main">
