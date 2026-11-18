@@ -44,11 +44,9 @@ function GuidelinePreview({ english }: { english: boolean }) {
   const [sampleProject, setSampleProject] = useState<BrandProject | null>(null);
   const [sampleError, setSampleError] = useState(false);
   const [index, setIndex] = useState(0);
-  const [playing, setPlaying] = useState(false);
   const touchStartX = useRef<number | null>(null);
   const changePage = (next: number, total: number) => {
     if (!total) return;
-    setPlaying(false);
     setIndex(((next % total) + total) % total);
   };
   useEffect(() => {
@@ -86,13 +84,8 @@ function GuidelinePreview({ english }: { english: boolean }) {
     return generated.map(page => ({ ...page, svg: monochrome(page.svg) }));
   }, [sampleProject, english]);
   useEffect(() => { if (index >= pages.length && pages.length) setIndex(0); }, [pages.length, index]);
-  useEffect(() => {
-    if (!playing || pages.length < 2 || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-    const timer = window.setInterval(() => setIndex(previous => (previous + 1) % pages.length), 5500);
-    return () => window.clearInterval(timer);
-  }, [playing, pages.length]);
   const onSwipeStart = (event: TouchEvent<HTMLDivElement>) => { touchStartX.current = event.touches[0]?.clientX ?? null; };
-  const onSwipeEnd = (event: React.TouchEvent<HTMLDivElement>) => {
+  const onSwipeEnd = (event: TouchEvent<HTMLDivElement>) => {
     const x = touchStartX.current;
     touchStartX.current = null;
     if (x === null || !event.changedTouches[0]) return;
@@ -252,7 +245,7 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
           <a href="#preview">{tr("서비스 소개","Overview")}</a>
           <a href="#how">{tr("이용 방법","How it works")}</a>
           <a href="#/guide">{tr("업종별 가이드","Industry guide")}</a>
-          <a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr("기술 소개","Technology")}</a>
+          <a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr("기술 소개","Technology")}</a>
         </nav>
         <div className="bramer-site-actions"><div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div><button type="button" className="bramer-site-start" onClick={event => openBeta(event,'choice')}>{tr("시작하기","Get started")}</button>
         </div>
@@ -373,9 +366,9 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
       <div className="bramer-footer-inner">
         <div className="bramer-footer-columns bramer-footer-curated">
           <div className="bramer-footer-col"><h3>BRAMER</h3><a href="#top">{tr('서비스 소개','Overview')}</a><a href="#preview">{tr('결과물 미리보기','Guideline preview')}</a><a href="#how">{tr('이용 방법','How it works')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('기술과 설계','Technology')}</h3><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 소개','Technical documentation')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('서비스 설계 철학','Design philosophy')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 구조와 검증','Architecture & validation')}</a></div>
+          <div className="bramer-footer-col"><h3>{tr('기술과 설계','Technology')}</h3><a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 소개','Technical documentation')}</a><a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('서비스 설계 철학','Design philosophy')}</a><a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('기술 구조와 검증','Architecture & validation')}</a></div>
           <div className="bramer-footer-col"><h3>{tr('이용 안내','Resources')}</h3><a href="#resources">{tr('준비할 자료','Preparation')}</a><a href="#faq">{tr('자주 묻는 질문','FAQ')}</a><a href="#privacy-info">{tr('데이터 보관 안내','Data storage')}</a></div>
-          <div className="bramer-footer-col"><h3>{tr('시작하기','Get started')}</h3><a href="#top" onClick={event=>{event.preventDefault();openBeta(undefined,'register')}}>{tr('베타 무료 체험','Free beta')}</a><a href="#/manifesto" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('제작·운영 정보','Creator & operator')}</a><span className="bramer-footer-company">NINEWORKS · 박재영</span></div>
+          <div className="bramer-footer-col"><h3>{tr('시작하기','Get started')}</h3><a href="#top" onClick={event=>{event.preventDefault();openBeta(undefined,'register')}}>{tr('베타 무료 체험','Free beta')}</a><a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr('제작·운영 정보','Creator & operator')}</a><span className="bramer-footer-company">NINEWORKS · 박재영</span></div>
         </div>
         <div className="bramer-footer-bottom"><div><BramerLogo light /><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>{tr('현재 제공되는 기능을 기준으로 안내합니다.','Features described reflect the current beta version.')}</small></div>
       </div>
