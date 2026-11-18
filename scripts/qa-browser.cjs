@@ -9,8 +9,8 @@ const assert=require('node:assert/strict');
 
 const output=path.resolve('artifacts/browser-qa');
 fs.mkdirSync(output,{recursive:true});
-const port=4173,url='http://127.0.0.1:'+port+'/';
-const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--host','127.0.0.1','--port',String(port),'--strictPort'],{stdio:['ignore','pipe','pipe']});
+const port=4173,url='http://127.0.0.1:'+port+'/brandcreator/';
+const vite=spawn(process.execPath,['node_modules/vite/bin/vite.js','preview','--base','/brandcreator/','--host','127.0.0.1','--port',String(port),'--strictPort'],{stdio:['ignore','pipe','pipe']});
 let serverOutput='';
 vite.stderr.on('data',d=>serverOutput+=d.toString());
 vite.stdout.on('data',d=>serverOutput+=d.toString());
@@ -37,6 +37,11 @@ try{
  page.on('pageerror',err=>errors.push(err.message));
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.locator('.bramer-home-hero').waitFor();
+ const favicon=await page.locator('link[rel="icon"]').getAttribute('href');
+ assert.equal(favicon,'/brandcreator/favicon.svg','Favicon must respect GitHub Pages base URL');
+ const faviconResponse=await page.request.get('http://127.0.0.1:'+port+favicon);
+ assert.ok(faviconResponse.ok(),'Favicon fetch must succeed at deployed path');
+ pass('GitHub Pages base path and favicon work');
  await page.screenshot({path:path.join(output,'01-landing-desktop.png')});
  const trial=page.locator('.bramer-home-primary').first();
  await trial.click();
@@ -76,16 +81,11 @@ try{
  const pdfPath=path.join(output,'guideline-output.pdf');
  const pdf=await page.pdf({path:pdfPath,printBackground:true,preferCSSPageSize:true});
  assert.ok(pdf.byteLength>20000);
- try {
-   const info=execFileSync('pdfinfo',[pdfPath],{encoding:'utf8'});
-   const number=Number(info.match(/^Pages:\\s*(\\d+)/m)?.[1]);
-   assert.equal(number,26,'PDF export must contain exactly 26 A4 landscape pages');
-   pass('Chromium PDF contains exactly 26 pages');
- } catch(error) {
-   if(error.code==='ENOENT')console.log('SKIP pdfinfo unavailable; PDF binary creation verified');
-   else throw error;
- }
- pass('Chromium print creates nonempty PDF');
+ // Chrome PDF writes one /Type /Page object per printed page. Check count
+ // even on runners without poppler's pdfinfo binary.
+ const pdfObjects=(pdf.toString('latin1').match(/\\/Type\\s*\\/Page\\b/g)||[]).length;
+ assert.equal(pdfObjects,26,'PDF must contain 26 A4 pages, not an extra blank page');
+ pass('Chromium print creates exactly 26-page PDF');
  await page.locator('.bramer-editor-global-menu .bramer-dash-nav').getByRole('button',{name:'내 프로젝트'}).click();
  await page.waitForURL('**/#/projects');
  await page.getByText('건강미 테스트').first().waitFor();
