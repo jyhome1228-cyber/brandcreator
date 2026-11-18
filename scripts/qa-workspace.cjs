@@ -60,3 +60,27 @@ for(const section of ['help-overview','help-steps','help-files','help-output','h
 assert.ok(help.includes('BRAMER 사용 가이드'));
 assert.ok(help.includes('내 프로젝트') || help.includes('이전 프로젝트'));
 console.log('PASS editorial documentation hierarchy and linked sections');
+
+/** BRAMER UI must remain grayscale; user-defined brand colors are intentionally excluded. */
+const entry = fs.readFileSync(path.join(root,'src/main.tsx'),'utf8');
+const uiStyles = [...entry.matchAll(/import ['"]\.\/([^'"]+\.css)['"]/g)].map(match=>match[1]);
+const isPurple = (red,green,blue) => {
+  const r=red/255,g=green/255,b=blue/255;
+  const max=Math.max(r,g,b),min=Math.min(r,g,b),delta=max-min;
+  if(delta<0.015 || delta/(max||1) <= 0.08) return false;
+  let h= max===r ? ((g-b)/delta)%6 : max===g ? (b-r)/delta+2 : (r-g)/delta+4;
+  h=(h*60+360)%360;
+  return h>=245 && h<=335;
+};
+for(const file of uiStyles){
+  const css=fs.readFileSync(path.join(root,'src',file),'utf8');
+  const hexes=[...css.matchAll(/#([0-9a-fA-F]{6})\b/g)];
+  for(const match of hexes){
+    const rgb=[0,2,4].map(start=>parseInt(match[1].slice(start,start+2),16));
+    assert.ok(!isPurple(...rgb),file+' still contains a purple accent: '+match[0]);
+  }
+  for(const match of css.matchAll(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/g)){
+    assert.ok(!isPurple(...match.slice(1,4).map(Number)),file+' still contains a purple RGB accent: '+match[0]);
+  }
+}
+console.log('PASS all imported BRAMER UI styles contain no purple/violet color accents');
