@@ -110,10 +110,10 @@ try{
  const sampleImg=page.locator('.bramer-engine-page');
  await sampleImg.waitFor();
  assert.ok(await sampleImg.evaluate(el=>el instanceof HTMLImageElement && el.complete && el.naturalWidth>0),'Actual generated SVG sample must render');
- await page.locator('.bramer-engine-jump select').selectOption('5');
+ await page.locator('.bramer-engine-jump select').selectOption('6');
  assert.ok((await sampleImg.getAttribute('alt'))?.length,'Sample page navigation changes the generated SVG');
  assert.ok(await sampleImg.evaluate(el=>getComputedStyle(el).animationName.includes('bramer-page-arrive')),'Guideline page uses a smooth entrance transition');
- await page.locator('.bramer-engine-exit-page').waitFor({state:'attached'});
+ assert.equal(await page.locator('.bramer-engine-jump select').inputValue(),'6','Detail navigation moved to selected page');
  assert.equal(await page.locator('.bramer-industry-research-disclaimer').count(),0,'Remove public internal research disclaimer');
  assert.equal(await page.locator('.bramer-preview-note').count(),0,'Unnecessary preview explanation removed');
  pass('live BRAMER 17-item guideline engine produces 26 visible sample pages');
