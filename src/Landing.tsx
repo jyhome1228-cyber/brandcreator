@@ -41,6 +41,15 @@ const bramerSampleBase: BrandProject = {
 };
 
 function GuidelinePreview({ english }: { english: boolean }) {
+  const [mobilePreview, setMobilePreview] = useState(() =>
+    typeof window !== 'undefined' && window.matchMedia('(max-width: 760px)').matches
+  );
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 760px)');
+    const onChange = () => setMobilePreview(media.matches);
+    media.addEventListener('change', onChange);
+    return () => media.removeEventListener('change', onChange);
+  }, []);
   const [sampleProject, setSampleProject] = useState<BrandProject | null>(null);
   const [sampleError, setSampleError] = useState(false);
   const [index, setIndex] = useState(0);
@@ -66,6 +75,11 @@ function GuidelinePreview({ english }: { english: boolean }) {
     if (leaveTimer.current) clearTimeout(leaveTimer.current);
   }, []);
   useEffect(() => {
+    if (mobilePreview) {
+      setSampleProject(null);
+      setSampleError(false);
+      return;
+    }
     let cancelled = false;
     const source = window.location.pathname.startsWith("/brandcreator/") ? "/brandcreator/bramer-sample-logo.svg" : "/bramer-sample-logo.svg";
     fetch(source)
@@ -87,7 +101,7 @@ function GuidelinePreview({ english }: { english: boolean }) {
       })
       .catch(() => { if (!cancelled) setSampleError(true); });
     return () => { cancelled = true; };
-  }, []);
+  }, [mobilePreview]);
   const pages = useMemo(() => {
     if (!sampleProject) return [];
     const generated = localizeGuidelinePages(generateV2Pages(sampleProject), english ? 'en' : 'ko');
@@ -129,6 +143,12 @@ function GuidelinePreview({ english }: { english: boolean }) {
   };
   return (
     <div className="bramer-preview bramer-engine-preview" data-reveal>
+      {mobilePreview ? (
+        <div className="bramer-mobile-logo-preview" role="img" aria-label={english ? 'BRAMER logo on a black background' : '검은 배경에 배치한 BRAMER 로고'}>
+          <BramerLogo light className="bramer-mobile-preview-logo" />
+        </div>
+      ) : (
+      <>
       <div className="bramer-preview-view-switch" role="group" aria-label={english ? 'Select guideline view' : '가이드라인 보기 방식'}>
         <button type="button" className={previewMode === 'overview' ? 'active' : ''} aria-pressed={previewMode === 'overview'}
           onClick={() => setPreviewMode('overview')}>{english ? 'View all' : '전체 보기'}</button>
@@ -190,6 +210,8 @@ function GuidelinePreview({ english }: { english: boolean }) {
             </label>
           </div>}
         </div>
+      )}
+      </>
       )}
     </div>
   );
