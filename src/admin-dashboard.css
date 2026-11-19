@@ -1,0 +1,131 @@
+
+/* BRAMER administration · NINEWORKS · mono editorial UI */
+.bramer-admin{background:#f8f8f8;min-height:100vh;color:#181818;font-family:Pretendard,'Apple SD Gothic Neo',sans-serif;-webkit-font-smoothing:antialiased}
+.bramer-admin *{box-sizing:border-box}
+.bramer-admin button,.bramer-admin input,.bramer-admin select{font:inherit}
+.bramer-admin button{cursor:pointer}
+.bramer-admin button:disabled{opacity:.45;cursor:not-allowed}
+.bramer-admin-header{height:68px;display:flex;align-items:center;gap:20px;padding:0 37px;background:#111;color:#fff;border-bottom:1px solid #333}
+.bramer-admin-logo{border:0;background:transparent;display:flex;align-items:center;padding:0}
+.bramer-admin-logo .bramer-logo{width:auto;height:19px}
+.bramer-admin-header-name{padding-left:18px;border-left:1px solid #454545;font-size:12px;letter-spacing:.15em;font-weight:550;color:#a5a5a5}
+.bramer-admin-header-actions{margin-left:auto;display:flex;align-items:center;gap:19px}
+.bramer-admin-header-actions button{border:0;background:transparent;color:#bcbcbc;font-size:12px;padding:10px 0}
+.bramer-admin-header-actions button:hover{color:#fff}
+.bramer-admin-connection{font-size:11px;color:#9f9f9f}
+.bramer-admin-connection:before{content:"";display:inline-block;width:6px;height:6px;border-radius:50%;background:#777;margin-right:8px;vertical-align:middle}
+.bramer-admin-connection.connected:before{background:#9f9f9f}
+.bramer-admin-layout{display:grid;grid-template-columns:236px minmax(0,1fr);min-height:calc(100vh - 68px);max-width:1780px;margin:auto}
+.bramer-admin-sidebar{position:sticky;top:0;align-self:start;height:calc(100vh - 68px);min-height:640px;background:#fff;border-right:1px solid #e6e6e6;padding:40px 21px;display:flex;flex-direction:column}
+.bramer-admin-side-label{color:#a2a2a2;letter-spacing:.08em;font-size:10px;margin-bottom:9px}
+.bramer-admin-sidebar>strong{font-size:17px;letter-spacing:-.035em;font-weight:650;margin-bottom:37px}
+.bramer-admin-sidebar nav{display:grid;gap:7px}
+.bramer-admin-sidebar nav button{border:0;text-align:left;background:transparent;color:#777;border-radius:8px;min-height:45px;padding:0 16px;font-size:13px;transition:background .15s,color .15s}
+.bramer-admin-sidebar nav button:hover{background:#f6f6f6;color:#222}
+.bramer-admin-sidebar nav button.active{background:#171717;color:#fff;font-weight:600}
+.bramer-admin-sidebar-foot{margin-top:auto;padding:20px 12px;border-top:1px solid #ededed;font-size:11px;color:#999;line-height:1.8}
+.bramer-admin-main{min-width:0;padding:45px clamp(22px,4vw,64px) 28px;display:flex;flex-direction:column}
+.bramer-admin-titlebar{display:flex;gap:16px;align-items:end;justify-content:space-between;margin-bottom:35px}
+.bramer-admin-titlebar p{font-size:10px;letter-spacing:.11em;color:#999;margin:0 0 12px}
+.bramer-admin-titlebar h1{font-size:clamp(27px,2.2vw,36px);line-height:1.35;letter-spacing:-.055em;font-weight:650;margin:0 0 10px}
+.bramer-admin-titlebar span{font-size:13px;color:#818181;line-height:1.65}
+.bramer-admin-title-actions{display:flex;gap:8px}
+.bramer-admin-title-actions button,.bramer-admin-list-head>button{border:1px solid #dedede;border-radius:7px;background:#fff;padding:10px 16px;font-size:12px;color:#333;white-space:nowrap}
+.bramer-admin-title-actions button:hover,.bramer-admin-list-head>button:hover{border-color:#777}
+.bramer-admin-mobile-nav,.bramer-admin-mobile-menu{display:none}
+.bramer-admin-setup-banner{background:#fff;border:1px solid #e8e8e8;border-radius:12px;padding:32px;display:flex;justify-content:space-between;gap:23px;margin-bottom:27px}
+.bramer-admin-setup-banner small,.bramer-admin-signin-top small{font-size:10px;letter-spacing:.11em;color:#999}
+.bramer-admin-setup-banner h2,.bramer-admin-signin h2{font-size:21px;line-height:1.5;letter-spacing:-.045em;margin:13px 0;font-weight:650}
+.bramer-admin-setup-banner p,.bramer-admin-signin p{max-width:650px;font-size:12px;line-height:1.85;color:#777;margin:9px 0 0;word-break:keep-all}
+.bramer-admin-setup-banner>span{align-self:start;border-radius:99px;padding:7px 12px;background:#f3f3f3;color:#888;font-size:11px;white-space:nowrap}
+.bramer-admin-signin{background:#fff;border:1px solid #e4e4e4;max-width:580px;border-radius:13px;padding:37px;margin-bottom:29px}
+.bramer-admin-signin form{display:grid;gap:17px;margin-top:29px}
+.bramer-admin-signin label{display:grid;gap:8px}
+.bramer-admin-signin label span{font-size:12px;font-weight:600}
+.bramer-admin-signin input{border:1px solid #ddd;border-radius:7px;background:#fafafa;padding:0 14px;height:45px;color:#111;font-size:14px}
+.bramer-admin-signin input:focus,.bramer-admin-filters input:focus,.bramer-admin-filters select:focus{outline:2px solid #c8c8c8;outline-offset:1px}
+.bramer-admin-signin form button{height:46px;border:0;border-radius:7px;background:#171717;color:#fff;font-size:13px;font-weight:600;margin-top:7px}
+.bramer-admin-error{background:#fff1f1;border:1px solid #e7caca;padding:15px 17px;border-radius:7px;color:#a33;font-size:12px;line-height:1.7;margin-bottom:22px}
+.bramer-admin-locked{opacity:.6;pointer-events:none}
+.bramer-admin-metrics{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;margin-bottom:22px}
+.bramer-admin-metrics article{background:#fff;border:1px solid #ebebeb;border-radius:10px;padding:23px 24px 22px;min-height:153px;display:flex;flex-direction:column;align-items:flex-start}
+.bramer-admin-metrics article>span{font-size:12px;color:#666;font-weight:550}
+.bramer-admin-metrics strong{font-size:clamp(31px,2.5vw,42px);line-height:1;letter-spacing:-.07em;font-weight:600;margin:22px 0 13px;font-variant-numeric:tabular-nums}
+.bramer-admin-metrics small{font-size:11px;color:#aaa}
+.bramer-admin-overview-grid{display:grid;grid-template-columns:1.2fr 1fr;gap:16px;margin-bottom:20px;align-items:stretch}
+.bramer-admin-panel{background:#fff;border:1px solid #eaeaea;border-radius:11px;min-width:0}
+.bramer-admin-overview-grid .bramer-admin-panel{min-height:325px;padding:27px 25px}
+.bramer-admin-panel-head,.bramer-admin-list-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.bramer-admin-panel-head h2,.bramer-admin-list-head h2{font-size:16px;font-weight:650;letter-spacing:-.04em;margin:0 0 6px}
+.bramer-admin-panel-head p,.bramer-admin-list-head p{font-size:11px;color:#999;margin:0}
+.bramer-admin-panel-head>span{font-size:10px;letter-spacing:.07em;color:#aaa}
+.bramer-admin-panel-head button{border:0;background:transparent;color:#888;font-size:11px;padding:9px;white-space:nowrap}
+.bramer-admin-panel-head button:hover{color:#111}
+.bramer-admin-chart{display:grid;grid-template-columns:repeat(7,1fr);align-items:end;gap:12px;height:162px;padding:23px 5px 0}
+.bramer-admin-chart-day{height:100%;display:grid;grid-template-rows:1fr auto;gap:12px;min-width:0}
+.bramer-admin-chart-track{height:100%;border-bottom:1px solid #eee;display:flex;align-items:flex-end;justify-content:center}
+.bramer-admin-chart-track>div{width:min(44px,70%);background:#1b1b1b;border-radius:3px 3px 0 0;transition:height .35s}
+.bramer-admin-chart-day>span{font-size:10px;text-align:center;color:#999;white-space:nowrap}
+.bramer-admin-empty-chart{font-size:11px;color:#aaa;text-align:center;margin:13px 0 0}
+.bramer-admin-activity{margin-top:19px}
+.bramer-admin-activity>div{display:flex;align-items:center;gap:13px;border-bottom:1px solid #f0f0f0;padding:12px 0}
+.bramer-admin-activity>div:last-child{border-bottom:0}
+.bramer-admin-activity-dot{width:7px;height:7px;background:#282828;border-radius:50%;flex:none}
+.bramer-admin-activity>div>div{min-width:0;display:grid;gap:5px}
+.bramer-admin-activity strong{font-size:12px;font-weight:600}
+.bramer-admin-activity small{font-size:11px;color:#999;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.bramer-admin-activity time{margin-left:auto;font-size:10px;color:#aaa;white-space:nowrap}
+.bramer-admin-empty{padding:75px 0 30px;text-align:center;color:#aaa;font-size:12px}
+.bramer-admin-recent{padding:28px 25px}
+.bramer-admin-recent .bramer-admin-panel-head{margin-bottom:19px}
+.bramer-admin-table-scroll{overflow-x:auto;overscroll-behavior-x:contain}
+.bramer-admin table{width:100%;border-collapse:collapse;text-align:left;white-space:nowrap;font-size:12px}
+.bramer-admin thead th{background:#fafafa;color:#8b8b8b;font-size:11px;font-weight:500;padding:15px 14px;border-bottom:1px solid #eaeaea}
+.bramer-admin tbody td{padding:17px 14px;border-bottom:1px solid #f0f0f0;color:#777;line-height:1.4}
+.bramer-admin tbody tr:last-child td{border-bottom:0}
+.bramer-admin tbody strong{color:#222;font-weight:600}
+.bramer-admin-status{background:#f3f3f3;color:#626262;font-size:10px;padding:5px 9px;border-radius:99px}
+.bramer-admin-empty-row{text-align:center!important;padding:65px 14px!important;color:#aaa!important}
+.bramer-admin-table-panel{padding:27px 25px}
+.bramer-admin-list-head{margin-bottom:22px}
+.bramer-admin-filters{display:flex;gap:9px;margin-bottom:20px}
+.bramer-admin-filters input,.bramer-admin-filters select{height:43px;border:1px solid #e4e4e4;border-radius:7px;background:#fff;padding:0 14px;color:#555;font-size:12px}
+.bramer-admin-filters input{width:min(330px,100%)}.bramer-admin-filters select{width:166px}
+.bramer-admin-footer{margin-top:auto;padding-top:38px;display:flex;flex-wrap:wrap;justify-content:space-between;gap:12px;font-size:10px;color:#aaa}
+@media(max-width:1180px){.bramer-admin-metrics{grid-template-columns:repeat(2,minmax(0,1fr))}.bramer-admin-overview-grid{grid-template-columns:1fr}}
+@media(max-width:760px){
+ .bramer-admin-header{height:60px;padding:0 16px;gap:10px}
+ .bramer-admin-logo .bramer-logo{height:16px}
+ .bramer-admin-header-name{padding-left:10px;font-size:10px}
+ .bramer-admin-header-actions{gap:11px}
+ .bramer-admin-connection{font-size:10px;max-width:95px;line-height:1.25}
+ .bramer-admin-header-actions button{font-size:11px}
+ .bramer-admin-layout{display:block;min-height:calc(100vh - 60px)}
+ .bramer-admin-sidebar{display:none}
+ .bramer-admin-main{padding:29px 17px 22px}
+ .bramer-admin-titlebar{margin-bottom:25px;align-items:end}
+ .bramer-admin-titlebar h1{font-size:27px}
+ .bramer-admin-titlebar span{font-size:12px}
+ .bramer-admin-title-actions .bramer-admin-mobile-nav{display:block}
+ .bramer-admin-title-actions button{padding:9px 10px;font-size:11px}
+ .bramer-admin-mobile-menu{display:flex;flex-wrap:wrap;gap:7px;margin:-12px 0 21px}
+ .bramer-admin-mobile-menu button{border:1px solid #e3e3e3;border-radius:7px;background:#fff;color:#555;padding:10px;font-size:12px}
+ .bramer-admin-setup-banner{padding:24px 20px;display:block}
+ .bramer-admin-setup-banner>span{display:inline-block;margin-top:19px}
+ .bramer-admin-signin{padding:27px 20px}
+ .bramer-admin-signin input{font-size:16px}
+ .bramer-admin-metrics{gap:9px;margin-bottom:13px}
+ .bramer-admin-metrics article{min-height:133px;padding:19px 17px}
+ .bramer-admin-metrics strong{font-size:32px;margin:19px 0 10px}
+ .bramer-admin-metrics article>span{font-size:11px}
+ .bramer-admin-metrics small{font-size:10px}
+ .bramer-admin-overview-grid{gap:13px;margin-bottom:13px}
+ .bramer-admin-overview-grid .bramer-admin-panel{padding:23px 18px;min-height:275px}
+ .bramer-admin-recent{padding:23px 18px}
+ .bramer-admin-table-panel{padding:23px 17px}
+ .bramer-admin-filters{flex-wrap:wrap}
+ .bramer-admin-filters input{flex:1 1 200px}
+ .bramer-admin-filters select{flex:0 1 150px}
+ .bramer-admin-activity time{font-size:9px}
+ .bramer-admin-footer{padding-top:28px}
+}
