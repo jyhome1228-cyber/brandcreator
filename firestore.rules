@@ -7,15 +7,13 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
     }
 
-    // An administrator's identity must be granted manually from Firebase Console.
-    // Ordinary users cannot create, edit or enumerate admin credentials.
+    // Administrator approval is granted manually in the Firebase console.
     match /admins/{uid} {
       allow get: if request.auth != null && request.auth.uid == uid;
       allow list, create, update, delete: if false;
     }
 
-    // These collections are private. A trusted backend, not anonymous client code,
-    // must eventually write beta registrations and event logs.
+    // Personal data must remain private. Do not allow unauthenticated reads.
     match /betaTesters/{id} {
       allow read: if isAdmin();
       allow write: if false;
@@ -24,22 +22,19 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if false;
     }
-    // Public counters contain only daily aggregate numbers and a calendar date.
-    // No names, phones, IP addresses, identifiers or per-visitor histories are stored.
-    // Anyone can read aggregates, but only Firebase anonymous users can add one visit.
-    // This is a convenience metric, not a tamper-proof or bot-proof analytics source.
+
+    // This collection contains aggregated daily counters only:
+    // day, visits, unique. There is no personally identifiable visit record.
     function anonymousVisit() {
       return request.auth != null
         && request.auth.token.firebase.sign_in_provider == 'anonymous';
     }
     function validVisitData(day) {
-      return request.resource.data.keys().hasOnly(['day','visits','unique'])
-        && request.resource.data.keys().hasAll(['day','visits','unique'])
+      return request.resource.data.keys().hasOnly(['day', 'visits', 'unique'])
+        && request.resource.data.keys().hasAll(['day', 'visits', 'unique'])
+        && request.resource.data.day is string
         && request.resource.data.day == day
-        && day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}
-  }
-}
-)
+        && day.size() == 10
         && request.resource.data.visits is int
         && request.resource.data.unique is int
         && request.resource.data.visits >= 1
