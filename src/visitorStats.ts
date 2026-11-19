@@ -15,7 +15,11 @@ type CachedAuth={refreshToken:string;idToken:string;expiresAt:number};
 let pendingAuth:Promise<string>|null=null;
 let pendingTrack:Promise<void>|null=null;
 function dayId(date=new Date()):string{
-  return new Intl.DateTimeFormat('en-CA',{timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
+  const parts=new Intl.DateTimeFormat('en-CA',{
+    timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',
+  }).formatToParts(date);
+  const pick=(type:string)=>parts.find(part=>part.type===type)?.value||'';
+  return pick('year')+'-'+pick('month')+'-'+pick('day');
 }
 export function latestDays(count=7):string[]{
   const now=new Date();
@@ -164,6 +168,21 @@ async function increaseDay(day:string, isUnique:boolean):Promise<void>{
   }
   throw new Error('동시 방문 집계 충돌로 기록하지 못했습니다.');
 }
+const visitHealthKey='bramer-visitor-record-health-v1';
+export function lastVisitRecordStatus():{day:string;ok:boolean;detail:string}|null{
+  try{
+    const raw=localStorage.getItem(visitHealthKey);
+    if(!raw)return null;
+    const obj=JSON.parse(raw) as {day:string;ok:boolean;detail:string};
+    if(typeof obj.day!=='string'||typeof obj.ok!=='boolean'||typeof obj.detail!=='string')return null;
+    return obj;
+  }catch{return null;}
+}
+function reportVisitHealth(day:string,ok:boolean,detail:string){
+  try{
+    localStorage.setItem(visitHealthKey,JSON.stringify({day,ok,detail:detail.slice(0,180)}));
+  }catch{}
+}
 export async function recordVisit():Promise<void>{
   if(typeof window==='undefined'||location.hash.startsWith('#/admin')||location.pathname.startsWith('/admin'))return;
   const day=dayId();
@@ -174,9 +193,15 @@ export async function recordVisit():Promise<void>{
   pendingTrack=(async()=>{
     let isUnique=true;
     try{isUnique=localStorage.getItem(uniqueKey)!=='ok';}catch{}
-    await increaseDay(day,isUnique);
-    try{sessionStorage.setItem(sessionKey,'ok');}catch{}
-    if(isUnique)try{localStorage.setItem(uniqueKey,'ok');}catch{}
+    try{
+      await increaseDay(day,isUnique);
+      try{sessionStorage.setItem(sessionKey,'ok');}catch{}
+      if(isUnique)try{localStorage.setItem(uniqueKey,'ok');}catch{}
+      reportVisitHealth(day,true,'방문 횟수가 Firestore에 저장됐습니다.');
+    }catch(error){
+      reportVisitHealth(day,false,error instanceof Error?error.message:'방문 기록에 실패했습니다.');
+      throw error;
+    }
   })();
   try{await pendingTrack;}finally{pendingTrack=null;}
 }
