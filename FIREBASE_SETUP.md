@@ -14,16 +14,11 @@
 
 Firebase Console에서 BRAMER 전용 프로젝트 생성 후 **Authentication → Sign-in method → 이메일/비밀번호** 활성화. **Cloud Firestore** 데이터베이스 생성. 브라우저 Web App 등록 후 Web API 키와 프로젝트 ID 확인.
 
-## 2. GitHub Actions 빌드 설정
+## 2. Firebase 웹 앱 연결 (2026-11-19)
 
-GitHub 저장소 → Settings → Secrets and variables → Actions → Variables에 다음 값 입력:
+제공된 웹 앱 프로젝트 `bramer-16c27`의 공개 설정을 `src/firebaseWebConfig.ts`에 반영했습니다. Firebase 웹 API 키는 브라우저에서 사용되는 공개 구성값이며, 관리자 비밀번호 또는 서비스 계정 비밀키가 아닙니다. GitHub Actions의 별도 Variables 설정 없이 기본 연결이 가능합니다. 향후 다른 Firebase 프로젝트를 사용할 경우 `BRAMER_FIREBASE_PROJECT_ID`, `BRAMER_FIREBASE_API_KEY` 변수로 재정의할 수 있습니다.
 
-| Variable | 값 |
-|---|---|
-| `BRAMER_FIREBASE_PROJECT_ID` | Firebase Project ID |
-| `BRAMER_FIREBASE_API_KEY` | Firebase Web API Key |
-
-GitHub Pages 워크플로가 빌드 시 이를 `VITE_FIREBASE_PROJECT_ID`, `VITE_FIREBASE_API_KEY`로 전달합니다. 두 값은 일반적인 **공개 웹 앱 식별자**이며 관리자 비밀번호나 서비스 계정 키를 GitHub에 등록하면 안 됩니다.
+현재 단계는 **브라우저의 Firebase 프로젝트 연결**이며 사용자 수집/Firestore 저장은 아직 실행되지 않습니다.
 
 ## 3. 관리자 로그인 활성화
 
