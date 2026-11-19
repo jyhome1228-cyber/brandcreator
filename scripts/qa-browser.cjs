@@ -90,7 +90,7 @@ try{
    'Real beta tester PII still requires Firebase administrator access');
  await adminPage.getByRole('button',{name:'베타테스터',exact:true}).click();
  await adminPage.getByRole('heading',{name:'베타테스터 목록'}).waitFor();
- assert.equal(await adminPage.getByText('등록된 베타테스터 데이터가 없습니다.').count(),1);
+ assert.equal(await adminPage.getByText('Firebase 관리자 인증 후 베타테스터 정보를 확인할 수 있습니다.').count(),1);
  await adminPage.getByRole('button',{name:'잠금'}).click();
  await adminPage.getByRole('heading',{name:'관리자 화면'}).waitFor();
  await adminPage.close();
