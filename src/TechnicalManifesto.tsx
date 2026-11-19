@@ -6,6 +6,8 @@ const chapters=[
  {id:'overview',label:'BRAMER 소개'},
  {id:'principles',label:'설계 원칙'},
  {id:'architecture',label:'기술 구조'},
+ {id:'svg-engine',label:'SVG 분석 엔진'},
+ {id:'rule-engine',label:'규칙 기반 생성'},
  {id:'workflow',label:'제작 프로세스'},
  {id:'outputs',label:'17개 제작 항목'},
  {id:'verification',label:'검증과 한계'},
@@ -61,8 +63,56 @@ export default function TechnicalManifesto({onHome,onBeta}:Props){
          <h3>로고 분석과 사용자 설정</h3><p>업로드한 SVG의 기본 구조와 시각적 영역을 확인하고, 로고 높이를 기준으로 비례 및 보호 공간을 표현합니다. 자동으로 제안되는 값은 제작을 돕기 위한 출발점으로 제공되며, 승인된 브랜드의 규정이나 인쇄소 사양을 대체하지 않습니다.</p>
          <h3>언어와 문서의 관계</h3><p>홈페이지 언어와 결과물 언어는 구분됩니다. 가이드라인의 기본 항목명 및 고정 안내 문구는 국문·영문 전환을 지원하지만, 브랜드 소개와 슬로건처럼 사용자가 직접 입력한 고유 문구를 임의 번역하지는 않습니다.</p>
        </section>
+
+       <section id="svg-engine" className="bramer-docs-section bramer-docs-engine">
+         <span className="bramer-docs-section-number">04 · SVG ANALYSIS ENGINE</span>
+         <h2>로고 이미지를 보는 것에서,<br/>로고의 구조를 읽는 것으로.</h2>
+         <p>BRAMER는 로고를 화면에 표시하는 데서 멈추지 않습니다. SVG 원본의 XML 구조와 그래픽 요소를 분석하여 가이드라인 제작에 필요한 형태·비례·색상 정보를 하나의 데이터 모델로 정리합니다. 원본에 이미 담겨 있는 정보를 활용하기 때문에 같은 값을 문서마다 다시 입력하는 반복을 줄일 수 있습니다.</p>
+         <div className="bramer-docs-engine-visual" aria-label="SVG 로고 데이터가 구조 분석과 규칙 제안으로 이어지는 과정">
+           <div className="bramer-docs-engine-source">
+             <span>VECTOR SOURCE</span>
+             <div className="bramer-docs-engine-code" aria-hidden="true">
+               <span>&lt;svg viewBox="…"&gt;</span>
+               <span>  &lt;path d="…"/&gt;</span>
+               <span>  &lt;path fill="…"/&gt;</span>
+               <span>&lt;/svg&gt;</span>
+             </div>
+           </div>
+           <div className="bramer-docs-engine-flowline" aria-hidden="true"></div>
+           <div className="bramer-docs-engine-results">
+             <div><small>01 · GEOMETRY</small><strong>Visual Bounds</strong><span>실제 시각 영역 · 비례 · 방향</span></div>
+             <div><small>02 · STRUCTURE</small><strong>Path &amp; Complexity</strong><span>그래픽 요소 · 세부 밀도 · 구조적 복잡도</span></div>
+             <div><small>03 · COLOR</small><strong>Fill / Stroke</strong><span>색상 추출 · HEX 정규화 · 사용 분포</span></div>
+           </div>
+         </div>
+         <div className="bramer-docs-tech-features">
+           <article><span>SVG PARSING</span><h3>원본 구조 해석</h3><p>DOMParser를 이용해 SVG 문서를 읽고 viewBox, 폭·높이, path와 그래픽 요소, fill 및 stroke 정보를 추출합니다. XML의 구조적 특성을 활용해 비율과 색상 정보를 분석할 수 있도록 구성합니다.</p></article>
+           <article><span>VISUAL GEOMETRY</span><h3>실제 시각 경계 측정</h3><p>SVG 대지의 크기와 실제 그래픽이 차지하는 영역은 다를 수 있습니다. 그래픽 요소의 경계를 측정하고 변환 행렬을 반영해 로고의 실질적인 비율과 캔버스 내 점유 영역을 계산합니다.</p></article>
+           <article><span>STRUCTURE ASSESSMENT</span><h3>형태 및 복잡도 분석</h3><p>패스 수, 그래픽 요소의 구성, 패스 명령과 미세한 세부 영역 등을 분석 지표로 활용합니다. 로고의 방향과 형태 유형도 규칙 기반으로 분류하여 제작 시 참고할 속성을 도출합니다.</p></article>
+           <article><span>SAFE SVG HANDLING</span><h3>안전한 벡터 처리</h3><p>업로드된 SVG에서 스크립트, 이벤트 속성, 외부 실행 리소스 등 불필요한 요소를 제거하거나 제한합니다. 원본의 시각적 특성을 유지하면서 웹 환경에서 사용할 수 있는 형태로 처리합니다.</p></article>
+         </div>
+         <p className="bramer-docs-engine-summary">핵심은 로고를 새로 그리는 것이 아니라, 이미 존재하는 원본의 데이터를 제작에 활용할 수 있는 정보로 변환하는 것입니다.</p>
+       </section>
+       <section id="rule-engine" className="bramer-docs-section bramer-docs-rule-engine">
+         <span className="bramer-docs-section-number">05 · GUIDELINE RULE ENGINE</span>
+         <h2>분석 결과를 실제 브랜드 사용 규칙으로 연결합니다.</h2>
+         <p>분석을 통해 얻은 형태·비례·컬러 정보를 단일 BrandProject 데이터 구조에 결합합니다. 시스템은 로고의 가로세로 비율과 복잡도, 세부 밀도 등을 참고하여 보호 공간과 최소 사용 크기의 시작값을 제안합니다. 사용자는 브랜드 운영 환경에 맞게 수치를 조정하고 최종 기준을 확정할 수 있습니다.</p>
+         <div className="bramer-docs-rule-diagram" aria-label="분석 정보, 규칙 구성, 결과물 생성 단계">
+           <div><span>01 · INPUT DATA</span><strong>Logo &amp; Brand</strong><small>SVG 원본, 시각 영역, 브랜드 컬러, 서체, 브랜드 정보</small></div>
+           <div><span>02 · RULE ENGINE</span><strong>Measured &amp; Configured</strong><small>비례, X 단위, 보호 공간, 최소 크기, 대비 조건</small></div>
+           <div><span>03 · DOCUMENT</span><strong>Consistent Output</strong><small>로고 규정, 컬러·서체, 가이드라인 및 응용 문서</small></div>
+         </div>
+         <div className="bramer-docs-rule-columns">
+           <article><div className="bramer-docs-rule-tag">SYSTEM ASSISTED</div><h3>시스템이 처리하는 영역</h3><p>원본 로고의 비율과 주요 컬러 분석, 구조 및 복잡도 지표 생성, 보호 공간·최소 크기의 초기값 제안, 규칙에 따른 페이지 구성, SVG 및 PDF 출력.</p></article>
+           <article><div className="bramer-docs-rule-tag">DESIGNER CONTROLLED</div><h3>디자이너가 결정하는 영역</h3><p>최종 보호 공간과 최소 크기 승인, 서체와 공식 컬러의 확정, 브랜드 메시지 작성, 특수한 매체에서의 적용 판단, 결과물의 시각적 검수.</p></article>
+         </div>
+         <h3>가이드라인 제작 표준화 연구와의 연결</h3>
+         <p>BRAMER는 국내 B2C 스타트업의 브랜드 아이덴티티 가이드라인에서 반복되는 구성요소와 정보 구조를 유형화하고, 이를 재사용 가능한 제작 과정으로 연결하려는 연구에서 출발했습니다. 브랜드마다 고유한 아이덴티티를 획일화하지 않고, 반복적인 정보 정리와 문서 제작 과정을 구조화하는 데 초점을 둡니다.</p>
+         <p>따라서 완성된 템플릿에 단순히 로고를 끼워 넣는 방식과 달리, SVG 분석 결과와 브랜드 데이터, 사용자가 결정한 규칙을 동일한 문서 생성 과정에 적용하는 구조를 채택했습니다. 핵심 연구 방향은 제작 정보의 완전성, 기준의 일관성, 반복 작업의 효율성, 수정 편의성과 실제 활용 가능성입니다.</p>
+         <div className="bramer-docs-research-meta"><span>RESEARCH FOUNDATION</span><strong>브랜드 아이덴티티 가이드라인 구성요소를 기반으로 한 제작 표준화 연구</strong><small>NINEWORKS · 박재영 · SVG 기반 제작 프로토타입</small></div>
+       </section>
        <section id="workflow" className="bramer-docs-section">
-         <span className="bramer-docs-section-number">04 · WORKFLOW</span><h2>브랜드 정보에서 운영 가이드까지 이어지는 제작 흐름</h2>
+         <span className="bramer-docs-section-number">06 · WORKFLOW</span><h2>브랜드 정보에서 운영 가이드까지 이어지는 제작 흐름</h2>
          <div className="bramer-docs-list">
            <div><b>01</b><div><h3>브랜드 정보 정의</h3><p>브랜드명과 영문명, 설명과 슬로건, 컬러와 서체를 입력합니다. 입력하지 않은 고유 브랜드 정보를 시스템이 임의로 확정하지 않습니다.</p></div></div>
            <div><b>02</b><div><h3>SVG 원본 등록 및 분석</h3><p>벡터 로고를 업로드하고 시각 영역, 비율과 주요 컬러를 확인합니다. Illustrator AI 원본 파일은 SVG로 저장한 뒤 업로드해야 합니다.</p></div></div>
@@ -72,23 +122,23 @@ export default function TechnicalManifesto({onHome,onBeta}:Props){
          </div>
        </section>
        <section id="outputs" className="bramer-docs-section">
-         <span className="bramer-docs-section-number">05 · DELIVERABLES</span><h2>브랜드 운영에 필요한 17개 기본 항목</h2>
+         <span className="bramer-docs-section-number">07 · DELIVERABLES</span><h2>브랜드 운영에 필요한 17개 기본 항목</h2>
          <p>BRAMER는 서로 다른 항목을 단절된 템플릿으로 처리하지 않습니다. 로고 데이터와 브랜드 기본 정보를 공유하는 하나의 문서 구조 안에서 사용 원칙과 응용 예시를 함께 구성합니다. 현재 베타에서는 17개 기본 제작 항목을 26페이지의 가이드라인으로 표현합니다.</p>
          <div className="bramer-docs-output-list">{core.map(([title,description])=><div key={title}><strong>{title}</strong><span>{description}</span></div>)}</div>
        </section>
        <section id="verification" className="bramer-docs-section">
-         <span className="bramer-docs-section-number">06 · QUALITY & LIMITATIONS</span><h2>자동 생성과 최종 승인 사이에는 검증 과정이 필요합니다.</h2>
+         <span className="bramer-docs-section-number">08 · QUALITY & LIMITATIONS</span><h2>자동 생성과 최종 승인 사이에는 검증 과정이 필요합니다.</h2>
          <p>BRAMER가 제공하는 결과물은 브랜드 가이드라인 제작을 위한 기준 초안과 시각적 예시입니다. 로고의 광학적 정렬, 획의 가독성, 복잡한 배경에서의 시인성, 법적 표기와 인쇄 매체의 재현 특성까지 자동으로 확정할 수는 없습니다.</p>
          <p>명함은 90×50mm, A4 서식은 210×297mm, 소봉투와 대봉투는 각각 220×105mm와 330×245mm의 외형 예시를 제공합니다. 실제 제작 전에는 인쇄소별 칼선·접착 플랩·도련·안전 여백과 글꼴을 확인해야 합니다. 현재 출력용 SVG는 디자인과 정보 배치를 검토하기 위한 자료이며, 모든 매체에 그대로 인쇄할 수 있는 제작 승인본을 의미하지 않습니다.</p>
          <div className="bramer-docs-notice"><strong>실무 검토 안내</strong><p>자동 분석 결과와 업종별 권장 항목은 검토를 돕는 참고 자료입니다. 현재 시스템을 공인된 BI 표준이나 검증된 품질 인증 도구로 소개하지 않습니다.</p></div>
        </section>
        <section id="privacy" className="bramer-docs-section">
-         <span className="bramer-docs-section-number">07 · DATA & BETA</span><h2>현재의 저장 방식과 베타 이용 조건을 명확히 안내합니다.</h2>
+         <span className="bramer-docs-section-number">09 · DATA & BETA</span><h2>현재의 저장 방식과 베타 이용 조건을 명확히 안내합니다.</h2>
          <p>브랜드 프로젝트는 현재 사용 중인 브라우저의 로컬 저장 영역에 보관됩니다. 따라서 기기 또는 브라우저를 변경하거나 사이트 데이터를 삭제하면 이전 자료를 다시 사용할 수 없을 수 있습니다. 중앙 계정 저장 및 여러 기기 간 자동 동기화는 제공되지 않습니다.</p>
          <p>베타 이용 정보는 성함과 연락처 조합의 확인값을 현재 브라우저에 저장하는 방식으로 사용됩니다. 이는 서버 기반 회원 인증이나 휴대전화 본인 확인이 아니며, 동일 브라우저에서만 재진입을 돕습니다. 중요한 자료는 출력한 파일을 별도로 관리하는 것이 좋습니다.</p>
        </section>
        <section id="credits" className="bramer-docs-section bramer-docs-credit">
-         <span className="bramer-docs-section-number">09 · CREATOR</span><h2>BRAMER를 설계하고 운영하는 사람들</h2>
+         <span className="bramer-docs-section-number">10 · CREATOR</span><h2>BRAMER를 설계하고 운영하는 사람들</h2>
          <dl><div><dt>제작·운영</dt><dd>NINEWORKS · 나인웍스</dd></div><div><dt>대표자</dt><dd>박재영</dd></div><div><dt>서비스</dt><dd>BRAMER · 브랜드 가이드라인 제작 솔루션</dd></div><div><dt>현재 단계</dt><dd>Beta</dd></div></dl>
          <p>브랜드의 언어와 디자인의 규칙을 일회성 결과물이 아닌 지속 가능한 운영 체계로 연결하는 것이 BRAMER가 지향하는 방향입니다.</p>
          <div className="bramer-docs-end"><strong>From Logo to Brand Standards.</strong><button type="button" onClick={onBeta}>BRAMER 베타 시작하기</button></div>
