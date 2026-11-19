@@ -5,6 +5,7 @@ import { generateV2Pages } from './guideline-system/v2Pages';
 import { localizeGuidelinePages } from './guideline-system/localizeGuideline';
 import type { BrandProject } from './types/guideline';
 import {registerLocalBeta,verifyLocalBeta} from './betaLocalAccess';
+import { registerFirebaseBetaTester } from './firebaseBetaRegistration';
 
 type LandingProps = { onStart: (newRegistration?: boolean) => void; onManifesto: () => void };
 type BetaForm = { name: string; phone: string; occupation: string };
@@ -265,13 +266,14 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
     if (!agreed) { setBetaError(tr('개인정보 이용 안내에 동의해 주세요.','Please agree to the privacy notice.')); return; }
     setSubmitting(true);
     try {
+      await registerFirebaseBetaTester(betaForm.name,betaForm.phone,betaForm.occupation);
       await registerLocalBeta(betaForm.name,betaForm.phone,betaForm.occupation);
       setBetaOpen(false);
       setBetaError('');
       // Registration always presents the welcome sequence, even on a reused browser.
       onStart(true);
-    } catch {
-      setBetaError(tr('이 브라우저에서 등록 정보를 저장할 수 없습니다. 브라우저 설정을 확인해 주세요.','Unable to save the registration on this browser.'));
+    } catch (e) {
+      setBetaError(e instanceof Error?e.message:tr('등록 정보를 저장하지 못했습니다. 다시 시도해 주세요.','Registration could not be saved. Please try again.'));
     } finally {setSubmitting(false);}
   };
   const tryLogin = async (event:FormEvent<HTMLFormElement>) => {
@@ -537,13 +539,13 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
               <label className="bramer-beta-consent"><input type="checkbox" checked={agreed} onChange={e=>setAgreed(e.target.checked)} required/><span>{tr('개인정보 이용 안내에 동의합니다. (필수)','I agree to the privacy notice. (Required)')}</span></label>
               <button type="button" className="bramer-beta-privacy-button" aria-expanded={privacyOpen} onClick={()=>setPrivacyOpen(v=>!v)}>{tr('이용 안내','Privacy details')} {privacyOpen?tr('접기','Hide'):tr('보기','View')}</button>
               {privacyOpen?<div className="bramer-beta-privacy-text"><strong>{tr('베타 등록 및 보관 안내','Beta registration and storage')}</strong>
-                <p>{tr('입력 항목은 성함, 연락처, 직업입니다. 서버 계정이나 중앙 회원 데이터베이스는 아직 제공되지 않습니다.','Fields: name, phone number, occupation. There is no central registration server or user database.')}</p>
-                <p>{tr('성함과 연락처의 조합은 이 브라우저에서만 확인하도록 무작위 솔트를 더한 해시로 보관합니다. 연락처와 성함의 원문은 저장하지 않으며 직업 선택 정보만 별도로 브라우저에 저장합니다. 기기를 바꾸거나 브라우저 데이터를 삭제하면 로그인할 수 없습니다.','The name and phone combination is stored only as a salted hash in this browser, not as raw values. Occupation is kept locally. A different device or cleared browser data cannot log in.')}</p>
-                <p>{tr('베타 접근은 실제 본인 인증이 아니며 별도 클라우드 계정, 사용자 간 데이터 동기화 또는 계정 복구 기능은 없습니다.','Beta access is not identity verification. Cloud accounts, syncing and account recovery are not available.')}</p>
+                <p>{tr('베타 신청을 위해 성함, 연락처, 직업을 수집하고 Firebase에 저장합니다. 운영 관리와 베타테스트 안내 및 문의 대응 목적으로 이용합니다.','We collect name, phone number, and occupation and store them in Firebase for beta registration, administration, support, and beta-related contact.')}</p>
+                <p>{tr('입력한 성함·연락처·직업 원문은 BRAMER의 Firebase Firestore에 저장되어 승인된 관리자만 조회합니다. 이 브라우저에는 재방문을 확인하기 위한 해시 정보가 별도로 보관되며, 이름과 연락처 원문은 브라우저 인증 정보에 저장하지 않습니다.','Your name, phone, and occupation are stored in private Firebase Firestore records accessible only to authorized admins. A separate salted verification hash is kept in this browser for returning access.')}</p>
+                <p>{tr('기본 보유기간은 베타 운영 종료 후 3개월이며, 별도 법령상 의무가 있는 경우를 제외하고 이후 삭제합니다. 삭제 문의는 NINEWORKS에 요청할 수 있습니다. 현재 로그인은 본인 인증이 아니며 동일 브라우저에서만 가능합니다.','Beta registration data is planned to be retained for three months after the beta ends, unless law requires otherwise. Deletion can be requested from NINEWORKS. Browser login is not identity verification or cross-device authentication.')}</p>
                 <p>{tr('방문 통계는 Firebase의 익명 세션을 활용해 날짜별 방문 횟수를 집계합니다. BRAMER의 방문 집계 문서에는 성함·연락처·IP 주소를 저장하지 않으며, 브라우저에 집계 중복 방지를 위한 세션 정보가 저장될 수 있습니다.','Visit counts use anonymous Firebase sessions and daily aggregates. BRAMER does not store names, phone numbers or IP addresses in visitor count documents. Browser session data is used to reduce duplicate counts.')}</p>
               </div>:null}
             </div>
-            <p className="bramer-beta-local-notice">{tr('현재는 브라우저 기반 베타 등록입니다. 다른 기기에서는 이어서 로그인할 수 없습니다.','This beta registration works only in this browser.')}</p>
+            <p className="bramer-beta-local-notice">{tr('신청 정보는 Firebase에 저장되며, 베타 로그인은 등록한 브라우저에서만 지원됩니다.','Registration details are stored in Firebase. Beta login remains limited to this browser.')}</p>
             {betaError?<p className="bramer-beta-error" role="alert">{betaError}</p>:null}
             <button type="submit" className="bramer-beta-primary" disabled={submitting}>{tr('등록하고 무료 체험하기','Register and start free trial')}</button>
           </form>
