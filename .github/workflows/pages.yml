@@ -46,6 +46,9 @@ jobs:
           test -s public/og-bramer.png
 
       - name: Build for GitHub Pages
+        env:
+          VITE_FIREBASE_PROJECT_ID: ${{ vars.BRAMER_FIREBASE_PROJECT_ID }}
+          VITE_FIREBASE_API_KEY: ${{ vars.BRAMER_FIREBASE_API_KEY }}
         run: npx vite build --base=/
 
       - name: Setup Pages
