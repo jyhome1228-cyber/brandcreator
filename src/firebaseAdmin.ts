@@ -46,18 +46,33 @@ export const firebaseReady = Boolean(firebaseProjectId && firebaseApiKey);
 const firestoreRoot = () =>
   `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(firebaseProjectId)}/databases/(default)/documents`;
 
-function messageFromError(message: string) {
-  if (message.includes('PERMISSION_DENIED')) return '관리자 권한이 없거나 Firestore 보안 규칙에서 접근을 허용하지 않았습니다.';
-  if (message.includes('INVALID_LOGIN_CREDENTIALS') || message.includes('INVALID_PASSWORD') || message.includes('EMAIL_NOT_FOUND'))
-    return '이메일 또는 비밀번호를 확인해 주세요.';
+function messageFromError(raw: string, status: number): string {
+  const message = raw.toUpperCase();
+  if (message.includes('OPERATION_NOT_ALLOWED') || message.includes('EMAIL_PASSWORD_SIGN_IN_DISABLED') || message.includes('PASSWORD_LOGIN_DISABLED'))
+    return 'Firebase에서 이메일/비밀번호 로그인이 비활성화되어 있습니다. Authentication → 로그인 방법에서 이메일/비밀번호를 사용 설정해 주세요.';
+  if (message.includes('INVALID_LOGIN_CREDENTIALS') || message.includes('INVALID_PASSWORD') || message.includes('EMAIL_NOT_FOUND') || message.includes('INVALID_EMAIL'))
+    return 'Firebase Authentication에 생성된 관리자 계정의 이메일과 비밀번호가 맞는지 확인해 주세요.';
+  if (message.includes('USER_DISABLED')) return 'Firebase에서 이 관리자 계정이 비활성화되어 있습니다.';
   if (message.includes('TOO_MANY_ATTEMPTS_TRY_LATER')) return '로그인 시도가 많습니다. 잠시 후 다시 시도해 주세요.';
-  if (message.includes('INVALID_API_KEY')) return 'Firebase Web API 키 설정을 확인해 주세요.';
-  return 'Firebase 요청에 실패했습니다. 관리자 설정 또는 네트워크 상태를 확인해 주세요.';
+  if (message.includes('API_KEY_HTTP_REFERRER_BLOCKED') || message.includes('API_KEY_SERVICE_BLOCKED') || message.includes('API_KEY_INVALID') || message.includes('INVALID_API_KEY'))
+    return 'Firebase Web API 키 제한 또는 프로젝트 연결 설정을 확인해 주세요.';
+  if (message.includes('CONFIGURATION_NOT_FOUND') || message.includes('PROJECT_NOT_FOUND'))
+    return 'Firebase Authentication 설정을 찾을 수 없습니다. 프로젝트와 로그인 방법 설정을 확인해 주세요.';
+  if (message.includes('PERMISSION_DENIED') || status === 403)
+    return 'Firestore 관리자 권한이 거부되었습니다. 최신 보안 규칙과 admins/{UID} 문서의 active=true를 확인해 주세요.';
+  if (status === 404) return '필요한 Firestore 문서를 찾지 못했습니다. admins/{UID} 관리자 문서가 생성되었는지 확인해 주세요.';
+  if (status === 429) return 'Firebase 요청 횟수 제한에 걸렸습니다. 잠시 후 다시 시도해 주세요.';
+  return `Firebase 요청에 실패했습니다 (HTTP ${status}). Authentication 로그인 설정과 관리자 권한을 확인해 주세요.`;
 }
 async function jsonRequest<T>(url: string, init: RequestInit): Promise<T> {
-  const response = await fetch(url, init);
-  const payload = await response.json().catch(() => ({})) as T & { error?: { message?: string } };
-  if (!response.ok) throw new Error(messageFromError(payload.error?.message || 'UNKNOWN'));
+  let response: Response;
+  try {
+    response = await fetch(url, init);
+  } catch {
+    throw new Error('Firebase 연결에 실패했습니다. 인터넷 연결과 브라우저의 요청 차단 설정을 확인해 주세요.');
+  }
+  const payload = await response.json().catch(() => ({})) as T & { error?: { message?: string; status?: string } };
+  if (!response.ok) throw new Error(messageFromError(payload.error?.message || payload.error?.status || 'UNKNOWN', response.status));
   return payload;
 }
 function value(field?: FirestoreValue): string | number | boolean {
@@ -96,7 +111,14 @@ export async function signInAdmin(email: string, password: string): Promise<Admi
       throw new Error('관리자 권한이 활성화되어 있지 않습니다.');
   } catch (error) {
     if (error instanceof Error && error.message === '관리자 권한이 활성화되어 있지 않습니다.') throw error;
-    throw new Error('관리자로 승인된 Firebase 계정이 아닙니다. 관리자 UID 문서와 Firestore 규칙을 확인해 주세요.');
+    const reason = error instanceof Error ? error.message : '';
+    if (reason.includes('문서를 찾지 못했습니다.')) {
+      throw new Error('Firebase 로그인은 성공했지만 관리자 승인이 없습니다. Authentication에서 UID를 확인하고 Firestore에 admins/{UID} 문서를 생성한 뒤 active를 Boolean true로 저장해 주세요.');
+    }
+    if (reason.includes('권한이 거부되었습니다.')) {
+      throw new Error('Firebase 로그인은 성공했지만 Firestore가 관리자 확인을 거부했습니다. admins/{UID}.active=true와 게시된 보안 규칙을 확인해 주세요.');
+    }
+    throw new Error('Firebase 로그인은 성공했지만 관리자 정보를 확인할 수 없습니다. Firestore 설정과 네트워크를 확인해 주세요.');
   }
   return { email: response.email, uid: response.localId, token: response.idToken };
 }
