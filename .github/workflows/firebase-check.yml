@@ -4,6 +4,7 @@ on:
   push:
     paths:
       - "src/visitorStats.ts"
+      - "scripts/firebase-check.mjs"
       - "src/firebaseWebConfig.ts"
       - "firestore.rules"
       - ".github/workflows/firebase-check.yml"
