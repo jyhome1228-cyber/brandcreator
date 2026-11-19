@@ -35,7 +35,8 @@ export async function registerFirebaseBetaTester(name:string,phone:string,occupa
   const payload=await response.json().catch(()=>({})) as {error?:{status?:string;message?:string}};
   // Re-registering on the same browser should not overwrite another record.
   // The original record remains immutable by client design.
-  if(response.status===409||payload.error?.status==='ALREADY_EXISTS')return;
+  if(response.status===409||payload.error?.status==='ALREADY_EXISTS')
+    throw new Error('이 브라우저에서 이미 베타 신청이 완료되었습니다. 베타테스트 로그인을 이용해 주세요.');
   if(response.status===403||payload.error?.status==='PERMISSION_DENIED')
     throw new Error('Firebase 베타 등록 권한이 설정되지 않았습니다. 관리자에게 문의해 주세요.');
   throw new Error('베타 등록 정보 저장에 실패했습니다. ('+String(response.status)+')');
