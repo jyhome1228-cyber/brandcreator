@@ -35,6 +35,19 @@ try{
  const page=await context.newPage();
  const errors=[];
  page.on('pageerror',err=>errors.push(err.message));
+ // Mock Firebase anonymous sign-up + restricted write for browser-only QA.
+ // Real Firestore rules must still be deployed and tested in Firebase Console.
+ const jwtPayload=Buffer.from(JSON.stringify({sub:'qaAnonymousBrowserTester0001'})).toString('base64url');
+ const testIdToken='eyJhbGciOiJub25lIn0.'+jwtPayload+'.qa';
+ let registeredBetaRecord=null;
+ await page.route('**/accounts:signUp?*',route=>route.fulfill({
+   status:200,contentType:'application/json',
+   body:JSON.stringify({idToken:testIdToken,localId:'qaAnonymousBrowserTester0001',refreshToken:'qa-refresh',expiresIn:'3600'}),
+ }));
+ await page.route('**/documents/betaTesters?documentId=*',async route=>{
+   registeredBetaRecord=route.request().postDataJSON();
+   await route.fulfill({status:200,contentType:'application/json',body:JSON.stringify({name:'projects/bramer-16c27/databases/(default)/documents/betaTesters/qaAnonymousBrowserTester0001'})});
+ });
  await page.goto(url,{waitUntil:'domcontentloaded'});
  await page.locator('.bramer-home-hero').waitFor();
  const favicon=await page.locator('link[rel="icon"]').getAttribute('href');
@@ -183,6 +196,9 @@ try{
  await page.locator('.bramer-beta-consent input').check();
  await page.locator('.bramer-beta-primary[type="submit"]').click();
  await page.waitForURL('**/#/welcome');
+ assert.equal(registeredBetaRecord?.fields?.name?.stringValue,'테스트 담당자','Firestore stores beta name after explicit consent');
+ assert.equal(registeredBetaRecord?.fields?.phone?.stringValue,'01012345678','Firestore stores beta contact for admin view');
+ assert.equal(registeredBetaRecord?.fields?.occupation?.stringValue,'디자이너','Firestore stores occupation');
  await page.getByRole('heading',{name:/브레이머를 소개합니다/}).waitFor();
  await page.getByRole('button',{name:'사용 방법 알아보기'}).click();
  await page.getByRole('heading',{name:/세 단계로 간단하게/}).waitFor();
