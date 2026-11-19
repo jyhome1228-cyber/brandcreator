@@ -319,14 +319,14 @@ try{
  assert.ok(mobileDocWidth.page<=mobileDocWidth.screen+3,'Mobile technical docs overflow '+JSON.stringify(mobileDocWidth));
  await mp.screenshot({path:path.join(output,'09-technology-mobile.png'),fullPage:true});
  await mp.goto(url,{waitUntil:'domcontentloaded'});
- await mp.locator('.bramer-preview-gallery-card').nth(25).waitFor();
- assert.equal(await mp.locator('.bramer-preview-gallery-card').count(),26,'All guideline samples visible on mobile');
- const mobileColumns=await mp.locator('.bramer-preview-gallery').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
- assert.equal(mobileColumns,2,'Mobile guideline gallery should use 2 columns');
- await mp.locator('.bramer-preview-gallery-card').nth(3).click();
- await mp.locator('.bramer-preview-side-button.next').click();
- assert.equal(await mp.locator('.bramer-engine-jump select').inputValue(),'4','Mobile page navigation advances correctly');
- await mp.getByRole('button',{name:'전체 보기'}).click();
+ const mobilePreview=mp.locator('.bramer-mobile-logo-preview');
+ await mobilePreview.waitFor();
+ await mobilePreview.locator('img[alt="BRAMER"]').waitFor();
+ assert.ok(await mobilePreview.evaluate(el=>getComputedStyle(el).backgroundColor==='rgb(8, 8, 8)'),'Mobile preview uses a black background');
+ assert.equal(await mp.locator('.bramer-preview-gallery-card').count(),0,'Mobile layout must not render the 26-page thumbnail gallery');
+ assert.equal(await mp.locator('.bramer-preview-view-switch').count(),0,'Mobile preview needs no page controls');
+ const mobileLogoLoaded=await mobilePreview.locator('img').evaluate(el=>el instanceof HTMLImageElement && el.complete && el.naturalWidth>0);
+ assert.ok(mobileLogoLoaded,'Approved BRAMER SVG appears in mobile preview');
  for(const size of [360,390,430]){
    await mp.setViewportSize({width:size,height:844});
    const dimensions=await mp.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
