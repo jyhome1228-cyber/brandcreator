@@ -44,6 +44,7 @@ function GuidelinePreview({ english }: { english: boolean }) {
   const [sampleProject, setSampleProject] = useState<BrandProject | null>(null);
   const [sampleError, setSampleError] = useState(false);
   const [index, setIndex] = useState(0);
+  const [previewMode, setPreviewMode] = useState<'overview' | 'detail'>('overview');
   const [outgoingSvg, setOutgoingSvg] = useState<string | null>(null);
   const [transitionDirection, setTransitionDirection] = useState<'forward' | 'backward'>('forward');
   const [transitionKey, setTransitionKey] = useState(0);
@@ -115,39 +116,81 @@ function GuidelinePreview({ english }: { english: boolean }) {
   };
   const current = pages[index];
   const selectedImage = useMemo(() => current ? `data:image/svg+xml;charset=utf-8,${encodeURIComponent(current.svg)}` : '', [current]);
+  const overviewImages = useMemo(
+    () => pages.map(page => ({ id: page.id, title: page.title, image: `data:image/svg+xml;charset=utf-8,${encodeURIComponent(page.svg)}` })),
+    [pages],
+  );
+  const showDetail = (pageIndex: number) => {
+    if (leaveTimer.current) clearTimeout(leaveTimer.current);
+    setOutgoingSvg(null);
+    setTransitionKey(key => key + 1);
+    setIndex(pageIndex);
+    setPreviewMode('detail');
+  };
   return (
     <div className="bramer-preview bramer-engine-preview" data-reveal>
-      <div className="bramer-preview-window">
-        <div className="bramer-preview-toolbar" aria-label={english ? 'Guideline page number' : '가이드라인 페이지 번호'}>
-          <span className="bramer-preview-page-count">{pages.length ? `${String(index+1).padStart(2,'0')} / ${String(pages.length).padStart(2,'0')}` : '—'}</span>
-        </div>
-        <div className="bramer-preview-canvas bramer-engine-canvas bramer-engine-side-controls" aria-live="polite" tabIndex={0} role="region"
-          aria-label={english ? 'Guideline sample, use arrow keys or swipe to change pages' : '가이드라인 미리보기, 방향키 또는 스와이프로 페이지 이동'}
-          onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onKeyDown={onPreviewKey}>
-          <div className="bramer-preview-page-stage">
-            {outgoingSvg ? <img aria-hidden="true" alt="" className={`bramer-engine-exit-page ${transitionDirection}`}
-              src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(outgoingSvg)}`} /> : null}
-            {current ? <img className={`bramer-engine-page bramer-engine-enter-page ${transitionDirection}`}
-              key={current.id+'-'+transitionKey+(english?'-en':'-ko')} src={selectedImage}
-              alt={`${current.title} — ${current.subtitle}`} loading="eager"/> :
-              <p className="bramer-engine-loading" role="status">{sampleError?(english?'Preview unavailable':'미리보기를 불러올 수 없습니다.'):(english?'Preparing preview…':'미리보기를 준비하고 있습니다…')}</p>}
-          </div>
-          {pages.length>0 && <>
-            <button type="button" className="bramer-preview-side-button previous" onClick={()=>changePage(index-1,pages.length)}
-              aria-label={english?'Previous page':'이전 페이지'}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" width="23" height="23"><path d="M14.5 5.5 8 12l6.5 6.5" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
-            <button type="button" className="bramer-preview-side-button next" onClick={()=>changePage(index+1,pages.length)}
-              aria-label={english?'Next page':'다음 페이지'}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" width="23" height="23"><path d="M9.5 5.5 16 12l-6.5 6.5" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
-          </>}
-        </div>
-        {pages.length>0 && <div className="bramer-preview-page-select">
-          <label className="bramer-engine-jump"><span className="bramer-sr-only">{english?'Select page':'페이지 선택'}</span>
-            <select aria-label={english?'Jump to page':'페이지 바로 이동'} value={index}
-              onChange={event=>changePage(Number(event.target.value),pages.length)}>
-              {pages.map((page,i)=><option value={i} key={page.id}>{String(i+1).padStart(2,'0')} · {page.title}</option>)}
-            </select>
-          </label>
-        </div>}
+      <div className="bramer-preview-view-switch" role="group" aria-label={english ? 'Select guideline view' : '가이드라인 보기 방식'}>
+        <button type="button" className={previewMode === 'overview' ? 'active' : ''} aria-pressed={previewMode === 'overview'}
+          onClick={() => setPreviewMode('overview')}>{english ? 'View all' : '전체 보기'}</button>
+        <button type="button" className={previewMode === 'detail' ? 'active' : ''} aria-pressed={previewMode === 'detail'}
+          onClick={() => setPreviewMode('detail')}>{english ? 'Page view' : '페이지 보기'}</button>
       </div>
+      {previewMode === 'overview' ? (
+        <section className="bramer-preview-overview" aria-label={english ? 'Complete guideline gallery' : '전체 브랜드 가이드라인 보기'}>
+          <div className="bramer-preview-overview-head">
+            <span>{english ? 'BRAMER BRAND GUIDELINES' : 'BRAMER 브랜드 가이드라인'}</span>
+            <span>{String(pages.length).padStart(2, '0')} {english ? 'PAGES' : 'PAGES'}</span>
+          </div>
+          {pages.length ? (
+            <div className="bramer-preview-gallery">
+              {overviewImages.map((page, pageIndex) => (
+                <button type="button" className="bramer-preview-gallery-card" key={page.id}
+                  title={page.title} aria-label={english ? `Open page ${pageIndex + 1}: ${page.title}` : `${pageIndex + 1}페이지 ${page.title} 자세히 보기`}
+                  onClick={() => showDetail(pageIndex)}>
+                  <span className="bramer-preview-gallery-paper">
+                    <img src={page.image} alt="" loading={pageIndex < 10 ? 'eager' : 'lazy'} draggable={false}/>
+                  </span>
+                  <span className="bramer-preview-gallery-meta"><span>{String(pageIndex + 1).padStart(2,'0')}</span><span>{page.title}</span></span>
+                </button>
+              ))}
+            </div>
+          ) : (
+            <p className="bramer-engine-loading" role="status">{sampleError ? (english ? 'Preview unavailable' : '미리보기를 불러올 수 없습니다.') : (english ? 'Preparing pages…' : '가이드라인을 준비하고 있습니다…')}</p>
+          )}
+        </section>
+      ) : (
+        <div className="bramer-preview-window bramer-preview-detail-view">
+          <div className="bramer-preview-toolbar" aria-label={english ? 'Guideline page number' : '가이드라인 페이지 번호'}>
+            <span className="bramer-preview-page-count">{pages.length ? `${String(index+1).padStart(2,'0')} / ${String(pages.length).padStart(2,'0')}` : '—'}</span>
+          </div>
+          <div className="bramer-preview-canvas bramer-engine-canvas bramer-engine-side-controls" aria-live="polite" tabIndex={0} role="region"
+            aria-label={english ? 'Guideline sample, use arrow keys or swipe to change pages' : '가이드라인 미리보기, 방향키 또는 스와이프로 페이지 이동'}
+            onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onKeyDown={onPreviewKey}>
+            <div className="bramer-preview-page-stage">
+              {outgoingSvg ? <img aria-hidden="true" alt="" className={`bramer-engine-exit-page ${transitionDirection}`}
+                src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(outgoingSvg)}`} /> : null}
+              {current ? <img className={`bramer-engine-page bramer-engine-enter-page ${transitionDirection}`}
+                key={current.id+'-'+transitionKey+(english?'-en':'-ko')} src={selectedImage}
+                alt={`${current.title} — ${current.subtitle}`} loading="eager"/> :
+                <p className="bramer-engine-loading" role="status">{sampleError?(english?'Preview unavailable':'미리보기를 불러올 수 없습니다.'):(english?'Preparing preview…':'미리보기를 준비하고 있습니다…')}</p>}
+            </div>
+            {pages.length>0 && <>
+              <button type="button" className="bramer-preview-side-button previous" onClick={()=>changePage(index-1,pages.length)}
+                aria-label={english?'Previous page':'이전 페이지'}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" width="23" height="23"><path d="M14.5 5.5 8 12l6.5 6.5" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+              <button type="button" className="bramer-preview-side-button next" onClick={()=>changePage(index+1,pages.length)}
+                aria-label={english?'Next page':'다음 페이지'}><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" width="23" height="23"><path d="M9.5 5.5 16 12l-6.5 6.5" stroke="currentColor" strokeWidth="1.35" strokeLinecap="round" strokeLinejoin="round"/></svg></button>
+            </>}
+          </div>
+          {pages.length>0 && <div className="bramer-preview-page-select">
+            <label className="bramer-engine-jump"><span className="bramer-sr-only">{english?'Select page':'페이지 선택'}</span>
+              <select aria-label={english?'Jump to page':'페이지 바로 이동'} value={index}
+                onChange={event=>changePage(Number(event.target.value),pages.length)}>
+                {pages.map((page,i)=><option value={i} key={page.id}>{String(i+1).padStart(2,'0')} · {page.title}</option>)}
+              </select>
+            </label>
+          </div>}
+        </div>
+      )}
     </div>
   );
 }
@@ -307,8 +350,8 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
 
       <section className="bramer-home-preview-section" id="preview">
         <div className="bramer-home-section-heading" data-reveal>
-          <h2>{tr("브랜드의 기준을, 하나의 가이드라인으로.","A complete brand guideline, all in one place.")}</h2>
-          <p>{tr("로고에서 가이드라인까지, 하나의 흐름으로.","From logo to guideline, in one seamless workflow.")}</p>
+          <h2>{tr("로고 디자인만 있다면, 브랜드 가이드라인이 뚝딱.","A logo is all you need to start.")}</h2>
+          <p>{tr("로고부터 브랜드의 사용 규칙과 응용 디자인까지, 한눈에 확인하세요.","Explore the complete brand guideline, from your logo to everyday applications.")}</p>
         </div>
         <GuidelinePreview english={en}/>
       </section>
