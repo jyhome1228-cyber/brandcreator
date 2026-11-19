@@ -45,18 +45,24 @@ try{
  // The admin page is available independently and must never show fabricated user data.
  const adminPage=await context.newPage();
  await adminPage.goto(url+'#/admin',{waitUntil:'domcontentloaded'});
+ await adminPage.getByRole('heading',{name:'관리자 화면'}).waitFor();
+ assert.equal(await adminPage.locator('.bramer-admin-metrics').count(),0,'Admin dashboard remains hidden until PIN');
+ await adminPage.locator('#bramer-admin-pin').fill('0000');
+ await adminPage.getByRole('button',{name:'확인'}).click();
+ await adminPage.getByRole('alert').getByText('비밀번호를 확인해 주세요.').waitFor();
+ await adminPage.locator('#bramer-admin-pin').fill('1228');
+ await adminPage.getByRole('button',{name:'확인'}).click();
  await adminPage.getByRole('heading',{name:'대시보드'}).waitFor();
- assert.equal(await adminPage.locator('.bramer-admin-metrics article').count(),4,'Admin dashboard has four actual-data KPI slots');
- assert.equal(await adminPage.locator('.bramer-admin-signin').count(),1,'Configured Firebase shows the secure admin sign-in');
- assert.equal(await adminPage.locator('.bramer-admin-setup-banner').count(),0,'Firebase configuration must be available');
- assert.equal(await adminPage.locator('.bramer-admin-metrics strong').first().innerText(),'—','Admin must not invent user counts');
+ assert.equal(await adminPage.locator('.bramer-admin-metrics article').count(),4,'Admin PIN opens dashboard UI');
+ assert.equal(await adminPage.locator('.bramer-admin-metrics strong').first().innerText(),'—','PIN does not disclose private user data');
+ assert.equal(await adminPage.locator('.bramer-admin-setup-banner').count(),1,'Real Firebase records remain locked');
  await adminPage.getByRole('button',{name:'베타테스터',exact:true}).click();
  await adminPage.getByRole('heading',{name:'베타테스터 목록'}).waitFor();
- assert.equal(await adminPage.getByText('등록된 베타테스터 데이터가 없습니다.').count(),1,'No fake beta-testers displayed');
- await adminPage.getByRole('button',{name:'이용 기록',exact:true}).click();
- await adminPage.getByRole('heading',{name:'이용 기록',exact:true,level:1}).waitFor();
+ assert.equal(await adminPage.getByText('등록된 베타테스터 데이터가 없습니다.').count(),1);
+ await adminPage.getByRole('button',{name:'잠금'}).click();
+ await adminPage.getByRole('heading',{name:'관리자 화면'}).waitFor();
  await adminPage.close();
- pass('admin dashboard routes, zero-data state and registered-user views');
+ pass('admin PIN screen, wrong-code rejection and private data protection');
  // Every beta workspace URL must redirect anonymous visitors into registration.
  for (const route of ['/dashboard','/guide','/create','/editor','/projects','/help','/welcome']) {
    const visitor=await context.newPage();
