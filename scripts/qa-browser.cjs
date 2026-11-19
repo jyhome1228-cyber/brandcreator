@@ -65,7 +65,12 @@ try{
  await publicPages.waitForURL('**/#/technology');
  await publicPages.getByRole('heading',{name:/브랜드의 기준을/}).waitFor();
  const links=await publicPages.locator('.bramer-docs-sidebar nav a').all();
- assert.equal(links.length,8,'Technical navigation only displays current information sections');
+ assert.equal(links.length,10,'Technical navigation includes SVG analysis and rule engine sections');
+ await publicPages.locator('.bramer-docs-sidebar nav').getByRole('link',{name:'SVG 분석 엔진'}).click();
+ assert.ok(publicPages.url().includes('#/technology'),'SVG analysis navigation remains within technology');
+ await publicPages.locator('#svg-engine').waitFor();
+ assert.ok((await publicPages.locator('.bramer-docs-engine-results>div').count())===3,'SVG technical summary renders geometry structure and color analysis');
+ assert.ok((await publicPages.locator('.bramer-docs-rule-diagram>div').count())===3,'Rule engine workflow renders data, rules, and output');
  await publicPages.locator('.bramer-docs-sidebar nav').getByRole('link',{name:'기술 구조'}).click();
  assert.ok(publicPages.url().includes('#/technology'),'Technical sidebar selection must stay inside the technical document');
  await publicPages.locator('#architecture').waitFor();
