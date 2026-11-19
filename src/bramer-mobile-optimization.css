@@ -1,0 +1,224 @@
+
+/* BRAMER mobile-first layout audit. Desktop layout intentionally unchanged. */
+.bramer-landing .bramer-mobile-menu-trigger,
+.bramer-landing .bramer-mobile-menu,
+.bramer-landing .bramer-mobile-menu-backdrop{display:none}
+@media(max-width:760px){
+  .bramer-landing{width:100%;min-width:0;overflow-x:clip}
+  .bramer-landing .bramer-site-header{z-index:110!important;isolation:isolate}
+  .bramer-landing .bramer-site-header-inner{
+    width:calc(100% - 32px)!important;max-width:none!important;
+    min-height:62px!important;height:62px!important;gap:10px!important;
+    flex-wrap:nowrap!important;justify-content:space-between!important;
+  }
+  .bramer-landing .bramer-site-logo{margin:0!important;min-width:0;flex:0 0 auto}
+  .bramer-landing .bramer-site-logo .bramer-logo{height:18px!important;max-width:106px}
+  .bramer-landing .bramer-site-menu{display:none!important}
+  .bramer-landing .bramer-site-actions{
+    display:flex!important;align-items:center!important;justify-content:flex-end!important;
+    gap:10px!important;min-width:0;margin:0 0 0 auto!important;flex:0 1 auto;
+  }
+  .bramer-landing .bramer-language-switch{margin:0!important;gap:3px!important}
+  .bramer-landing .bramer-language-switch button{
+    min-width:25px;min-height:40px;padding:0 3px!important;font-size:11px!important;
+  }
+  .bramer-landing .bramer-site-start{
+    min-width:0!important;min-height:38px!important;
+    padding:0 14px!important;margin:0!important;font-size:11px!important;white-space:nowrap;
+  }
+  .bramer-landing .bramer-mobile-menu-trigger{
+    border:0;display:flex;flex:0 0 42px;flex-direction:column;align-items:center;
+    justify-content:center;gap:6px;width:42px;height:42px;padding:0;background:transparent;
+    color:#fff;cursor:pointer;
+  }
+  .bramer-landing .bramer-mobile-menu-trigger span{
+    display:block;width:20px;height:1.5px;background:currentColor;border-radius:2px;
+  }
+  .bramer-landing .bramer-mobile-menu-backdrop{
+    display:block;position:fixed;inset:62px 0 0;background:rgba(0,0,0,.45);z-index:110;
+  }
+  .bramer-landing .bramer-mobile-menu{
+    position:absolute;top:62px;left:0;right:0;z-index:111;display:none;
+    padding:12px 20px 23px;background:#101010;border-bottom:1px solid #333;
+    box-shadow:0 18px 36px rgba(0,0,0,.22);
+  }
+  .bramer-landing .bramer-mobile-menu.open{display:flex;flex-direction:column}
+  .bramer-landing .bramer-mobile-menu a{
+    display:flex;align-items:center;min-height:52px;padding:6px 8px;
+    border-bottom:1px solid #292929;font-size:14px!important;color:#ededed!important;
+    text-align:left;letter-spacing:-.02em;text-decoration:none;
+  }
+  .bramer-landing .bramer-mobile-menu a:last-child{border-bottom:0}
+  .bramer-landing .bramer-home-hero{
+    min-height:max(550px,calc(100svh - 62px))!important;
+    padding:74px 22px 81px!important;overflow:hidden;
+  }
+  .bramer-landing .bramer-home-hero-content{min-width:0;width:100%;max-width:540px}
+  .bramer-landing .bramer-home-overline{font-size:11px!important;margin-bottom:20px!important}
+  .bramer-landing .bramer-hero-rotation{width:100%;min-width:0}
+  .bramer-landing .bramer-hero-rotation-stage{width:100%;min-width:0}
+  .bramer-landing .bramer-hero-rotation-slide h1{
+    font-size:clamp(27px,6.1vw,35px)!important;line-height:1.42!important;
+    letter-spacing:-.055em!important;max-width:100%;word-break:keep-all;
+  }
+  .bramer-landing .bramer-hero-slide-description{
+    font-size:13px!important;line-height:1.85!important;max-width:320px;
+    margin-left:auto;margin-right:auto;word-break:keep-all;
+  }
+  .bramer-landing .bramer-home-primary{
+    min-height:47px!important;padding:0 24px!important;font-size:12px!important;
+  }
+  .bramer-landing .bramer-hero-tech-link{
+    min-height:44px;margin:12px auto 0!important;display:flex;align-items:center;justify-content:center;
+  }
+  .bramer-landing .bramer-home-preview-section{padding:63px 16px 85px!important}
+  .bramer-landing .bramer-home-preview-section .bramer-home-section-heading{margin:0 auto 26px!important}
+  .bramer-landing .bramer-home-preview-section .bramer-home-section-heading h2{
+    font-size:clamp(24px,5.8vw,31px)!important;line-height:1.42!important;
+  }
+  .bramer-landing .bramer-home-preview-section .bramer-home-section-heading p{
+    font-size:12px!important;line-height:1.75!important;
+  }
+  .bramer-landing .bramer-preview-overview-head{margin-bottom:16px!important;font-size:10px!important}
+  .bramer-landing .bramer-preview-view-switch{margin-bottom:23px!important}
+  .bramer-landing .bramer-preview-view-switch button{
+    min-height:38px!important;padding:0 19px!important;font-size:12px!important;
+  }
+  .bramer-landing .bramer-preview-gallery{
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:22px 12px!important;min-width:0;
+  }
+  .bramer-landing .bramer-preview-gallery-card{
+    min-width:0!important;width:100%!important;transform:none;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .bramer-landing .bramer-preview-gallery-paper{aspect-ratio:297/210;overflow:hidden}
+  .bramer-landing .bramer-preview-gallery-meta{margin-top:9px!important;font-size:10px!important}
+  .bramer-landing .bramer-preview-gallery-meta span:last-child{
+    max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+  }
+  .bramer-landing .bramer-engine-preview .bramer-preview-toolbar{
+    width:calc(100% - 44px)!important;max-width:none!important;
+    min-height:28px!important;margin-bottom:8px!important;
+  }
+  .bramer-landing .bramer-engine-preview .bramer-engine-canvas,
+  .bramer-landing .bramer-engine-preview .bramer-engine-side-controls{
+    width:100%!important;max-width:none!important;min-height:0!important;
+    padding:0 22px!important;overflow:visible!important;
+  }
+  .bramer-landing .bramer-engine-preview .bramer-preview-page-stage{
+    width:100%!important;max-width:100%!important;min-width:0!important;
+  }
+  .bramer-landing .bramer-preview-side-button{
+    width:28px!important;height:45px!important;min-width:28px!important;
+  }
+  .bramer-landing .bramer-preview-side-button.previous{left:-3px!important}
+  .bramer-landing .bramer-preview-side-button.next{right:-3px!important}
+  .bramer-landing .bramer-preview-page-select{margin-top:17px!important}
+  .bramer-landing .bramer-preview-page-select select{max-width:80vw!important;min-height:44px!important;font-size:12px!important}
+  .bramer-landing .bramer-home-steps-section{padding:73px 20px 78px!important}
+  .bramer-landing .bramer-process-list{gap:16px!important}
+  .bramer-landing .bramer-process-step{
+    display:grid!important;grid-template-columns:43px minmax(0,1fr)!important;
+    gap:9px 13px!important;padding:18px 0!important;
+  }
+  .bramer-landing .bramer-process-index>span{font-size:25px!important}
+  .bramer-landing .bramer-process-copy h3{font-size:18px!important;line-height:1.48!important}
+  .bramer-landing .bramer-process-copy p{font-size:12px!important;line-height:1.8!important}
+  .bramer-landing .bramer-process-graphic{width:180px!important;max-width:100%;height:102px!important}
+  .bramer-landing .bramer-help-section{padding:66px 18px 76px!important}
+  .bramer-landing .bramer-help-faq summary{min-height:55px;font-size:13px!important;line-height:1.6!important}
+  .bramer-landing .bramer-home-footer{padding:51px 18px 26px!important}
+  .bramer-landing .bramer-footer-columns.bramer-footer-curated{
+    display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;
+    gap:35px 22px!important;padding-bottom:44px!important;
+  }
+  .bramer-landing .bramer-footer-col a,
+  .bramer-landing .bramer-footer-link-button{
+    display:block;min-height:36px;line-height:1.5;padding:6px 0;
+    font-size:12px!important;
+  }
+  .bramer-landing .bramer-footer-bottom{
+    display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;
+  }
+  .bramer-landing .bramer-footer-bottom small{line-height:1.6}
+  .bramer-landing .bramer-beta-overlay{
+    display:flex;align-items:center;justify-content:center;
+    padding:14px!important;overflow-y:auto;overscroll-behavior:contain;
+  }
+  .bramer-landing .bramer-beta-dialog.bramer-beta-refined{
+    width:100%!important;max-width:480px!important;max-height:calc(100dvh - 28px);
+    margin:auto!important;overflow-y:auto!important;overscroll-behavior:contain;
+    padding:28px 22px 25px!important;
+  }
+  .bramer-landing .bramer-beta-refined .bramer-beta-field-grid input{
+    min-height:47px;font-size:16px!important;
+  }
+  .bramer-landing .bramer-beta-refined .bramer-occupation-trigger{min-height:47px}
+  .bramer-landing .bramer-beta-choice>button{min-height:83px}
+  .bramer-landing .bramer-beta-close{min-width:38px;min-height:38px}
+  /* Technical documentation: the left menu becomes a swipeable, sticky chapter strip. */
+  .bramer-docs-header{height:60px!important;padding-inline:18px!important}
+  .bramer-docs-head-actions{gap:10px!important}
+  .bramer-docs-cta{min-height:40px;padding:0 13px!important;font-size:11px!important}
+  .bramer-docs-shell{display:block!important;width:100%!important;max-width:none!important}
+  .bramer-docs-sidebar{
+    position:sticky!important;top:60px!important;z-index:50;
+    display:block!important;width:100%!important;height:auto!important;max-height:none!important;
+    padding:9px 14px!important;border-right:0!important;border-bottom:1px solid #eaeaea!important;
+    background:rgba(255,255,255,.97)!important;overflow-x:auto!important;
+    -webkit-overflow-scrolling:touch;scrollbar-width:none;
+  }
+  .bramer-docs-sidebar::-webkit-scrollbar{display:none}
+  .bramer-docs-side-head,.bramer-docs-side-bottom{display:none!important}
+  .bramer-docs-sidebar nav{
+    display:flex!important;flex-direction:row!important;gap:5px!important;
+    width:max-content!important;min-width:100%!important;
+  }
+  .bramer-docs-sidebar nav a{
+    display:flex!important;width:auto!important;min-width:0!important;white-space:nowrap!important;
+    min-height:40px!important;padding:0 13px!important;border-radius:999px!important;
+    font-size:12px!important;
+  }
+  .bramer-docs-main{
+    width:100%!important;max-width:none!important;margin:0!important;
+    padding:48px 20px 45px!important;
+  }
+  .bramer-docs-main section{scroll-margin-top:120px!important}
+  .bramer-docs-hero{padding-bottom:65px!important}
+  .bramer-docs-hero h1{font-size:clamp(27px,6.3vw,33px)!important}
+  .bramer-docs-hero .bramer-docs-lead{font-size:14px!important;line-height:1.85!important}
+  .bramer-docs-section{padding:61px 0 69px!important}
+  .bramer-docs-section h2{font-size:clamp(22px,5.2vw,27px)!important}
+  .bramer-docs-metrics{gap:10px!important}
+  .bramer-docs-metrics strong{font-size:19px!important}
+  .bramer-docs-principles,
+  .bramer-docs-tech-features,
+  .bramer-docs-rule-columns{grid-template-columns:1fr!important}
+  .bramer-docs-flow{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .bramer-docs-output-list>div{grid-template-columns:1fr!important;gap:7px!important}
+  .bramer-docs-engine .bramer-docs-engine-visual{
+    padding:23px 18px!important;grid-template-columns:1fr!important;min-height:0!important;
+  }
+  .bramer-docs-engine-code{font-size:11px!important;overflow-wrap:anywhere}
+  .bramer-docs-rule-diagram{grid-template-columns:1fr!important}
+  .bramer-docs-rule-diagram>div{min-height:0!important}
+  .bramer-docs-credit dl>div{grid-template-columns:94px minmax(0,1fr)!important;gap:12px!important}
+  .bramer-docs-end{padding:26px 22px!important}
+  .bramer-docs-footer{gap:20px;flex-wrap:wrap}
+}
+@media(max-width:380px){
+ .bramer-landing .bramer-site-header-inner{width:calc(100% - 22px)!important;gap:5px!important}
+ .bramer-landing .bramer-site-actions{gap:5px!important}
+ .bramer-landing .bramer-site-logo .bramer-logo{height:16px!important}
+ .bramer-landing .bramer-site-start{padding:0 10px!important}
+ .bramer-landing .bramer-mobile-menu-trigger{width:36px;flex-basis:36px}
+ .bramer-landing .bramer-home-hero{padding-inline:16px!important}
+ .bramer-landing .bramer-hero-rotation-slide h1{font-size:clamp(25px,7vw,29px)!important}
+ .bramer-landing .bramer-home-preview-section{padding-inline:13px!important}
+ .bramer-landing .bramer-preview-gallery{gap:17px 9px!important}
+}
+@media(prefers-reduced-motion:reduce){
+ .bramer-landing .bramer-mobile-menu,
+ .bramer-landing .bramer-mobile-menu-backdrop{transition:none!important}
+}
