@@ -53,7 +53,7 @@ try{
  await adminPage.getByRole('heading',{name:'베타테스터 목록'}).waitFor();
  assert.equal(await adminPage.getByText('등록된 베타테스터 데이터가 없습니다.').count(),1,'No fake beta-testers displayed');
  await adminPage.getByRole('button',{name:'이용 기록',exact:true}).click();
- await adminPage.getByRole('heading',{name:'이용 기록',exact:true}).waitFor();
+ await adminPage.getByRole('heading',{name:'이용 기록',exact:true,level:1}).waitFor();
  await adminPage.close();
  pass('admin dashboard routes, zero-data state and registered-user views');
  // Every beta workspace URL must redirect anonymous visitors into registration.
