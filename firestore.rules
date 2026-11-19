@@ -14,9 +14,78 @@ service cloud.firestore {
     }
 
     // Personal data must remain private. Do not allow unauthenticated reads.
-    match /betaTesters/{id} {
+    // Only an authenticated anonymous visitor can submit a one-time
+    // registration for its own UID. Never expose names or phone numbers publicly.
+    function validBetaSignup(id) {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'anonymous'
+        && request.auth.uid == id
+        && request.resource.data.keys().hasOnly(
+          ['uid','name','phone','occupation','registeredAt','status'])
+        && request.resource.data.keys().hasAll(
+          ['uid','name','phone','occupation','registeredAt','status'])
+        && request.resource.data.uid == id
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 40
+        && request.resource.data.phone is string
+        && request.resource.data.phone.matches('^[0-9]{9,11}
+    match /usageEvents/{id} {
       allow read: if isAdmin();
       allow write: if false;
+    }
+
+    // This collection contains aggregated daily counters only:
+    // day, visits, unique. There is no personally identifiable visit record.
+    function anonymousVisit() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+    function validVisitData(day) {
+      return request.resource.data.keys().hasOnly(['day', 'visits', 'unique'])
+        && request.resource.data.keys().hasAll(['day', 'visits', 'unique'])
+        && request.resource.data.day is string
+        && request.resource.data.day == day
+        && day.size() == 10
+        && request.resource.data.visits is int
+        && request.resource.data.unique is int
+        && request.resource.data.visits >= 1
+        && request.resource.data.unique >= 0
+        && request.resource.data.unique <= request.resource.data.visits;
+    }
+    match /visitDaily/{day} {
+      allow get, list: if true;
+      allow create: if anonymousVisit()
+        && validVisitData(day)
+        && request.resource.data.visits == 1
+        && request.resource.data.unique <= 1;
+      allow update: if anonymousVisit()
+        && validVisitData(day)
+        && resource.data.day == day
+        && request.resource.data.visits == resource.data.visits + 1
+        && request.resource.data.unique >= resource.data.unique
+        && request.resource.data.unique <= resource.data.unique + 1;
+      allow delete: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+)
+        && request.resource.data.occupation is string
+        && request.resource.data.occupation.size() > 0
+        && request.resource.data.occupation.size() <= 50
+        && request.resource.data.registeredAt is timestamp
+        && request.resource.data.registeredAt <= request.time
+        && request.resource.data.registeredAt >= request.time - duration.value(5,'m')
+        && request.resource.data.status == 'active';
+    }
+    match /betaTesters/{id} {
+      allow get, list: if isAdmin();
+      allow create: if validBetaSignup(id);
+      allow update, delete: if false;
     }
     match /usageEvents/{id} {
       allow read: if isAdmin();
