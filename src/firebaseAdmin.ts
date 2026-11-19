@@ -1,3 +1,4 @@
+/// <reference types="vite/client" />
 /**
  * BRAMER admin-only Firebase REST adapter.
  * The Firebase web API key/project ID are public configuration, not credentials.
