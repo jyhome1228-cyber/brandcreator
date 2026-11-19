@@ -80,16 +80,56 @@ function firestoreDay(doc:FirestoreDoc):DailyVisits{
   return{day:String(doc.fields?.day?.stringValue||doc.name?.split('/').pop()||''),
     visits:numberOf(doc,'visits'),unique:numberOf(doc,'unique')};
 }
+type VisitConnectionState = {
+  auth: 'ok' | 'error';
+  read: 'ok' | 'error' | 'not_checked';
+  message: string;
+  statusCode?: number;
+};
+function firestoreResponseError(status:number, operation:'read'|'write', detail:string):Error {
+  const summary=detail.toUpperCase();
+  if(status===401)return new Error('Firebase 인증 토큰을 확인할 수 없습니다. Authentication의 익명 로그인 설정을 확인해 주세요. (401)');
+  if(status===403)return new Error(
+    operation==='read'
+      ? 'Firestore visitDaily 읽기 권한이 거부됐습니다. Firebase Console에 최신 규칙을 게시했는지 확인해 주세요. (403)'
+      : 'Firestore visitDaily 쓰기 권한이 거부됐습니다. 익명 인증과 create/update 규칙을 확인해 주세요. (403)'
+  );
+  if(status===404&&operation==='read')return new Error('Firestore 데이터베이스 또는 visitDaily 컬렉션이 아직 준비되지 않았습니다. (404)');
+  if(summary.includes('QUOTA_EXCEEDED')||status===429)return new Error('Firestore 사용량 제한에 도달했습니다. (429)');
+  return new Error('Firestore '+(operation==='read'?'조회':'기록')+' 오류 (HTTP '+status+').');
+}
+export async function checkVisitConnectivity():Promise<VisitConnectionState> {
+  let token:string;
+  try { token=await visitorToken(); }
+  catch(e) {
+    return {auth:'error',read:'not_checked',message:e instanceof Error?e.message:'익명 인증에 실패했습니다.'};
+  }
+  try {
+    const response=await fetch(`${root}/visitDaily/${dayId()}`,{
+      cache:'no-store',headers:{Authorization:`Bearer ${token}`},
+    });
+    if(response.ok||response.status===404) {
+      return {auth:'ok',read:'ok',statusCode:response.status,
+        message:response.status===404
+          ? '익명 로그인과 Firestore 조회는 정상입니다. 오늘 방문 기록이 아직 생성되지 않았습니다.'
+          : '익명 로그인과 Firestore 방문 기록 조회가 정상입니다.'};
+    }
+    return {auth:'ok',read:'error',statusCode:response.status,
+      message:firestoreResponseError(response.status,'read','').message};
+  }catch{
+    return {auth:'ok',read:'error',message:'Firestore 네트워크 요청에 실패했습니다. 브라우저 네트워크 차단 또는 연결 상태를 확인해 주세요.'};
+  }
+}
 export async function fetchDailyVisits():Promise<DailyVisits[]>{
   const rows:DailyVisits[]=[];
+  const auth=await visitorToken();
   let token='';
   for(let page=0;page<15;page++){
     const qs=new URLSearchParams({pageSize:'100'});
     if(token)qs.set('pageToken',token);
-    const response=await fetch(`${root}/visitDaily?${qs.toString()}`,{cache:'no-store'});
+    const response=await fetch(`${root}/visitDaily?${qs.toString()}`,{cache:'no-store',headers:{Authorization:`Bearer ${auth}`}});
     if(!response.ok){
-      if(response.status===403)throw new Error('Firestore visitDaily 읽기 규칙을 게시해야 합니다.');
-      throw new Error('방문자 통계를 불러오지 못했습니다.');
+      throw firestoreResponseError(response.status,'read',await response.text().catch(()=>''));
     }
     const payload=await response.json() as {documents?:FirestoreDoc[];nextPageToken?:string};
     rows.push(...(payload.documents||[]).map(firestoreDay).filter(row=>/^\d{4}-\d{2}-\d{2}$/.test(row.day)));
@@ -102,8 +142,8 @@ async function increaseDay(day:string, isUnique:boolean):Promise<void>{
   const auth=await visitorToken();
   const url=`${root}/visitDaily/${day}`;
   for(let attempt=0;attempt<5;attempt++){
-    const currentResponse=await fetch(url,{cache:'no-store'});
-    if(!currentResponse.ok&&currentResponse.status!==404)throw new Error('방문자 집계 조회 권한을 확인해 주세요.');
+    const currentResponse=await fetch(url,{cache:'no-store',headers:{Authorization:`Bearer ${auth}`}});
+    if(!currentResponse.ok&&currentResponse.status!==404)throw firestoreResponseError(currentResponse.status,'read','');
     const current:FirestoreDoc=currentResponse.ok?await currentResponse.json() as FirestoreDoc:{};
     const previous=currentResponse.ok?firestoreDay(current):{visits:0,unique:0};
     const query=new URLSearchParams();
@@ -120,7 +160,7 @@ async function increaseDay(day:string, isUnique:boolean):Promise<void>{
     if(response.ok)return;
     if(response.status===409||response.status===412)continue;
     const detail=await response.text().catch(()=>'');
-    throw new Error(response.status===403?'Firestore 방문 기록 규칙과 익명 로그인을 확인해 주세요.':`방문 기록 실패: ${response.status} ${detail.slice(0,100)}`);
+    throw firestoreResponseError(response.status,'write',detail);
   }
   throw new Error('동시 방문 집계 충돌로 기록하지 못했습니다.');
 }
