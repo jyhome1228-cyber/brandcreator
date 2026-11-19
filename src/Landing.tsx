@@ -203,6 +203,7 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
   const changeLanguage = (next: 'ko' | 'en') => { setLanguage(next); try { localStorage.setItem('bramer-site-language', next); } catch { /* optional preference */ } };
   const [audienceIndex, setAudienceIndex] = useState(0);
   const [rollPaused, setRollPaused] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [betaOpen, setBetaOpen] = useState(() => {
     try {
       const shouldOpen = sessionStorage.getItem('bramer-open-registration-v1') === '1';
@@ -266,6 +267,14 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
     onStart(false);
   };
   useEffect(() => {
+    if (!mobileMenuOpen) return;
+    const onEscape = (event: globalThis.KeyboardEvent) => {
+      if (event.key === 'Escape') setMobileMenuOpen(false);
+    };
+    window.addEventListener('keydown', onEscape);
+    return () => window.removeEventListener('keydown', onEscape);
+  }, [mobileMenuOpen]);
+  useEffect(() => {
     if (rollPaused || betaOpen || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
     const interval = window.setInterval(() => setAudienceIndex(index => (index + 1) % audiences.length), 4000);
     return () => window.clearInterval(interval);
@@ -313,9 +322,21 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
           <a href="#/guide">{tr("업종별 가이드","Industry guide")}</a>
           <a href="#/technology" onClick={event=>{event.preventDefault();onManifesto()}}>{tr("기술 소개","Technology")}</a>
         </nav>
-        <div className="bramer-site-actions"><div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div><button type="button" className="bramer-site-start" onClick={event => openBeta(event,'choice')}>{tr("시작하기","Get started")}</button>
+        <div className="bramer-site-actions">
+          <div className="bramer-language-switch" aria-label="Language"><button type="button" className={!en ? "active" : ""} aria-pressed={!en} onClick={() => changeLanguage("ko")}>KO</button><span>/</span><button type="button" className={en ? "active" : ""} aria-pressed={en} onClick={() => changeLanguage("en")}>EN</button></div>
+          <button type="button" className="bramer-site-start" onClick={event => {setMobileMenuOpen(false);openBeta(event,'choice')}}>{tr("시작하기","Get started")}</button>
+          <button type="button" className="bramer-mobile-menu-trigger" aria-label={mobileMenuOpen ? tr("메뉴 닫기","Close menu") : tr("메뉴 열기","Open menu")} aria-expanded={mobileMenuOpen} aria-controls="bramer-mobile-site-nav" onClick={() => setMobileMenuOpen(open => !open)}>
+            <span/><span/>
+          </button>
         </div>
       </div>
+      {mobileMenuOpen && <div className="bramer-mobile-menu-backdrop" onClick={() => setMobileMenuOpen(false)} />}
+      <nav id="bramer-mobile-site-nav" className={`bramer-mobile-menu ${mobileMenuOpen ? 'open' : ''}`} aria-label={tr("모바일 메뉴","Mobile navigation")} aria-hidden={!mobileMenuOpen}>
+        <a href="#preview" onClick={() => setMobileMenuOpen(false)}>{tr("서비스 소개","Overview")}</a>
+        <a href="#how" onClick={() => setMobileMenuOpen(false)}>{tr("이용 방법","How it works")}</a>
+        <a href="#/guide" onClick={() => setMobileMenuOpen(false)}>{tr("업종별 가이드","Industry guide")}</a>
+        <a href="#/technology" onClick={event => {event.preventDefault();setMobileMenuOpen(false);onManifesto()}}>{tr("기술 소개","Technology")}</a>
+      </nav>
     </header>
 
     <main id="top">
