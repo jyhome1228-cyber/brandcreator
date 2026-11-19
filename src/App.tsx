@@ -4,6 +4,7 @@ import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
 import TechnicalManifesto from './TechnicalManifesto';
 import WelcomeExperience from './WelcomeExperience';
+import { hasLocalBetaRegistration } from './betaLocalAccess';
 import Dashboard from './Dashboard';
 import ProjectLibrary from './ProjectLibrary';
 import HelpView from './HelpView';
@@ -75,9 +76,12 @@ export default function App() {
   const [welcomeLanguage, setWelcomeLanguage] = useState<'ko'|'en'>(() => {
     try { return localStorage.getItem('bramer-site-language')==='en'?'en':'ko'; } catch { return 'ko'; }
   });
+  // Beta registration currently remains browser-local, not server authorization.
   const hasBetaSession = () => {
-    try { return sessionStorage.getItem('bramer-beta-session-v1') === 'active'; }
-    catch { return false; }
+    try {
+      return sessionStorage.getItem('bramer-beta-session-v1') === 'active' &&
+        hasLocalBetaRegistration();
+    } catch { return false; }
   };
   const openManifesto = () => {
     window.location.hash = '/technology';
@@ -111,6 +115,7 @@ export default function App() {
     goToDashboard();
   };
   const openCreate = (nextIndustry?: IndustryId) => {
+    if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     if (nextIndustry) {
       setIndustry(nextIndustry);
       setSelectedCategories(getDefaultSelection(nextIndustry));
@@ -121,6 +126,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const navigateWorkspace = (view: 'dashboard' | 'guide') => {
+    if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     if (view === 'guide') {
       window.location.hash = '/guide';
       setMode('guide');
@@ -150,6 +156,18 @@ export default function App() {
     window.addEventListener('hashchange', syncRoute);
     return () => window.removeEventListener('hashchange', syncRoute);
   }, []);
+  // Keep every workspace page behind the same registration gate, including
+  // deep links and the public site's Industry Guide navigation.
+  useEffect(() => {
+    const protectedModes = ['dashboard','guide','setup','editor','projects','help','welcome'];
+    if (!protectedModes.includes(mode) || hasBetaSession()) return;
+    try {
+      sessionStorage.setItem('bramer-open-registration-v1','1');
+    } catch { /* Browsers may restrict storage */ }
+    window.history.replaceState(null, '', window.location.pathname + window.location.search + '#/');
+    setMode('landing');
+    window.scrollTo({top:0,behavior:'instant'});
+  }, [mode]);
   const [setupStep, setSetupStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [currentId, setCurrentId] = useState('01-cover');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
@@ -239,16 +257,19 @@ export default function App() {
     return () => document.removeEventListener('visibilitychange',flush);
   },[hydrated,project,projectId,industry,selectedCategories,enabled,setupStep]);
   const openHelp = () => {
+    if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     window.location.hash = '/help';
     setMode('help');
     window.scrollTo({top:0,behavior:'instant'});
   };
   const openGuide = () => {
+    if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     window.location.hash = '/guide';
     setMode('guide');
     window.scrollTo({top:0,behavior:'instant'});
   };
   const openProjectLibrary = async () => {
+    if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
     if (hasDraftContent()) await saveToBrowser();
     await refreshProjects();
@@ -257,6 +278,7 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
   const createNewProject = async () => {
+    if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
     if (hasDraftContent()) await saveToBrowser();
     const nextId=newProjectId();
@@ -445,10 +467,10 @@ export default function App() {
   };
 
   if (!hydrated && (mode==='setup' || mode==='editor')) return <div className="bramer-loading-project" role="status">저장된 프로젝트 확인 중...</div>;
-  // This client-side guard prevents accidental pre-registration workspace access.
-  // Browser-session access is not a substitute for backend authorization.
-  if (!hasBetaSession() && ['dashboard','setup','editor','projects'].includes(mode)) {
-    return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
+  // Never render protected workspace UI until an explicit local beta session exists.
+  // This is a client-side UX gate; server-side access control is a separate requirement.
+  if (!hasBetaSession() && ['dashboard','guide','setup','editor','projects','help','welcome'].includes(mode)) {
+    return null;
   }
   if (mode === 'manifesto') return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
   if (mode === 'projects') return <ProjectLibrary projects={savedProjects}
