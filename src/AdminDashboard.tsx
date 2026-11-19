@@ -273,18 +273,18 @@ export default function AdminDashboard({onHome}:Props) {
               <section className="bramer-admin-panel">
                 <div className="bramer-admin-panel-head"><div><h2>최근 활동</h2><p>기록된 주요 이용 이벤트</p></div>
                   <button type="button" onClick={()=>selectSection('events')}>전체 보기</button></div>
-                {sortedEvents.length ? <div className="bramer-admin-activity">
+                {adminSession&&sortedEvents.length ? <div className="bramer-admin-activity">
                   {sortedEvents.slice(0,5).map(item=><div key={item.id}>
                     <span className="bramer-admin-activity-dot"/><div><strong>{eventNames[item.event]||item.event}</strong>
                     <small>{item.projectName||item.userId||'이용 기록'}</small></div>
                     <time>{readableDate(item.createdAt,true)}</time></div>)}
-                </div>:<div className="bramer-admin-empty">아직 기록된 활동이 없습니다.</div>}
+                </div>:<div className="bramer-admin-empty">{adminSession?'아직 기록된 활동이 없습니다.':'관리자 인증 후 이용 기록을 확인할 수 있습니다.'}</div>}
               </section>
             </div>
             <section className="bramer-admin-panel bramer-admin-recent">
               <div className="bramer-admin-panel-head"><div><h2>최근 등록자</h2><p>베타테스터 등록 현황</p></div>
                 <button type="button" onClick={()=>selectSection('testers')}>등록자 관리</button></div>
-              <TesterTable testers={testers.slice().sort((a,b)=>b.registeredAt.localeCompare(a.registeredAt)).slice(0,6)}/>
+              {adminSession?<TesterTable testers={testers.slice().sort((a,b)=>b.registeredAt.localeCompare(a.registeredAt)).slice(0,6)}/>:<div className="bramer-admin-empty">Firebase 관리자 인증 후 최근 등록자가 표시됩니다.</div>}
             </section>
           </>:section==='visitors'?<section className="bramer-admin-panel bramer-admin-table-panel">
             <div className="bramer-admin-list-head"><div><h2>날짜별 방문 기록</h2>
@@ -315,18 +315,18 @@ export default function AdminDashboard({onHome}:Props) {
                   {occupations.map(value=><option key={value} value={value}>{value}</option>)}
                 </select>
               </div>
-              <TesterTable testers={activeTesters}/>
+              {adminSession?<TesterTable testers={activeTesters}/>:<div className="bramer-admin-empty">Firebase 관리자 인증 후 베타테스터 정보를 확인할 수 있습니다.</div>}
             </section>
           </>:<section className="bramer-admin-panel bramer-admin-table-panel">
             <div className="bramer-admin-list-head"><div><h2>이용 기록</h2>
-              <p>최근 기록부터 표시 · 총 {validData?sortedEvents.length:0}건</p></div>
+              <p>최근 기록부터 표시 · {validData?`총 ${sortedEvents.length}건`:'관리자 인증 필요'}</p></div>
               <button type="button" onClick={exportEvents} disabled={!validData}>CSV 내보내기</button></div>
             <div className="bramer-admin-table-scroll"><table><thead><tr>
               <th>이벤트</th><th>사용자 ID</th><th>프로젝트</th><th>일시</th>
             </tr></thead><tbody>{sortedEvents.length?sortedEvents.map(item=><tr key={item.id}>
               <td><strong>{eventNames[item.event]||item.event}</strong></td><td>{item.userId||'—'}</td>
               <td>{item.projectName||'—'}</td><td>{readableDate(item.createdAt,true)}</td>
-            </tr>):<tr><td colSpan={4} className="bramer-admin-empty-row">기록된 이용 이벤트가 없습니다.</td></tr>}</tbody></table></div>
+            </tr>):<tr><td colSpan={4} className="bramer-admin-empty-row">{adminSession?'기록된 이용 이벤트가 없습니다.':'Firebase 관리자 인증 후 이용 기록이 표시됩니다.'}</td></tr>}</tbody></table></div>
           </section>}
         </div>
         <footer className="bramer-admin-footer">
