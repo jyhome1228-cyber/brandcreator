@@ -236,7 +236,7 @@ export default function AdminDashboard({onHome}:Props) {
           <section className="bramer-admin-signin bramer-admin-private-login">
             <div className="bramer-admin-signin-top">
               <small>FIREBASE AUTHENTICATION</small><h2>등록자 정보 보호</h2>
-              <p>베타테스터의 이름과 연락처는 4자리 화면 비밀번호만으로 공개되지 않습니다. Firebase에서 승인된 관리자로 로그인하면 실제 등록 기록을 조회할 수 있습니다.</p>
+              <p>등록자 정보는 Firebase 관리자에게만 표시됩니다. Authentication의 이메일/비밀번호 로그인 활성화, 관리자 계정 생성, Firestore admins/{'{UID}'} 문서의 active=true 설정이 필요합니다.</p>
             </div>
             <form onSubmit={event=>void adminLogin(event)}>
               <label><span>관리자 이메일</span><input type="email" autoComplete="username" required
