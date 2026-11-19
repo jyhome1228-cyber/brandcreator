@@ -307,6 +307,32 @@ try{
  assert.ok((await mp.locator('.bramer-hero-image').evaluate(el=>getComputedStyle(el).backgroundImage)).includes('20261118-043848-'),'Mobile second slide uses company reference image');
  const mobileLandingWidth=await mp.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
  assert.ok(mobileLandingWidth.page<=mobileLandingWidth.screen+3,'Mobile landing overflow '+JSON.stringify(mobileLandingWidth));
+ await mp.getByRole('button',{name:'메뉴 열기'}).click();
+ assert.equal(await mp.getByRole('navigation',{name:'모바일 메뉴'}).getByRole('link').count(),4,'Mobile navigation should expose all four pages');
+ await mp.getByRole('navigation',{name:'모바일 메뉴'}).getByRole('link',{name:'이용 방법'}).click();
+ assert.equal(await mp.getByRole('button',{name:'메뉴 열기'}).count(),1,'Mobile navigation closes after selection');
+ await mp.getByRole('button',{name:'메뉴 열기'}).click();
+ await mp.getByRole('navigation',{name:'모바일 메뉴'}).getByRole('link',{name:'기술 소개'}).click();
+ await mp.waitForURL('**/#/technology');
+ await mp.locator('.bramer-docs-sidebar nav a').first().waitFor();
+ const mobileDocWidth=await mp.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
+ assert.ok(mobileDocWidth.page<=mobileDocWidth.screen+3,'Mobile technical docs overflow '+JSON.stringify(mobileDocWidth));
+ await mp.screenshot({path:path.join(output,'09-technology-mobile.png'),fullPage:true});
+ await mp.goto(url,{waitUntil:'domcontentloaded'});
+ await mp.locator('.bramer-preview-gallery-card').nth(25).waitFor();
+ assert.equal(await mp.locator('.bramer-preview-gallery-card').count(),26,'All guideline samples visible on mobile');
+ const mobileColumns=await mp.locator('.bramer-preview-gallery').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length);
+ assert.equal(mobileColumns,2,'Mobile guideline gallery should use 2 columns');
+ await mp.locator('.bramer-preview-gallery-card').nth(3).click();
+ await mp.locator('.bramer-preview-side-button.next').click();
+ assert.equal(await mp.locator('.bramer-engine-jump select').inputValue(),'4','Mobile page navigation advances correctly');
+ await mp.getByRole('button',{name:'전체 보기'}).click();
+ for(const size of [360,390,430]){
+   await mp.setViewportSize({width:size,height:844});
+   const dimensions=await mp.evaluate(()=>({screen:innerWidth,page:document.documentElement.scrollWidth}));
+   assert.ok(dimensions.page<=dimensions.screen+3,'Mobile landing overflow at '+size+': '+JSON.stringify(dimensions));
+ }
+ await mp.setViewportSize({width:390,height:844});
  await mp.screenshot({path:path.join(output,'04-landing-mobile.png'),fullPage:true});
  await mp.locator('.bramer-site-start').click();
  await mp.getByRole('dialog').waitFor();
