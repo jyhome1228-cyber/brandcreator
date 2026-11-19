@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import BramerLogo from './components/BramerLogo';
-import {
-  firebaseReady, firebaseProjectId, signInAdmin, loadAdminData,
-  type AdminSession, type BetaTester, type UsageEvent,
-} from './firebaseAdmin';
+import { firebaseProjectId, type BetaTester, type UsageEvent } from './firebaseAdmin';
 
 type AdminSection = 'overview' | 'testers' | 'events';
 type Props = { onHome: () => void };
@@ -37,11 +34,12 @@ function downloadCsv(rows:string[][], filename:string) {
 function shortDate(value:Date) {return `${value.getMonth()+1}/${value.getDate()}`;}
 
 export default function AdminDashboard({onHome}:Props) {
-  const [session,setSession]=useState<AdminSession|null>(null);
-  const [email,setEmail]=useState('');
+  const [unlocked,setUnlocked]=useState(() => {
+    try { return sessionStorage.getItem('bramer-admin-preview-v1') === 'yes'; }
+    catch { return false; }
+  });
   const [password,setPassword]=useState('');
-  const [loggingIn,setLoggingIn]=useState(false);
-  const [loading,setLoading]=useState(false);
+  const [loading] = useState(false);
   const [error,setError]=useState('');
   const [testers,setTesters]=useState<BetaTester[]>([]);
   const [events,setEvents]=useState<UsageEvent[]>([]);
@@ -50,38 +48,22 @@ export default function AdminDashboard({onHome}:Props) {
   const [occupation,setOccupation]=useState('all');
   const [menuOpen,setMenuOpen]=useState(false);
 
-  const refresh = async (current:AdminSession) => {
-    setLoading(true);setError('');
-    try {
-      const data=await loadAdminData(current);
-      setTesters(data.testers);
-      setEvents(data.events);
-    } catch (e) {
-      const message=e instanceof Error?e.message:'관리자 데이터를 불러올 수 없습니다.';
-      setError(message);
-      if (/권한|승인|로그인|인증/.test(message)) {
-        setSession(null);setTesters([]);setEvents([]);
-      }
-    } finally {setLoading(false);}
-  };
   useEffect(()=>{document.title='BRAMER ADMIN | 베타 운영 관리';return()=>{document.title='BRAMER | 로고만 있다면, 가이드라인이 뚝딱!';};},[]);
-  async function login(event:FormEvent<HTMLFormElement>) {
+  function unlock(event:FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!email.trim()||!password) return;
-    setLoggingIn(true);setError('');
-    try {
-      const current=await signInAdmin(email.trim(),password);
-      setSession(current);setPassword('');
-      await refresh(current);
-    } catch (e) {setError(e instanceof Error?e.message:'관리자 로그인에 실패했습니다.');}
-    finally {setLoggingIn(false);}
+    // This is deliberately a UI-preview PIN, not an authentication mechanism.
+    // Firestore data stays inaccessible without Firebase admin authentication.
+    if(password !== '1228') {setError('비밀번호를 확인해 주세요.');return;}
+    try {sessionStorage.setItem('bramer-admin-preview-v1','yes');} catch { /* optional */ }
+    setUnlocked(true);setPassword('');setError('');
   }
   function logout() {
-    setSession(null);setEmail('');setPassword('');
+    try {sessionStorage.removeItem('bramer-admin-preview-v1');} catch { /* optional */ }
+    setUnlocked(false);setPassword('');
     setTesters([]);setEvents([]);setError('');
     setSection('overview');setSearch('');setOccupation('all');
   }
-  const available = Boolean(session);
+  const available = unlocked;
   const activeTesters=useMemo(()=>{
     const normalized=search.trim().toLocaleLowerCase('ko-KR');
     return testers.filter(tester=>
@@ -104,8 +86,8 @@ export default function AdminDashboard({onHome}:Props) {
   const latestWeek=events.filter(item=>new Date(item.createdAt).getTime()>Date.now()-7*86400000).length;
   const produced=events.filter(item=>item.event==='guideline_generated').length;
   const exported=events.filter(item=>item.event==='guideline_exported'||item.event==='export_pdf'||item.event==='export_svg').length;
-  const validData=available&&!loading;
-  const statusMessage=!firebaseReady?'Firebase 연결 전':!available?'관리자 로그인 필요':loading?'데이터 불러오는 중':'Firestore 연결됨';
+  const validData=false; // Firestore records are never exposed by a browser-only PIN.
+  const statusMessage=unlocked?'화면 미리보기':'비밀번호 입력';
   const exportTesters=()=>downloadCsv([
     ['성함','연락처','직업','등록일','최근 이용','프로젝트 수','가이드라인 생성','상태'],
     ...activeTesters.map(item=>[item.name,item.phone,item.occupation,readableDate(item.registeredAt,true),
@@ -117,13 +99,35 @@ export default function AdminDashboard({onHome}:Props) {
   ],'bramer-usage-events.csv');
   const selectSection=(value:AdminSection)=>{setSection(value);setMenuOpen(false);};
 
+  if (!unlocked) return <div className="bramer-admin bramer-admin-pin-screen">
+    <header className="bramer-admin-header">
+      <button type="button" className="bramer-admin-logo" onClick={onHome} aria-label="BRAMER 홈페이지"><BramerLogo light/></button>
+      <span className="bramer-admin-header-name">ADMIN</span>
+      <div className="bramer-admin-header-actions"><button type="button" onClick={onHome}>홈페이지</button></div>
+    </header>
+    <main className="bramer-admin-pin-main">
+      <div className="bramer-admin-pin-card">
+        <span>BRAMER ADMIN</span><h1>관리자 화면</h1>
+        <p>비밀번호를 입력하면 관리자 대시보드 화면을 확인할 수 있습니다.</p>
+        <form onSubmit={unlock}>
+          <label htmlFor="bramer-admin-pin">비밀번호</label>
+          <input id="bramer-admin-pin" type="password" inputMode="numeric" autoComplete="off"
+            maxLength={12} value={password} onChange={event=>setPassword(event.target.value)}
+            placeholder="비밀번호 입력" required autoFocus/>
+          {error?<p role="alert" className="bramer-admin-pin-error">{error}</p>:null}
+          <button type="submit">확인</button>
+        </form>
+        <small>현재 4자리 코드는 화면 확인용입니다. 실제 이용자 데이터는 Firebase 관리자 인증이 필요합니다.</small>
+      </div>
+    </main>
+  </div>;
   return <div className="bramer-admin">
     <header className="bramer-admin-header">
       <button type="button" className="bramer-admin-logo" onClick={onHome} aria-label="BRAMER 홈페이지"><BramerLogo light/></button>
       <span className="bramer-admin-header-name">ADMIN</span>
       <div className="bramer-admin-header-actions">
         <span className={'bramer-admin-connection '+(available?'connected':'')}>{statusMessage}</span>
-        {session?<button type="button" onClick={logout}>로그아웃</button>:null}
+        {unlocked?<button type="button" onClick={logout}>잠금</button>:null}
         <button type="button" className="bramer-admin-home" onClick={onHome}>홈페이지</button>
       </div>
     </header>
@@ -150,32 +154,21 @@ export default function AdminDashboard({onHome}:Props) {
           <div className="bramer-admin-title-actions">
             <button type="button" className="bramer-admin-mobile-nav" aria-expanded={menuOpen}
               onClick={()=>setMenuOpen(open=>!open)}>메뉴</button>
-            {available&&<button type="button" onClick={()=>void refresh(session!)} disabled={loading}>{loading?'불러오는 중':'새로고침'}</button>}
+            
           </div>
         </div>
         {menuOpen?<nav className="bramer-admin-mobile-menu" aria-label="모바일 관리자 메뉴">
           {(['overview','testers','events'] as AdminSection[]).map(value=><button key={value} type="button"
             onClick={()=>selectSection(value)}>{sectionNames[value]}</button>)}</nav>:null}
 
-        {!firebaseReady?<section className="bramer-admin-setup-banner">
-          <div><small>FIREBASE SETUP</small><h2>관리자 화면 준비 완료</h2>
-            <p>대시보드 레이아웃과 데이터 조회 구조를 만들었습니다. Firebase 프로젝트 ID와 Web API 키를 연결하면 관리자 인증과 Firestore 데이터 조회를 사용할 수 있습니다.</p>
-            <p>아직 실제 베타테스터 정보가 수집되거나 연결된 상태는 아닙니다.</p></div>
-          <span>연결 대기</span>
-        </section>:!available?<section className="bramer-admin-signin">
-          <div className="bramer-admin-signin-top"><small>SECURE ACCESS</small><h2>관리자 로그인</h2>
-            <p>Firebase Authentication 계정으로 로그인합니다. 관리자 UID가 Firestore에 승인되어 있어야 데이터를 확인할 수 있습니다.</p></div>
-          <form onSubmit={event=>void login(event)}>
-            <label><span>이메일</span><input type="email" autoComplete="username" placeholder="관리자 이메일"
-              value={email} onChange={event=>setEmail(event.target.value)} required /></label>
-            <label><span>비밀번호</span><input type="password" autoComplete="current-password"
-              placeholder="비밀번호" value={password} onChange={event=>setPassword(event.target.value)} required /></label>
-            <button type="submit" disabled={loggingIn}>{loggingIn?'확인 중':'관리자 로그인'}</button>
-          </form>
-        </section>:null}
-
+        <section className="bramer-admin-setup-banner">
+          <div><small>FIREBASE DATA ACCESS</small><h2>관리자 화면 미리보기</h2>
+            <p>비밀번호로 화면을 열었습니다. 현재는 실제 등록자·이용 기록이 표시되지 않습니다.</p>
+            <p>Firestore 개인정보를 조회하려면 별도의 Firebase 관리자 인증 또는 서버 기반 권한 확인이 필요합니다.</p></div>
+          <span>조회 연결 전</span>
+        </section>
         {error?<div className="bramer-admin-error" role="alert">{error}</div>:null}
-        <div className={!validData?'bramer-admin-locked':''}>
+        <div className="bramer-admin-preview-data">
           {section==='overview'?<>
             <div className="bramer-admin-metrics">
               {[{label:'베타 등록자',value:testers.length,caption:'누적 등록 인원'},
@@ -241,7 +234,7 @@ export default function AdminDashboard({onHome}:Props) {
         </div>
         <footer className="bramer-admin-footer">
           <span>© 2026 NINEWORKS · BRAMER ADMIN</span>
-          <span>{firebaseProjectId ? 'Firebase '+firebaseProjectId : 'Firebase 연결 전 · 실제 데이터 미수집'}</span>
+          <span>Firebase {firebaseProjectId} · 기록 조회 미연결</span>
         </footer>
       </main>
     </div>
