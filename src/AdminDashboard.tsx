@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import BramerLogo from './components/BramerLogo';
 import { firebaseProjectId, signInAdmin, loadAdminData, type AdminSession, type BetaTester, type UsageEvent } from './firebaseAdmin';
-import { fetchDailyVisits, latestDays, type DailyVisits } from './visitorStats';
+import { fetchDailyVisits, latestDays, checkVisitConnectivity, type DailyVisits } from './visitorStats';
 
 type AdminSection = 'overview' | 'visitors' | 'testers' | 'events';
 type Props = { onHome: () => void };
@@ -80,6 +80,15 @@ export default function AdminDashboard({onHome}:Props) {
   const [visitLoading,setVisitLoading]=useState(false);
   const [visitReady,setVisitReady]=useState(false);
   const [visitError,setVisitError]=useState('');
+  const [diagnostic,setDiagnostic]=useState('');
+  const [diagnosing,setDiagnosing]=useState(false);
+  const diagnose=async()=>{
+    setDiagnosing(true);
+    try{
+      const result=await checkVisitConnectivity();
+      setDiagnostic(`인증: ${result.auth==='ok'?'정상':'오류'} · 조회: ${result.read==='ok'?'정상':result.read==='error'?'오류':'미확인'} — ${result.message}`);
+    }finally{setDiagnosing(false);}
+  };
   const refreshVisits=async()=>{
     setVisitLoading(true);setVisitError('');
     try {
@@ -229,6 +238,12 @@ export default function AdminDashboard({onHome}:Props) {
               'Firebase 익명 로그인을 활성화하고 Firestore 방문 기록 규칙을 게시하면 실측 방문 횟수를 기록할 수 있습니다.'}</p>
             <p>개인정보가 없는 일별 집계이며, 베타테스터 연락처 등은 별도의 관리자 인증 없이는 조회되지 않습니다.</p>
             {visitError?<p className="bramer-admin-visit-error" role="alert">{visitError}</p>:null}
+            <div className="bramer-admin-diagnostic">
+              <button type="button" onClick={()=>void diagnose()} disabled={diagnosing}>
+                {diagnosing?'연동 확인 중':'Firebase 연결 진단'}
+              </button>
+              {diagnostic?<p role="status">{diagnostic}</p>:null}
+            </div>
           </div><span>{visitLoading?'조회 중':visitReady?'집계 연결':'설정 확인'}</span>
         </section>
         {error?<div className="bramer-admin-error" role="alert">{error}</div>:null}
