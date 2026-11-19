@@ -66,6 +66,27 @@ try{
        fields:{day:{stringValue:currentVisitDay},visits:{integerValue:'7'},unique:{integerValue:'5'}}}],
    }),
  }));
+ await adminPage.route('**/accounts:signInWithPassword?*',route=>route.fulfill({
+   status:200,contentType:'application/json',body:JSON.stringify({
+     idToken:'qa-admin-auth-token',localId:'qaAdminUID',email:'admin@example.com',
+   }),
+ }));
+ await adminPage.route('**/documents/admins/qaAdminUID',route=>route.fulfill({
+   status:200,contentType:'application/json',body:JSON.stringify({
+     fields:{active:{booleanValue:true}},
+   }),
+ }));
+ await adminPage.route('**/documents/betaTesters?*',route=>route.fulfill({
+   status:200,contentType:'application/json',body:JSON.stringify({
+     documents:[{name:'projects/bramer-16c27/databases/(default)/documents/betaTesters/qaTestUser',
+       fields:{name:{stringValue:'관리자 검증 사용자'},phone:{stringValue:'01012345678'},
+         occupation:{stringValue:'디자이너'},registeredAt:{timestampValue:'2026-11-19T12:00:00Z'},
+         status:{stringValue:'active'}}}],
+   }),
+ }));
+ await adminPage.route('**/documents/usageEvents?*',route=>route.fulfill({
+   status:200,contentType:'application/json',body:'{"documents":[]}',
+ }));
  await adminPage.goto(url+'#/admin',{waitUntil:'domcontentloaded'});
  await adminPage.getByRole('heading',{name:'관리자 화면'}).waitFor();
  assert.equal(await adminPage.locator('.bramer-admin-metrics').count(),0,'Admin dashboard remains hidden until PIN');
@@ -91,6 +112,15 @@ try{
  await adminPage.getByRole('button',{name:'베타테스터',exact:true}).click();
  await adminPage.getByRole('heading',{name:'베타테스터 목록'}).waitFor();
  assert.equal(await adminPage.getByText('Firebase 관리자 인증 후 베타테스터 정보를 확인할 수 있습니다.').count(),1);
+ assert.equal(await adminPage.getByText('관리자 검증 사용자').count(),0,
+   'Tester personal information is not shown after PIN only');
+ await adminPage.getByPlaceholder('관리자 이메일').fill('admin@example.com');
+ await adminPage.locator('.bramer-admin-private-login input[type="password"]').fill('qa-password');
+ await adminPage.getByRole('button',{name:'등록자 조회 인증'}).click();
+ await adminPage.getByText('관리자 검증 사용자').waitFor();
+ assert.equal(await adminPage.getByText('01012345678').count(),1,
+   'Authorized Firebase admin can access stored beta signup');
+
  await adminPage.getByRole('button',{name:'잠금'}).click();
  await adminPage.getByRole('heading',{name:'관리자 화면'}).waitFor();
  await adminPage.close();
