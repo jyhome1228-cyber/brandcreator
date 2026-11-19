@@ -1,0 +1,31 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAdmin() {
+      return request.auth != null
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.active == true;
+    }
+
+    // An administrator's identity must be granted manually from Firebase Console.
+    // Ordinary users cannot create, edit or enumerate admin credentials.
+    match /admins/{uid} {
+      allow get: if request.auth != null && request.auth.uid == uid;
+      allow list, create, update, delete: if false;
+    }
+
+    // These collections are private. A trusted backend, not anonymous client code,
+    // must eventually write beta registrations and event logs.
+    match /betaTesters/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /usageEvents/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
