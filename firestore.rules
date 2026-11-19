@@ -78,7 +78,7 @@ service cloud.firestore {
         && request.resource.data.occupation.size() > 0
         && request.resource.data.occupation.size() <= 50
         && request.resource.data.registeredAt is timestamp
-        && request.resource.data.registeredAt <= request.time
+        && request.resource.data.registeredAt <= request.time + duration.value(5,'m')
         && request.resource.data.registeredAt >= request.time - duration.value(5,'m')
         && request.resource.data.status == 'active';
     }
