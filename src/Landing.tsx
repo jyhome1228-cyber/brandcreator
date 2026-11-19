@@ -540,6 +540,7 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
                 <p>{tr('입력 항목은 성함, 연락처, 직업입니다. 서버 계정이나 중앙 회원 데이터베이스는 아직 제공되지 않습니다.','Fields: name, phone number, occupation. There is no central registration server or user database.')}</p>
                 <p>{tr('성함과 연락처의 조합은 이 브라우저에서만 확인하도록 무작위 솔트를 더한 해시로 보관합니다. 연락처와 성함의 원문은 저장하지 않으며 직업 선택 정보만 별도로 브라우저에 저장합니다. 기기를 바꾸거나 브라우저 데이터를 삭제하면 로그인할 수 없습니다.','The name and phone combination is stored only as a salted hash in this browser, not as raw values. Occupation is kept locally. A different device or cleared browser data cannot log in.')}</p>
                 <p>{tr('베타 접근은 실제 본인 인증이 아니며 별도 클라우드 계정, 사용자 간 데이터 동기화 또는 계정 복구 기능은 없습니다.','Beta access is not identity verification. Cloud accounts, syncing and account recovery are not available.')}</p>
+                <p>{tr('방문 통계는 Firebase의 익명 세션을 활용해 날짜별 방문 횟수를 집계합니다. BRAMER의 방문 집계 문서에는 성함·연락처·IP 주소를 저장하지 않으며, 브라우저에 집계 중복 방지를 위한 세션 정보가 저장될 수 있습니다.','Visit counts use anonymous Firebase sessions and daily aggregates. BRAMER does not store names, phone numbers or IP addresses in visitor count documents. Browser session data is used to reduce duplicate counts.')}</p>
               </div>:null}
             </div>
             <p className="bramer-beta-local-notice">{tr('현재는 브라우저 기반 베타 등록입니다. 다른 기기에서는 이어서 로그인할 수 없습니다.','This beta registration works only in this browser.')}</p>
