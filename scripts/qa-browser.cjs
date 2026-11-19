@@ -42,6 +42,20 @@ try{
  const faviconResponse=await page.request.get('http://127.0.0.1:'+port+favicon);
  assert.ok(faviconResponse.ok(),'Favicon fetch must succeed at deployed path');
  pass('GitHub Pages base path and favicon work');
+ // The admin page is available independently and must never show fabricated user data.
+ const adminPage=await context.newPage();
+ await adminPage.goto(url+'#/admin',{waitUntil:'domcontentloaded'});
+ await adminPage.getByRole('heading',{name:'대시보드'}).waitFor();
+ assert.equal(await adminPage.locator('.bramer-admin-metrics article').count(),4,'Admin dashboard has four actual-data KPI slots');
+ assert.equal(await adminPage.locator('.bramer-admin-setup-banner').count(),1,'Firebase-unconfigured admin shows a setup state');
+ assert.equal(await adminPage.locator('.bramer-admin-metrics strong').first().innerText(),'—','Admin must not invent user counts');
+ await adminPage.getByRole('button',{name:'베타테스터',exact:true}).click();
+ await adminPage.getByRole('heading',{name:'베타테스터 목록'}).waitFor();
+ assert.equal(await adminPage.getByText('등록된 베타테스터 데이터가 없습니다.').count(),1,'No fake beta-testers displayed');
+ await adminPage.getByRole('button',{name:'이용 기록',exact:true}).click();
+ await adminPage.getByRole('heading',{name:'이용 기록',exact:true}).waitFor();
+ await adminPage.close();
+ pass('admin dashboard routes, zero-data state and registered-user views');
  // Every beta workspace URL must redirect anonymous visitors into registration.
  for (const route of ['/dashboard','/guide','/create','/editor','/projects','/help','/welcome']) {
    const visitor=await context.newPage();
