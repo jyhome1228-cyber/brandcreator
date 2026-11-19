@@ -44,6 +44,15 @@ try{
  pass('GitHub Pages base path and favicon work');
  // The admin page is available independently and must never show fabricated user data.
  const adminPage=await context.newPage();
+ const currentVisitDay=new Intl.DateTimeFormat('en-CA',{
+   timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',
+ }).format(new Date());
+ await adminPage.route('**/visitDaily?*',route=>route.fulfill({
+   status:200,contentType:'application/json',body:JSON.stringify({
+     documents:[{name:'projects/bramer-16c27/databases/(default)/documents/visitDaily/'+currentVisitDay,
+       fields:{day:{stringValue:currentVisitDay},visits:{integerValue:'7'},unique:{integerValue:'5'}}}],
+   }),
+ }));
  await adminPage.goto(url+'#/admin',{waitUntil:'domcontentloaded'});
  await adminPage.getByRole('heading',{name:'관리자 화면'}).waitFor();
  assert.equal(await adminPage.locator('.bramer-admin-metrics').count(),0,'Admin dashboard remains hidden until PIN');
@@ -54,8 +63,18 @@ try{
  await adminPage.getByRole('button',{name:'확인'}).click();
  await adminPage.getByRole('heading',{name:'대시보드'}).waitFor();
  assert.equal(await adminPage.locator('.bramer-admin-metrics article').count(),4,'Admin PIN opens dashboard UI');
- assert.equal(await adminPage.locator('.bramer-admin-metrics strong').first().innerText(),'—','PIN does not disclose private user data');
- assert.equal(await adminPage.locator('.bramer-admin-setup-banner').count(),1,'Real Firebase records remain locked');
+ await adminPage.getByText('방문 기록 집계 중').waitFor();
+ assert.equal(await adminPage.locator('.bramer-admin-metrics strong').first().innerText(),'7',
+   'Admin shows Firestore cumulative visit total');
+ assert.equal(await adminPage.locator('.bramer-admin-metrics strong').nth(1).innerText(),'7',
+   'Admin shows today visits');
+ assert.equal(await adminPage.locator('.bramer-admin-metrics strong').nth(3).innerText(),'5',
+   'Admin shows today first-time browsers');
+ await adminPage.getByRole('button',{name:'방문 기록',exact:true}).click();
+ await adminPage.getByRole('heading',{name:'날짜별 방문 기록'}).waitFor();
+ assert.ok(await adminPage.getByText(currentVisitDay).count()>0,'Day-by-day visitor report is visible');
+ assert.equal(await adminPage.locator('.bramer-admin-setup-banner').count(),1,
+   'Real beta tester PII still requires Firebase administrator access');
  await adminPage.getByRole('button',{name:'베타테스터',exact:true}).click();
  await adminPage.getByRole('heading',{name:'베타테스터 목록'}).waitFor();
  assert.equal(await adminPage.getByText('등록된 베타테스터 데이터가 없습니다.').count(),1);
