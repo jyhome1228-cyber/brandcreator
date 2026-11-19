@@ -222,3 +222,32 @@
  .bramer-landing .bramer-mobile-menu,
  .bramer-landing .bramer-mobile-menu-backdrop{transition:none!important}
 }
+
+
+/* Mobile only: replace tiny document thumbnails with the approved BRAMER logo. */
+.bramer-landing .bramer-mobile-logo-preview{display:none}
+@media(max-width:760px){
+ .bramer-landing .bramer-home-preview-section{
+   background:#fff!important;padding:57px 16px 72px!important;
+ }
+ .bramer-landing .bramer-home-preview-section .bramer-home-section-heading{
+   max-width:440px!important;margin-bottom:27px!important;
+ }
+ .bramer-landing .bramer-mobile-logo-preview{
+   display:flex!important;align-items:center;justify-content:center;
+   width:100%;max-width:560px;margin:0 auto;
+   aspect-ratio:1.54;min-height:220px;max-height:370px;
+   padding:35px;background:#080808;border:0;border-radius:0;
+   overflow:hidden;
+ }
+ .bramer-landing .bramer-mobile-logo-preview .bramer-logo{
+   display:block!important;width:min(48%,220px)!important;
+   height:auto!important;max-width:220px!important;max-height:52px!important;
+   object-fit:contain;object-position:center;filter:brightness(0) invert(1)!important;
+ }
+}
+@media(max-width:380px){
+ .bramer-landing .bramer-mobile-logo-preview{
+   min-height:210px;padding:25px;
+ }
+}
