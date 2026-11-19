@@ -3,6 +3,7 @@ import BramerLogo from './components/BramerLogo';
 import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
 import AdminDashboard from './AdminDashboard';
+import { recordVisit } from './visitorStats';
 import TechnicalManifesto from './TechnicalManifesto';
 import WelcomeExperience from './WelcomeExperience';
 import { hasLocalBetaRegistration } from './betaLocalAccess';
@@ -74,6 +75,12 @@ export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
   const [mode, setMode] = useState<'landing' | 'admin' | 'manifesto' | 'welcome' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/admin' ? 'admin' : location.hash === '#/technology' ? 'manifesto' : location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/welcome' ? 'welcome' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
   const [showFirstCoach, setShowFirstCoach] = useState(false);
+  useEffect(() => {
+    // Public pages are counted once per browser tab/day. Admin traffic is excluded.
+    // Tracking only writes date and aggregate counts. Availability depends on
+    // Firebase anonymous auth + published Firestore rules.
+    void recordVisit().catch(() => { /* Tracking must never block the website. */ });
+  }, [mode]);
   const [welcomeLanguage, setWelcomeLanguage] = useState<'ko'|'en'>(() => {
     try { return localStorage.getItem('bramer-site-language')==='en'?'en':'ko'; } catch { return 'ko'; }
   });
