@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+import { firebaseWebConfig } from './firebaseWebConfig';
 /**
  * BRAMER admin-only Firebase REST adapter.
  * The Firebase web API key/project ID are public configuration, not credentials.
@@ -39,8 +40,8 @@ type FirestoreDocument = {
 };
 type CollectionResponse = { documents?: FirestoreDocument[]; nextPageToken?: string };
 
-export const firebaseProjectId = (import.meta.env.VITE_FIREBASE_PROJECT_ID || '').trim();
-export const firebaseApiKey = (import.meta.env.VITE_FIREBASE_API_KEY || '').trim();
+export const firebaseProjectId = (import.meta.env.VITE_FIREBASE_PROJECT_ID || firebaseWebConfig.projectId).trim();
+export const firebaseApiKey = (import.meta.env.VITE_FIREBASE_API_KEY || firebaseWebConfig.apiKey).trim();
 export const firebaseReady = Boolean(firebaseProjectId && firebaseApiKey);
 const firestoreRoot = () =>
   `https://firestore.googleapis.com/v1/projects/${encodeURIComponent(firebaseProjectId)}/databases/(default)/documents`;
