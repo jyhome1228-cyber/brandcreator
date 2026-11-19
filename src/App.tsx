@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react';
 import BramerLogo from './components/BramerLogo';
 import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
+import AdminDashboard from './AdminDashboard';
 import TechnicalManifesto from './TechnicalManifesto';
 import WelcomeExperience from './WelcomeExperience';
 import { hasLocalBetaRegistration } from './betaLocalAccess';
@@ -71,7 +72,7 @@ function isHex(value: string): boolean {
 
 export default function App() {
   const [project, setProject] = useState<BrandProject>(initialProject);
-  const [mode, setMode] = useState<'landing' | 'manifesto' | 'welcome' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/technology' ? 'manifesto' : location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/welcome' ? 'welcome' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
+  const [mode, setMode] = useState<'landing' | 'admin' | 'manifesto' | 'welcome' | 'dashboard' | 'guide' | 'setup' | 'editor' | 'projects' | 'help'>(() => location.hash === '#/admin' ? 'admin' : location.hash === '#/technology' ? 'manifesto' : location.hash === '#/create' || location.hash === '#/editor' ? 'setup' : location.hash === '#/dashboard' ? 'dashboard' : location.hash === '#/welcome' ? 'welcome' : location.hash === '#/guide' ? 'guide' : location.hash === '#/projects' ? 'projects' : location.hash === '#/help' ? 'help' : 'landing');
   const [showFirstCoach, setShowFirstCoach] = useState(false);
   const [welcomeLanguage, setWelcomeLanguage] = useState<'ko'|'en'>(() => {
     try { return localStorage.getItem('bramer-site-language')==='en'?'en':'ko'; } catch { return 'ko'; }
@@ -143,7 +144,8 @@ export default function App() {
   };
   useEffect(() => {
     const syncRoute = () => {
-      if (window.location.hash === '#/technology') setMode('manifesto');
+      if (window.location.hash === '#/admin') setMode('admin');
+      else if (window.location.hash === '#/technology') setMode('manifesto');
       else if (window.location.hash === '#/dashboard') setMode('dashboard');
       else if (window.location.hash === '#/welcome') setMode('welcome');
       else if (window.location.hash === '#/guide') setMode('guide');
@@ -472,6 +474,7 @@ export default function App() {
   if (!hasBetaSession() && ['dashboard','guide','setup','editor','projects','help','welcome'].includes(mode)) {
     return null;
   }
+  if (mode === 'admin') return <AdminDashboard onHome={goHome}/>;
   if (mode === 'manifesto') return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
   if (mode === 'projects') return <ProjectLibrary projects={savedProjects}
     onOpen={id=>void resumeSavedProject(id)} onRemove={id=>void removeSavedProject(id)}
