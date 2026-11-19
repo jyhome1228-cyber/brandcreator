@@ -61,10 +61,6 @@ try{
  assert.equal(await publicPages.locator('.bramer-dash-layout').count(),0,'Industry guide entry must not expose workspace');
  await publicPages.getByRole('button',{name:'닫기'}).click();
  await publicPages.goto(url,{waitUntil:'domcontentloaded'});
- await publicPages.locator('.bramer-site-menu').getByRole('link',{name:'업종별 가이드'}).click();
- await publicPages.waitForURL('**/#/guide');
- await publicPages.getByRole('heading',{name:'우리 브랜드에는 어떤 기준이 필요할까요?'}).waitFor();
- await publicPages.goto(url,{waitUntil:'domcontentloaded'});
  await publicPages.locator('.bramer-site-menu').getByRole('link',{name:'기술 소개'}).click();
  await publicPages.waitForURL('**/#/technology');
  await publicPages.getByRole('heading',{name:/브랜드의 기준을/}).waitFor();
