@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import BramerLogo from './components/BramerLogo';
-import { firebaseProjectId, type BetaTester, type UsageEvent } from './firebaseAdmin';
+import { firebaseProjectId, signInAdmin, loadAdminData, type AdminSession, type BetaTester, type UsageEvent } from './firebaseAdmin';
 import { fetchDailyVisits, latestDays, type DailyVisits } from './visitorStats';
 
 type AdminSection = 'overview' | 'visitors' | 'testers' | 'events';
@@ -48,6 +48,34 @@ export default function AdminDashboard({onHome}:Props) {
   const [search,setSearch]=useState('');
   const [occupation,setOccupation]=useState('all');
   const [menuOpen,setMenuOpen]=useState(false);
+  const [adminSession,setAdminSession]=useState<AdminSession|null>(null);
+  const [adminEmail,setAdminEmail]=useState('');
+  const [adminPassword,setAdminPassword]=useState('');
+  const [adminPending,setAdminPending]=useState(false);
+  const [adminError,setAdminError]=useState('');
+  async function loadPrivateData(current:AdminSession){
+    try {
+      const records=await loadAdminData(current);
+      setTesters(records.testers);
+      setEvents(records.events);
+      setAdminError('');
+    }catch(e){
+      setAdminError(e instanceof Error?e.message:'Firebase 관리자 데이터를 읽지 못했습니다.');
+    }
+  }
+  async function adminLogin(event:FormEvent<HTMLFormElement>){
+    event.preventDefault();
+    if(adminPending)return;
+    setAdminPending(true);setAdminError('');
+    try{
+      const current=await signInAdmin(adminEmail.trim(),adminPassword);
+      setAdminSession(current);
+      setAdminPassword('');
+      await loadPrivateData(current);
+    }catch(e){
+      setAdminError(e instanceof Error?e.message:'관리자 인증에 실패했습니다.');
+    }finally{setAdminPending(false);}
+  }
   const [visits,setVisits]=useState<DailyVisits[]>([]);
   const [visitLoading,setVisitLoading]=useState(false);
   const [visitReady,setVisitReady]=useState(false);
@@ -76,6 +104,7 @@ export default function AdminDashboard({onHome}:Props) {
   function logout() {
     try {sessionStorage.removeItem('bramer-admin-preview-v1');} catch { /* optional */ }
     setUnlocked(false);setPassword('');
+    setAdminSession(null);setAdminEmail('');setAdminPassword('');setAdminError('');
     setTesters([]);setEvents([]);setVisits([]);setVisitReady(false);setVisitError('');setError('');
     setSection('overview');setSearch('');setOccupation('all');
   }
@@ -102,7 +131,7 @@ export default function AdminDashboard({onHome}:Props) {
   const latestWeek=events.filter(item=>new Date(item.createdAt).getTime()>Date.now()-7*86400000).length;
   const produced=events.filter(item=>item.event==='guideline_generated').length;
   const exported=events.filter(item=>item.event==='guideline_exported'||item.event==='export_pdf'||item.event==='export_svg').length;
-  const validData=false; // No private Firestore records are available via PIN alone.
+  const validData=Boolean(adminSession); // Firebase authorization, not the preview PIN.
   const visitorTotal=visits.reduce((total,row)=>total+row.visits,0);
   const todayRecord=visits.find(row=>row.day===latestDays(1)[0]);
   const sevenKeys=new Set(latestDays(7));
@@ -203,6 +232,25 @@ export default function AdminDashboard({onHome}:Props) {
           </div><span>{visitLoading?'조회 중':visitReady?'집계 연결':'설정 확인'}</span>
         </section>
         {error?<div className="bramer-admin-error" role="alert">{error}</div>:null}
+        {(section==='testers'||section==='events')&&!adminSession?
+          <section className="bramer-admin-signin bramer-admin-private-login">
+            <div className="bramer-admin-signin-top">
+              <small>FIREBASE AUTHENTICATION</small><h2>등록자 정보 보호</h2>
+              <p>베타테스터의 이름과 연락처는 4자리 화면 비밀번호만으로 공개되지 않습니다. Firebase에서 승인된 관리자로 로그인하면 실제 등록 기록을 조회할 수 있습니다.</p>
+            </div>
+            <form onSubmit={event=>void adminLogin(event)}>
+              <label><span>관리자 이메일</span><input type="email" autoComplete="username" required
+                value={adminEmail} onChange={event=>setAdminEmail(event.target.value)} placeholder="이메일"/></label>
+              <label><span>비밀번호</span><input type="password" autoComplete="current-password" required
+                value={adminPassword} onChange={event=>setAdminPassword(event.target.value)} placeholder="비밀번호"/></label>
+              <button type="submit" disabled={adminPending}>{adminPending?'인증 중':'등록자 조회 인증'}</button>
+            </form>
+            {adminError?<p role="alert" className="bramer-admin-error">{adminError}</p>:null}
+          </section>:null}
+        {adminSession?<div className="bramer-admin-verified"><span>Firebase 관리자 인증됨</span>
+          <button type="button" onClick={()=>{setAdminSession(null);setTesters([]);setEvents([]);}}>관리자 연결 해제</button>
+          <button type="button" onClick={()=>void loadPrivateData(adminSession)}>데이터 새로고침</button>
+        </div>:null}
         <div className="bramer-admin-preview-data">
           {section==='overview'?<>
             <div className="bramer-admin-metrics">
@@ -256,7 +304,7 @@ export default function AdminDashboard({onHome}:Props) {
             <section className="bramer-admin-panel bramer-admin-table-panel">
               <div className="bramer-admin-list-head"><div><h2>베타테스터 목록</h2>
                 <p>검색 결과 {validData?activeTesters.length:0}명</p></div>
-                <button type="button" onClick={exportTesters} disabled={!validData}>CSV 내보내기</button>
+                <button type="button" onClick={exportTesters} disabled={!adminSession}>CSV 내보내기</button>
               </div>
               <div className="bramer-admin-filters">
                 <input value={search} onChange={event=>setSearch(event.target.value)}
