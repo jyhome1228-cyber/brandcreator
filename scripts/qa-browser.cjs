@@ -371,6 +371,26 @@ try{
    assert.ok(dimensions.page<=dimensions.screen+3,'Mobile landing overflow at '+size+': '+JSON.stringify(dimensions));
  }
  await mp.setViewportSize({width:390,height:844});
+ const processAlignment=await mp.locator('.bramer-home-steps-section .bramer-process-step').evaluateAll(nodes=>
+   nodes.map(node=>{
+     const article=node.getBoundingClientRect();
+     const graphic=node.querySelector('.bramer-process-graphic')?.getBoundingClientRect();
+     const copy=node.querySelector('.bramer-process-copy')?.getBoundingClientRect();
+     const index=node.querySelector('.bramer-process-index')?.getBoundingClientRect();
+     return {articleCenter:article.x+article.width/2,
+       graphicCenter:graphic?graphic.x+graphic.width/2:0,
+       copyCenter:copy?copy.x+copy.width/2:0,
+       indexCenter:index?index.x+index.width/2:0};
+   })
+ );
+ assert.equal(processAlignment.length,3,'Mobile process still has three steps');
+ for(const [i,step] of processAlignment.entries()){
+   for(const field of ['graphicCenter','copyCenter','indexCenter']){
+     assert.ok(Math.abs(step[field]-step.articleCenter)<=3,
+       'Process step '+(i+1)+' '+field+' is off-center: '+JSON.stringify(step));
+   }
+ }
+ pass('mobile process numbers, text and illustrations share the same center axis');
  await mp.screenshot({path:path.join(output,'04-landing-mobile.png'),fullPage:true});
  await mp.locator('.bramer-site-start').click();
  await mp.getByRole('dialog').waitFor();
