@@ -25,7 +25,7 @@ function readAuth():CachedAuth|null{
   try{const raw=localStorage.getItem(tokenStorage);return raw?JSON.parse(raw) as CachedAuth:null;}
   catch{return null;}
 }
-async function visitorToken():Promise<string>{
+export async function visitorToken():Promise<string>{
   if(pendingAuth)return pendingAuth;
   pendingAuth=(async()=>{
     const cached=readAuth();
@@ -61,6 +61,18 @@ async function visitorToken():Promise<string>{
     return token;
   })();
   try{return await pendingAuth;}finally{pendingAuth=null;}
+}
+export async function getAnonymousFirebaseIdentity():Promise<{uid:string;token:string}>{
+  const token=await visitorToken();
+  try {
+    const payload=token.split('.')[1];
+    const decoded=JSON.parse(atob(payload.replace(/-/g,'+').replace(/_/g,'/'))) as {sub?:string;user_id?:string};
+    const uid=decoded.sub||decoded.user_id;
+    if (!uid || !/^[a-zA-Z0-9_-]{6,128}$/.test(uid))throw new Error('Invalid UID');
+    return {uid,token};
+  } catch {
+    throw new Error('Firebase 익명 계정 정보를 확인하지 못했습니다.');
+  }
 }
 type FirestoreDoc={name?:string;updateTime?:string;fields?:Record<string,{integerValue?:string;stringValue?:string}>};
 function numberOf(doc:FirestoreDoc,key:string):number{return Number(doc.fields?.[key]?.integerValue||0);}
