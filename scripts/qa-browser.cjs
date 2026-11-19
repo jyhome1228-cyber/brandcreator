@@ -99,6 +99,12 @@ try{
  assert.equal(await page.locator('.bramer-process-graphic').count(),3,'All three process steps have distinct visuals');
  assert.equal(await page.locator('.bramer-home-footer').count(),1,'Footer remains a single section');
  pass('supplied hero imagery, low opacity and unified landing cards');
+ await page.locator('.bramer-preview-gallery-card').nth(25).waitFor();
+ assert.equal(await page.locator('.bramer-preview-gallery-card').count(),26,'Overview displays all 26 actual guideline pages');
+ assert.equal(await page.locator('.bramer-preview-view-switch button.active').innerText(),'전체 보기','Full overview is the first preview tab');
+ await page.locator('.bramer-preview-gallery-card').nth(5).click();
+ assert.equal(await page.locator('.bramer-preview-view-switch button.active').innerText(),'페이지 보기','Selecting a thumbnail opens the single-page view');
+ assert.equal(await page.locator('.bramer-engine-jump select').inputValue(),'5');
  await page.locator('.bramer-engine-jump select option').nth(25).waitFor({state:'attached'});
  assert.equal(await page.locator('.bramer-engine-jump select option').count(),26,'Real BRAMER generator sample should contain 26 selectable pages');
  const sampleImg=page.locator('.bramer-engine-page');
