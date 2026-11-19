@@ -42,20 +42,24 @@ try{
  const faviconResponse=await page.request.get('http://127.0.0.1:'+port+favicon);
  assert.ok(faviconResponse.ok(),'Favicon fetch must succeed at deployed path');
  pass('GitHub Pages base path and favicon work');
- // The public documentation must be accessible before beta enrollment, while
- // a pasted direct dashboard URL must never show the workspace anonymously.
- const visitor=await context.newPage();
- await visitor.goto(url+'#/dashboard',{waitUntil:'domcontentloaded'});
- await visitor.getByRole('heading',{name:/브랜드의 기준을/}).waitFor();
- assert.equal(await visitor.locator('.bramer-dash-layout').count(),0,'Anonymous visitors must not see the workspace');
- assert.ok(await visitor.getByText('NINEWORKS · 나인웍스').count()>0,'Documentation identifies the creator');
- await visitor.getByRole('button',{name:'베타 시작하기',exact:true}).click();
- await visitor.waitForURL('**/#/');
- await visitor.getByRole('dialog').waitFor();
- await visitor.getByRole('heading',{name:'브레이머를 무료로 체험하세요.'}).waitFor();
- await visitor.close();
- pass('public technology documentation precedes beta registration and guards direct dashboard URL');
+ // Every beta workspace URL must redirect anonymous visitors into registration.
+ for (const route of ['/dashboard','/guide','/create','/editor','/projects','/help','/welcome']) {
+   const visitor=await context.newPage();
+   await visitor.goto(url+'#'+route,{waitUntil:'domcontentloaded'});
+   await visitor.waitForURL('**/#/');
+   await visitor.getByRole('dialog',{name:'브레이머를 무료로 체험하세요.'}).waitFor();
+   assert.equal(await visitor.locator('.bramer-dash-layout,.bramer-create-shell,.editor-layout').count(),0,
+     'Anonymous users must not see workspace on '+route);
+   await visitor.close();
+ }
+ pass('all seven protected beta routes require registration before workspace');
  const publicPages=await context.newPage();
+ await publicPages.goto(url,{waitUntil:'domcontentloaded'});
+ await publicPages.locator('.bramer-site-menu').getByRole('link',{name:'업종별 가이드'}).click();
+ await publicPages.waitForURL('**/#/');
+ await publicPages.getByRole('dialog',{name:'브레이머를 무료로 체험하세요.'}).waitFor();
+ assert.equal(await publicPages.locator('.bramer-dash-layout').count(),0,'Industry guide entry must not expose workspace');
+ await publicPages.getByRole('button',{name:'닫기'}).click();
  await publicPages.goto(url,{waitUntil:'domcontentloaded'});
  await publicPages.locator('.bramer-site-menu').getByRole('link',{name:'업종별 가이드'}).click();
  await publicPages.waitForURL('**/#/guide');
@@ -75,7 +79,7 @@ try{
  assert.ok(publicPages.url().includes('#/technology'),'Technical sidebar selection must stay inside the technical document');
  await publicPages.locator('#architecture').waitFor();
  await publicPages.close();
- pass('header and documentation routes display the correct industry and technology pages');
+ pass('public industry guide opens registration; technology documentation stays public');
  const grayscale = (color,label) => {
    const values=color.split(/[^0-9.]+/).filter(Boolean).slice(0,3).map(Number);
    assert.ok(values.length===3 && Math.max(...values)-Math.min(...values)<=2,label+' is not neutral gray: '+color);
@@ -148,6 +152,19 @@ try{
  await page.getByRole('button',{name:/이제 시작합니다/}).click();
  await page.waitForURL('**/#/dashboard');
  await page.getByRole('dialog',{name:'첫 번째 가이드라인을 만들어보세요.'}).waitFor();
+ const enrolledGuide=await context.newPage();
+ await enrolledGuide.goto(url,{waitUntil:'domcontentloaded'});
+ // Session proof is tab-local; a returning beta user signs in before accessing the guide.
+ await enrolledGuide.locator('.bramer-site-start').click();
+ await enrolledGuide.getByRole('button',{name:/베타테스트 로그인/}).click();
+ await enrolledGuide.locator('.bramer-auth-fields input[autocomplete="name"]').fill('테스트 담당자');
+ await enrolledGuide.locator('.bramer-auth-fields input[type="tel"]').fill('010-1234-5678');
+ await enrolledGuide.getByRole('button',{name:'로그인하고 계속하기'}).click();
+ await enrolledGuide.waitForURL('**/#/dashboard');
+ await enrolledGuide.goto(url+'#/guide',{waitUntil:'domcontentloaded'});
+ await enrolledGuide.getByRole('heading',{name:'우리 브랜드에는 어떤 기준이 필요할까요?'}).waitFor();
+ await enrolledGuide.close();
+ pass('registered beta user can open industry guide after login');
  const returning=await context.newPage();
  await returning.goto(url,{waitUntil:'domcontentloaded'});
  await returning.locator('.bramer-site-start').click();
@@ -296,7 +313,10 @@ try{
  // Mobile viewport tests: global menus, beta modal and guide navigation.
  const mobile=await browser.newContext({viewport:{width:390,height:844},acceptDownloads:true,isMobile:true,deviceScaleFactor:1});
  // Mobile workspace layout is tested in an explicitly enrolled beta session.
- await mobile.addInitScript(() => sessionStorage.setItem('bramer-beta-session-v1','active'));
+ await mobile.addInitScript(() => {
+   sessionStorage.setItem('bramer-beta-session-v1','active');
+   localStorage.setItem('bramer-local-beta-proof-v1',JSON.stringify({salt:'qa-fixture',digest:'qa-fixture',occupation:'디자이너'}));
+ });
  const mp=await mobile.newPage();
  const mobileErrors=[];
  mp.on('pageerror',err=>mobileErrors.push(err.message));
