@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState, type FormEvent } from 'react';
 import BramerLogo from './components/BramerLogo';
 import { firebaseProjectId, signInAdmin, loadAdminData, type AdminSession, type BetaTester, type UsageEvent } from './firebaseAdmin';
-import { fetchDailyVisits, latestDays, checkVisitConnectivity, type DailyVisits } from './visitorStats';
+import { fetchDailyVisits, latestDays, checkVisitConnectivity, lastVisitRecordStatus, type DailyVisits } from './visitorStats';
 
 type AdminSection = 'overview' | 'visitors' | 'testers' | 'events';
 type Props = { onHome: () => void };
@@ -82,8 +82,11 @@ export default function AdminDashboard({onHome}:Props) {
   const [visitError,setVisitError]=useState('');
   const [diagnostic,setDiagnostic]=useState('');
   const [diagnosing,setDiagnosing]=useState(false);
+  const [lastVisit,setLastVisit]=useState(lastVisitRecordStatus);
+
   const diagnose=async()=>{
     setDiagnosing(true);
+    setLastVisit(lastVisitRecordStatus());
     try{
       const result=await checkVisitConnectivity();
       setDiagnostic(`인증: ${result.auth==='ok'?'정상':'오류'} · 조회: ${result.read==='ok'?'정상':result.read==='error'?'오류':'미확인'} — ${result.message}`);
@@ -243,6 +246,9 @@ export default function AdminDashboard({onHome}:Props) {
                 {diagnosing?'연동 확인 중':'Firebase 연결 진단'}
               </button>
               {diagnostic?<p role="status">{diagnostic}</p>:null}
+              {lastVisit?<p className={lastVisit.ok?'bramer-admin-visit-ok':'bramer-admin-visit-error'}>
+                최근 홈페이지 기록 ({lastVisit.day}): {lastVisit.detail}
+              </p>:<p>이 브라우저의 방문 기록 시도가 아직 없습니다. 홈페이지를 방문한 뒤 다시 진단해 주세요.</p>}
             </div>
           </div><span>{visitLoading?'조회 중':visitReady?'집계 연결':'설정 확인'}</span>
         </section>
