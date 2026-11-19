@@ -114,7 +114,7 @@ try{
  assert.equal(await adminPage.getByText('Firebase 관리자 인증 후 베타테스터 정보를 확인할 수 있습니다.').count(),1);
  assert.equal(await adminPage.getByText('관리자 검증 사용자').count(),0,
    'Tester personal information is not shown after PIN only');
- await adminPage.getByPlaceholder('관리자 이메일').fill('admin@example.com');
+ await adminPage.locator('.bramer-admin-private-login input[type="email"]').fill('admin@example.com');
  await adminPage.locator('.bramer-admin-private-login input[type="password"]').fill('qa-password');
  await adminPage.getByRole('button',{name:'등록자 조회 인증'}).click();
  await adminPage.getByText('관리자 검증 사용자').waitFor();
