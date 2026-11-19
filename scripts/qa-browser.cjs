@@ -99,6 +99,7 @@ try{
  pass('landing hero typography and active indicator are grayscale');
  const heroLayer=page.locator('.bramer-hero-image-layer');
  await heroLayer.waitFor();
+ await page.locator('.bramer-roller-controls button').first().click();
  const firstImage=page.locator('.bramer-hero-image');
  assert.equal(await firstImage.count(),1,'Exactly one image for the current audience slide');
  const firstCss=await firstImage.evaluate(el=>({background:getComputedStyle(el).backgroundImage,opacity:Number(getComputedStyle(el).opacity)}));
