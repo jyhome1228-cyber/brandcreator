@@ -24,6 +24,43 @@ service cloud.firestore {
       allow read: if isAdmin();
       allow write: if false;
     }
+    // Public counters contain only daily aggregate numbers and a calendar date.
+    // No names, phones, IP addresses, identifiers or per-visitor histories are stored.
+    // Anyone can read aggregates, but only Firebase anonymous users can add one visit.
+    // This is a convenience metric, not a tamper-proof or bot-proof analytics source.
+    function anonymousVisit() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+    function validVisitData(day) {
+      return request.resource.data.keys().hasOnly(['day','visits','unique'])
+        && request.resource.data.keys().hasAll(['day','visits','unique'])
+        && request.resource.data.day == day
+        && day.matches('^[0-9]{4}-[0-9]{2}-[0-9]{2}
+  }
+}
+)
+        && request.resource.data.visits is int
+        && request.resource.data.unique is int
+        && request.resource.data.visits >= 1
+        && request.resource.data.unique >= 0
+        && request.resource.data.unique <= request.resource.data.visits;
+    }
+    match /visitDaily/{day} {
+      allow get, list: if true;
+      allow create: if anonymousVisit()
+        && validVisitData(day)
+        && request.resource.data.visits == 1
+        && request.resource.data.unique <= 1;
+      allow update: if anonymousVisit()
+        && validVisitData(day)
+        && resource.data.day == day
+        && request.resource.data.visits == resource.data.visits + 1
+        && request.resource.data.unique >= resource.data.unique
+        && request.resource.data.unique <= resource.data.unique + 1;
+      allow delete: if false;
+    }
+
     match /{document=**} {
       allow read, write: if false;
     }
