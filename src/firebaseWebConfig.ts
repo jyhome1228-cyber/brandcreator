@@ -4,7 +4,7 @@
  * Protect beta records with Firebase Authentication and Firestore Security Rules.
  */
 export const firebaseWebConfig = {
-  apiKey: 'AIzaSyDvQZpA93C4vsNd0MBquyWoU9Ur-PE--j4',
+  apiKey: 'AIzaSyDv0ZpA93C4vsNd0MBquyWoU9Ur-PE--j4',
   authDomain: 'bramer-16c27.firebaseapp.com',
   projectId: 'bramer-16c27',
   storageBucket: 'bramer-16c27.firebasestorage.app',
