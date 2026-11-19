@@ -47,7 +47,8 @@ try{
  await adminPage.goto(url+'#/admin',{waitUntil:'domcontentloaded'});
  await adminPage.getByRole('heading',{name:'대시보드'}).waitFor();
  assert.equal(await adminPage.locator('.bramer-admin-metrics article').count(),4,'Admin dashboard has four actual-data KPI slots');
- assert.equal(await adminPage.locator('.bramer-admin-setup-banner').count(),1,'Firebase-unconfigured admin shows a setup state');
+ assert.equal(await adminPage.locator('.bramer-admin-signin').count(),1,'Configured Firebase shows the secure admin sign-in');
+ assert.equal(await adminPage.locator('.bramer-admin-setup-banner').count(),0,'Firebase configuration must be available');
  assert.equal(await adminPage.locator('.bramer-admin-metrics strong').first().innerText(),'—','Admin must not invent user counts');
  await adminPage.getByRole('button',{name:'베타테스터',exact:true}).click();
  await adminPage.getByRole('heading',{name:'베타테스터 목록'}).waitFor();
