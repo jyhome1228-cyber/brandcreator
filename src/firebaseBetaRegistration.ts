@@ -41,3 +41,20 @@ export async function registerFirebaseBetaTester(name:string,phone:string,occupa
     throw new Error('Firebase 베타 등록 권한이 설정되지 않았습니다. 관리자에게 문의해 주세요.');
   throw new Error('베타 등록 정보 저장에 실패했습니다. ('+String(response.status)+')');
 }
+
+/** Re-verify the current anonymous Firebase user's own record without listing private signups. */
+export async function verifyOwnFirebaseBetaTester(name:string,phone:string):Promise<{name:string;phone:string;occupation:string}|null>{
+  const {uid,token}=await getAnonymousFirebaseIdentity();
+  const url=`https://firestore.googleapis.com/v1/projects/${firebaseWebConfig.projectId}/databases/(default)/documents/betaTesters/${encodeURIComponent(uid)}`;
+  const response=await fetch(url,{headers:{Authorization:`Bearer ${token}`},cache:'no-store'});
+  if(response.status===404)return null;
+  if(!response.ok)throw new Error('등록 정보 조회에 실패했습니다. ('+response.status+')');
+  const doc=await response.json() as {fields?:Record<string,{stringValue?:string}>};
+  const data=doc.fields||{};
+  const registeredName=(data.name?.stringValue||'').trim().normalize('NFC');
+  const registeredPhone=(data.phone?.stringValue||'').replace(/\D/g,'');
+  if(registeredName.toLowerCase()!==name.trim().normalize('NFC').toLowerCase()
+    ||registeredPhone!==phone.replace(/\D/g,'')
+    ||data.status?.stringValue!=='active')return null;
+  return {name:registeredName,phone:registeredPhone,occupation:data.occupation?.stringValue||''};
+}
