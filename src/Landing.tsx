@@ -5,7 +5,7 @@ import { generateV2Pages } from './guideline-system/v2Pages';
 import { localizeGuidelinePages } from './guideline-system/localizeGuideline';
 import type { BrandProject } from './types/guideline';
 import {registerLocalBeta,verifyLocalBeta} from './betaLocalAccess';
-import { sendBetaVerification, confirmBetaVerification, readVerifiedBeta, registerVerifiedBeta, recoverLegacyBeta } from './firebasePhoneBeta';
+import { sendBetaVerification, confirmBetaVerification, readVerifiedBeta, registerVerifiedBeta, recoverLegacyBeta, resetBetaPhoneVerification } from './firebasePhoneBeta';
 
 type LandingProps = { onStart: (newRegistration?: boolean) => void; onManifesto: () => void };
 type BetaForm = { name: string; phone: string; occupation: string };
@@ -254,6 +254,7 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
     setBetaOpen(true);
   };
   const closeBeta = () => {
+    resetBetaPhoneVerification();
     setBetaOpen(false);
     setOccupationOpen(false);
     requestAnimationFrame(() => lastTrigger.current?.focus());
