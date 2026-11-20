@@ -1,25 +1,31 @@
-# BRAMER 베타 인증 전환 배포
+# BRAMER 베타 가입 및 로그인 안내
 
-GitHub 웹 코드는 Firebase 전화번호 인증(문자 OTP), Firestore 문서 접근, 기존 익명 가입자 데이터 이전을 지원합니다.
+BRAMER는 전화번호를 문자 인증 수단이 아닌 **연락처 정보**로만 수집합니다.
 
-## Firebase 콘솔에서 필요한 설정
-1. Firebase 프로젝트 `bramer-16c27`에서 Authentication > 로그인 방법 > **전화번호** 활성화
-2. Authentication > 설정 > 승인된 도메인에 `bramer.cloud` 및 `www.bramer.cloud` 등록
-3. Firebase SMS 서비스 사용을 위한 지역 정책, SMS 발송 한도 및 요금제 확인
-4. Firestore 규칙 게시: `firebase deploy --only firestore:rules --project bramer-16c27`
-5. 기존 익명 가입 데이터 연결용 Functions 배포: `cd functions && npm install && cd .. && firebase deploy --only functions:recoverBetaAccount --project bramer-16c27`
-6. Firebase Functions 배포에는 사용 가능한 요금제와 배포 권한이 필요합니다.
+## 가입
+- 성함, 연락처, 직업 입력 및 개인정보 이용 동의
+- Firebase Anonymous Authentication으로 방문자 UID를 발급받음
+- Firestore `betaTesters/{uid}`에 등록 정보 저장
+- 같은 브라우저에서 해시 기반 등록 확인 정보를 저장
+- Firestore 규칙은 익명 인증된 사용자의 자기 문서 생성·조회만 허용하며, 목록 조회는 승인된 관리자만 가능합니다.
 
-## 데이터 처리
-- 기존 `betaTesters/{anonymousUid}` 문서를 삭제하거나 공개하지 않습니다.
-- 문자 인증된 계정은 `betaTesters/{phoneAuthUid}` 문서를 사용합니다.
-- `recoverBetaAccount`는 관리자 권한으로 기존 가입 이력을 검색하지만, **Firebase가 인증한 전화번호가 일치하는 경우에만** 기존 데이터를 안전하게 새로운 사용자 UID에 연결합니다.
-- 이름과 전화번호만 아는 익명 사용자가 기존 등록 기록을 읽을 수 없도록 유지합니다.
-- 기존 브라우저의 로컬 로그인 방식은 전환기 호환성을 위해 남아 있습니다.
+## 로그인
+- 가입한 브라우저에서는 이름·전화번호로 브라우저 등록 확인 정보 대조
+- 로컬 등록 확인 정보가 없다면 **현재 브라우저의 동일한 익명 Firebase UID**로 본인 등록 문서를 조회한 뒤 입력값 대조
+- 별도의 문자 OTP/SMS, Firebase Phone Auth, Cloud Function은 사용하지 않습니다.
+- 전화번호 입력만으로 다른 브라우저나 다른 기기에서 신원을 확인할 수 없으므로 교차 기기 로그인은 지원하지 않습니다.
 
-## 테스트
-- Firebase 프로젝트 테스트 전화번호 또는 실제 SMS 번호를 통해 첫 가입/같은 기기 재로그인/새 기기 재로그인 검증
-- 기존 익명 가입자에 대해 OTP 인증 후 `recoverBetaAccount` 연결 및 관리자 화면 중복/이전 상태 확인
-- Firestore 규칙 시뮬레이터에서 익명 사용자 list 거부, 타인 uid get 거부, phone user 자기 문서 get/create 허용 검증
+## Firebase 콘솔
+1. Firebase Authentication → 익명 로그인(Anonymous)을 활성화합니다.
+2. Firestore 규칙 편집기에서 GitHub의 최신 `firestore.rules` 파일 **전체**를 교체하여 게시합니다.
+3. 전화번호(Phone) 제공업체는 이 기능에서 필요하지 않습니다.
+4. 기존 베타테스터 문서는 삭제하거나 덮어쓰지 않습니다.
 
-**주의:** GitHub에 코드만 반영하는 것으로 Firestore 규칙이나 Cloud Function이 자동 배포되지는 않습니다. Firebase 콘솔 설정과 배포 및 실제 SMS 검증을 별도로 완료해야 합니다.
+## 확인
+- 신규 가입: 입력·Firestore 문서 생성·로그인/대시보드 전환
+- 가입 브라우저 재로그인
+- 익명 UID가 유지되는 상태에서 로컬 확인 정보가 없을 때 Firestore 자기 문서 읽기
+- 다른 UID의 문서 읽기 및 전체 등록자 목록 조회 차단
+- 관리자 등록자 목록/CSV 정상 동작
+
+**주의:** 번호를 입력하는 것만으로는 본인 인증을 할 수 없습니다. 다른 기기 로그인이 필요하면 이메일 인증, 문자 OTP 또는 별도 안전한 계정 인증 절차를 추가해야 합니다.
