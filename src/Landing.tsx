@@ -295,10 +295,17 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
     try {
       const identity = await confirmBetaVerification(otpCode);
       if (otpPurpose === 'register') {
-        if (await readVerifiedBeta(identity)) throw new Error('이미 가입된 휴대전화입니다. 로그인 메뉴를 이용해 주세요.');
-        await registerVerifiedBeta(identity,betaForm.name,betaForm.occupation);
-        await registerLocalBeta(betaForm.name,betaForm.phone,betaForm.occupation);
-        setBetaOpen(false); onStart(true);
+        const existingAccount = await readVerifiedBeta(identity) || await recoverLegacyBeta(identity,betaForm.name);
+        if (existingAccount) {
+          if (existingAccount.name.trim().normalize('NFC') !== betaForm.name.trim().normalize('NFC'))
+            throw new Error('이미 가입된 번호입니다. 가입 당시 성함으로 로그인해 주세요.');
+          await registerLocalBeta(existingAccount.name,existingAccount.phone,existingAccount.occupation);
+          setBetaOpen(false); onStart(false);
+        } else {
+          await registerVerifiedBeta(identity,betaForm.name,betaForm.occupation);
+          await registerLocalBeta(betaForm.name,betaForm.phone,betaForm.occupation);
+          setBetaOpen(false); onStart(true);
+        }
       } else {
         let existing = await readVerifiedBeta(identity);
         if (!existing) existing = await recoverLegacyBeta(identity,loginForm.name);
