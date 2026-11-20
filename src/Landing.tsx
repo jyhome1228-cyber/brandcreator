@@ -5,7 +5,7 @@ import { generateV2Pages } from './guideline-system/v2Pages';
 import { localizeGuidelinePages } from './guideline-system/localizeGuideline';
 import type { BrandProject } from './types/guideline';
 import {registerLocalBeta,verifyLocalBeta} from './betaLocalAccess';
-import { sendBetaVerification, confirmBetaVerification, readVerifiedBeta, registerVerifiedBeta, recoverLegacyBeta, resetBetaPhoneVerification } from './firebasePhoneBeta';
+import { registerFirebaseBetaTester, verifyOwnFirebaseBetaTester } from './firebaseBetaRegistration';
 
 type LandingProps = { onStart: (newRegistration?: boolean) => void; onManifesto: () => void };
 type BetaForm = { name: string; phone: string; occupation: string };
@@ -234,11 +234,9 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
       return shouldOpen;
     } catch { return false; }
   });
-  const [betaMode, setBetaMode] = useState<'choice'|'register'|'login'|'otp'>('register');
+  const [betaMode, setBetaMode] = useState<'choice'|'register'|'login'>('register');
   const [occupationOpen,setOccupationOpen] = useState(false);
   const [loginForm,setLoginForm] = useState({name:'',phone:''});
-  const [otpCode,setOtpCode] = useState('');
-  const [otpPurpose,setOtpPurpose] = useState<'register'|'login'>('register');
   const [submitting,setSubmitting] = useState(false);
   const [betaForm, setBetaForm] = useState<BetaForm>(initialBetaForm);
   const [agreed, setAgreed] = useState(false);
@@ -254,7 +252,6 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
     setBetaOpen(true);
   };
   const closeBeta = () => {
-    resetBetaPhoneVerification();
     setBetaOpen(false);
     setOccupationOpen(false);
     requestAnimationFrame(() => lastTrigger.current?.focus());
@@ -262,62 +259,48 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
   const tryBeta = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     if (submitting) return;
-    if (!betaForm.name.trim() || !/^010\d{8}$/.test(betaForm.phone.replace(/\D/g,'')) || !betaForm.occupation) {
-      setBetaError('성함, 휴대전화 번호, 직업을 확인해 주세요.');
+    if (!betaForm.name.trim() || !/^\d{9,11}$/.test(betaForm.phone.replace(/\D/g,'')) || !betaForm.occupation) {
+      setBetaError(tr('성함, 연락처, 직업을 확인해 주세요.','Please check your name, phone number and occupation.'));
       return;
     }
-    if (!agreed) { setBetaError('개인정보 이용 안내에 동의해 주세요.'); return; }
+    if (!agreed) { setBetaError(tr('개인정보 이용 안내에 동의해 주세요.','Please agree to the privacy notice.')); return; }
     setSubmitting(true);
     setBetaError('');
     try {
-      await sendBetaVerification(betaForm.phone);
-      setOtpPurpose('register'); setOtpCode(''); setBetaMode('otp');
-    } catch (e) { setBetaError(e instanceof Error ? e.message : '인증번호를 전송하지 못했습니다.'); }
-    finally { setSubmitting(false); }
+      await registerFirebaseBetaTester(betaForm.name,betaForm.phone,betaForm.occupation);
+      await registerLocalBeta(betaForm.name,betaForm.phone,betaForm.occupation);
+      setBetaOpen(false);
+      onStart(true);
+    } catch (e) {
+      setBetaError(e instanceof Error?e.message:tr('등록 정보를 저장하지 못했습니다. 다시 시도해 주세요.','Registration could not be saved. Please try again.'));
+    } finally {setSubmitting(false);}
   };
   const tryLogin = async (event:FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if(submitting)return;
-    if(!loginForm.name.trim()||!loginForm.phone.trim()){setBetaError('성함과 연락처를 입력해 주세요.');return;}
-    setSubmitting(true); setBetaError('');
+    if (submitting) return;
+    if (!loginForm.name.trim() || !loginForm.phone.trim()) {
+      setBetaError(tr('성함과 연락처를 입력해 주세요.','Enter your name and phone number.'));
+      return;
+    }
+    setSubmitting(true);
+    setBetaError('');
     try {
       if (await verifyLocalBeta(loginForm.name,loginForm.phone)) {
-        setBetaOpen(false); onStart(false); return;
+        setBetaOpen(false);
+        onStart(false);
+        return;
       }
-      await sendBetaVerification(loginForm.phone);
-      setOtpPurpose('login'); setOtpCode(''); setBetaMode('otp');
-    } catch (e) { setBetaError(e instanceof Error ? e.message : '인증번호를 전송하지 못했습니다.'); }
-    finally { setSubmitting(false); }
-  };
-  const confirmOtp = async (event:FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (submitting) return;
-    setSubmitting(true); setBetaError('');
-    try {
-      const identity = await confirmBetaVerification(otpCode);
-      if (otpPurpose === 'register') {
-        const existingAccount = await readVerifiedBeta(identity) || await recoverLegacyBeta(identity,betaForm.name);
-        if (existingAccount) {
-          if (existingAccount.name.trim().normalize('NFC') !== betaForm.name.trim().normalize('NFC'))
-            throw new Error('이미 가입된 번호입니다. 가입 당시 성함으로 로그인해 주세요.');
-          await registerLocalBeta(existingAccount.name,existingAccount.phone,existingAccount.occupation);
-          setBetaOpen(false); onStart(false);
-        } else {
-          await registerVerifiedBeta(identity,betaForm.name,betaForm.occupation);
-          await registerLocalBeta(betaForm.name,betaForm.phone,betaForm.occupation);
-          setBetaOpen(false); onStart(true);
-        }
-      } else {
-        let existing = await readVerifiedBeta(identity);
-        if (!existing) existing = await recoverLegacyBeta(identity,loginForm.name);
-        if (!existing) throw new Error('기존 가입 기록 연결을 완료하지 못했습니다. 관리자에게 등록 정보 이전을 요청해 주세요.');
-        if (existing.name.trim().normalize('NFC') !== loginForm.name.trim().normalize('NFC'))
-          throw new Error('등록된 성함과 일치하지 않습니다.');
-        await registerLocalBeta(existing.name,existing.phone,existing.occupation);
-        setBetaOpen(false); onStart(false);
+      const record = await verifyOwnFirebaseBetaTester(loginForm.name,loginForm.phone);
+      if (!record) {
+        setBetaError(tr('등록 정보와 일치하지 않습니다. 가입한 브라우저에서 다시 시도해 주세요.','Registration not found on this browser. Please sign in from the original browser.'));
+        return;
       }
-    } catch (e) { setBetaError(e instanceof Error ? e.message : '인증에 실패했습니다.'); }
-    finally { setSubmitting(false); }
+      await registerLocalBeta(record.name,record.phone,record.occupation);
+      setBetaOpen(false);
+      onStart(false);
+    } catch (e) {
+      setBetaError(e instanceof Error?e.message:tr('등록 정보 확인에 실패했습니다.','Could not verify registration.'));
+    } finally {setSubmitting(false);}
   };
   useEffect(() => {
     if (!mobileMenuOpen) return;
@@ -528,15 +511,14 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
       <div className="bramer-beta-dialog bramer-beta-refined" role="dialog" aria-modal="true" aria-labelledby="bramer-beta-title" aria-describedby="bramer-beta-description" ref={dialogRef} tabIndex={-1}>
         <button type="button" className="bramer-beta-close" aria-label={tr('닫기','Close')} onClick={closeBeta}>{tr('닫기','Close')}</button>
         <div className="bramer-beta-label">BRAMER BETA</div>
-        <div id="bramer-phone-recaptcha" />
         {betaMode==='choice'?<>
           <h2 id="bramer-beta-title">{tr('브레이머를 시작해 볼까요?','Let’s get started with BRAMER.')}</h2>
-          <p id="bramer-beta-description">{tr('새로운 가이드라인을 만들거나, 인증된 휴대전화 번호로 기존 가입 정보를 확인하고 다시 시작할 수 있습니다.','Create your first guideline or return using your beta registration on this browser.')}</p>
+          <p id="bramer-beta-description">{tr('새로운 가이드라인을 만들거나, 이 브라우저에 등록된 베타 정보를 이용해 다시 시작할 수 있습니다.','Create your first guideline or return using your beta registration on this browser.')}</p>
           <div className="bramer-beta-choice">
             <button type="button" onClick={()=>{setBetaError('');setBetaMode('register');}}><span><strong>{tr('새로 시작하기','Start new')}</strong><small>{tr('간단한 정보 등록 후 무료 체험','Register a few details to try it for free')}</small></span><span aria-hidden="true">→</span></button>
             <button type="button" onClick={()=>{setBetaError('');setBetaMode('login');}}><span><strong>{tr('베타테스트 로그인','Beta login')}</strong><small>{tr('등록한 성함과 연락처로 다시 시작','Return with your registered name and phone')}</small></span><span aria-hidden="true">→</span></button>
           </div>
-          <p className="bramer-beta-footnote">{tr('새 기기에서 로그인하려면 휴대전화 인증이 필요합니다.','Phone verification is required when signing in on a new device.')}</p>
+          <p className="bramer-beta-footnote">{tr('베타 로그인은 가입에 사용한 브라우저에서만 지원됩니다.','Beta login works only on the browser where you registered.')}</p>
         </>:betaMode==='login'?<>
           <h2 id="bramer-beta-title">{tr('베타테스트 로그인','Beta login')}</h2>
           <p id="bramer-beta-description">{tr('등록할 때 사용한 성함과 연락처를 입력해 주세요.','Enter the name and phone number used during registration.')}</p>
@@ -545,22 +527,11 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
               <label><span>{tr('성함','Name')}</span><input autoComplete="name" value={loginForm.name} maxLength={40} onChange={e=>setLoginForm(p=>({...p,name:e.target.value}))} required placeholder={tr('등록한 성함','Registered name')}/></label>
               <label><span>{tr('연락처','Phone number')}</span><input autoComplete="tel" type="tel" value={loginForm.phone} maxLength={20} onChange={e=>setLoginForm(p=>({...p,phone:e.target.value}))} required placeholder="010-1234-5678"/></label>
             </div>
-            <p className="bramer-beta-local-notice">{tr('기존 브라우저에서는 바로 로그인할 수 있고, 새로운 기기에서는 문자 인증번호로 가입 기록을 확인합니다.','Existing browser access is retained. SMS verification links your account across devices.')}</p>
+            <p className="bramer-beta-local-notice">{tr('로그인은 이 브라우저의 등록 정보 또는 동일한 익명 Firebase 계정을 확인합니다. 다른 기기에서는 로그인할 수 없습니다.','Login verifies registration in this browser or the same anonymous Firebase account. Other devices are not supported.')}</p>
             {betaError?<p className="bramer-beta-error" role="alert">{betaError}</p>:null}
             <button type="submit" className="bramer-beta-primary" disabled={submitting}>{tr('로그인하고 계속하기','Login and continue')}</button>
           </form>
           <button type="button" className="bramer-beta-back" onClick={()=>{setBetaMode('choice');setBetaError('')}}>{tr('이전으로','Back')}</button>
-        </>:betaMode==='otp'?<>
-          <h2 id="bramer-beta-title">{tr('휴대전화 인증','Verify your phone')}</h2>
-          <p id="bramer-beta-description">{tr('전송된 6자리 인증번호를 입력해 주세요.','Enter the six-digit SMS verification code.')}</p>
-          <form className="bramer-beta-form bramer-auth-fields" onSubmit={confirmOtp}>
-            <div className="bramer-beta-field-grid">
-              <label><span>{tr('인증번호','Verification code')}</span><input autoComplete="one-time-code" inputMode="numeric" pattern="[0-9]{6}" maxLength={6} value={otpCode} onChange={event=>setOtpCode(event.target.value.replace(/\D/g,''))} placeholder="000000" required/></label>
-            </div>
-            {betaError?<p className="bramer-beta-error" role="alert">{betaError}</p>:null}
-            <button type="submit" className="bramer-beta-primary" disabled={submitting || otpCode.length!==6}>{submitting?tr('확인 중...','Verifying...'):tr('인증하고 계속하기','Verify and continue')}</button>
-          </form>
-          <button type="button" className="bramer-beta-back" onClick={()=>{setBetaError('');setBetaMode(otpPurpose);}}>{tr('번호 다시 입력하기','Change phone number')}</button>
         </>:<>
           <h2 id="bramer-beta-title">{tr('브레이머를 무료로 체험하세요.','Explore BRAMER for free.')}</h2>
           <p id="bramer-beta-description">{tr('성함과 연락처, 직업만 입력하면 시작할 수 있습니다. 처음 등록한 분께는 짧은 사용 안내가 제공됩니다.','Enter your name, phone number and occupation to begin. First-time registration includes a short introduction.')}</p>
@@ -582,11 +553,11 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
               {privacyOpen?<div className="bramer-beta-privacy-text"><strong>{tr('베타 등록 및 보관 안내','Beta registration and storage')}</strong>
                 <p>{tr('베타 신청을 위해 성함, 연락처, 직업을 수집하고 Firebase에 저장합니다. 운영 관리와 베타테스트 안내 및 문의 대응 목적으로 이용합니다.','We collect name, phone number, and occupation and store them in Firebase for beta registration, administration, support, and beta-related contact.')}</p>
                 <p>{tr('입력한 성함·연락처·직업 원문은 BRAMER의 Firebase Firestore에 저장되어 승인된 관리자만 조회합니다. 이 브라우저에는 재방문을 확인하기 위한 해시 정보가 별도로 보관되며, 이름과 연락처 원문은 브라우저 인증 정보에 저장하지 않습니다.','Your name, phone, and occupation are stored in private Firebase Firestore records accessible only to authorized admins. A separate salted verification hash is kept in this browser for returning access.')}</p>
-                <p>{tr('기본 보유기간은 베타 운영 종료 후 3개월이며, 별도 법령상 의무가 있는 경우를 제외하고 이후 삭제합니다. 삭제 문의는 NINEWORKS에 요청할 수 있습니다. 휴대전화 인증을 사용하며 기존 등록정보 연결 과정에는 별도 확인이 필요할 수 있습니다.','Beta registration data is planned to be retained for three months after the beta ends, unless law requires otherwise. Deletion can be requested from NINEWORKS. Phone OTP verifies access; legacy account migration may require assistance.')}</p>
+                <p>{tr('기본 보유기간은 베타 운영 종료 후 3개월이며, 별도 법령상 의무가 있는 경우를 제외하고 이후 삭제합니다. 삭제 문의는 NINEWORKS에 요청할 수 있습니다. 전화번호는 연락처 용도로만 수집하며, 현재 로그인은 브라우저 기반 등록 정보 확인 방식입니다.','Beta registration data is planned to be retained for three months after the beta ends, unless law requires otherwise. Deletion can be requested from NINEWORKS. Phone numbers are contact information only; beta login is browser-based and does not verify identity.')}</p>
                 <p>{tr('방문 통계는 Firebase의 익명 세션을 활용해 날짜별 방문 횟수를 집계합니다. BRAMER의 방문 집계 문서에는 성함·연락처·IP 주소를 저장하지 않으며, 브라우저에 집계 중복 방지를 위한 세션 정보가 저장될 수 있습니다.','Visit counts use anonymous Firebase sessions and daily aggregates. BRAMER does not store names, phone numbers or IP addresses in visitor count documents. Browser session data is used to reduce duplicate counts.')}</p>
               </div>:null}
             </div>
-            <p className="bramer-beta-local-notice">{tr('가입 정보는 Firebase에 보관되며, 휴대전화 인증 후 다른 기기에서도 로그인할 수 있습니다.','Registration details are stored in Firebase. Phone verification enables sign-in on other devices.')}</p>
+            <p className="bramer-beta-local-notice">{tr('전화번호는 연락처 기록용이며 문자 인증은 사용하지 않습니다. 베타 로그인은 가입한 브라우저에서 지원됩니다.','Phone number is collected as contact information only. Beta login is limited to the original browser.')}</p>
             {betaError?<p className="bramer-beta-error" role="alert">{betaError}</p>:null}
             <button type="submit" className="bramer-beta-primary" disabled={submitting}>{tr('등록하고 무료 체험하기','Register and start free trial')}</button>
           </form>
