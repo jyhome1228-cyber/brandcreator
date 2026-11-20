@@ -31,9 +31,75 @@ service cloud.firestore {
         && request.resource.data.registeredAt <= request.time + duration.value(10, 'm')
         && request.resource.data.status == 'active';
     }
+    function validVerifiedPhoneSignup(id) {
+      return request.auth != null
+        && request.auth.uid == id
+        && request.auth.token.firebase.sign_in_provider == 'phone'
+        && request.auth.token.phone_number is string
+        && request.resource.data.keys().hasOnly(['uid','name','phone','occupation','registeredAt','status','verifiedPhone'])
+        && request.resource.data.keys().hasAll(['uid','name','phone','occupation','registeredAt','status','verifiedPhone'])
+        && request.resource.data.uid == id
+        && request.resource.data.verifiedPhone == request.auth.token.phone_number
+        && request.resource.data.phone is string
+        && request.resource.data.phone.matches('^010[0-9]{8}
+    match /usageEvents/{id} {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    function anonymousVisit() {
+      return request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'anonymous';
+    }
+    function validVisitData(day) {
+      return request.resource.data.keys().hasOnly(['day','visits','unique'])
+        && request.resource.data.keys().hasAll(['day','visits','unique'])
+        && request.resource.data.day is string
+        && request.resource.data.day == day
+        && day.size() == 10
+        && request.resource.data.visits is int
+        && request.resource.data.unique is int
+        && request.resource.data.visits >= 1
+        && request.resource.data.unique >= 0
+        && request.resource.data.unique <= request.resource.data.visits;
+    }
+    match /visitDaily/{day} {
+      allow get, list: if true;
+      allow create: if anonymousVisit()
+        && validVisitData(day)
+        && request.resource.data.visits == 1
+        && request.resource.data.unique <= 1;
+      allow update: if anonymousVisit()
+        && validVisitData(day)
+        && resource.data.day == day
+        && request.resource.data.visits == resource.data.visits + 1
+        && request.resource.data.unique >= resource.data.unique
+        && request.resource.data.unique <= resource.data.unique + 1;
+      allow delete: if false;
+    }
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
+)
+        && request.resource.data.name is string
+        && request.resource.data.name.size() > 0
+        && request.resource.data.name.size() <= 40
+        && request.resource.data.occupation is string
+        && request.resource.data.occupation.size() > 0
+        && request.resource.data.occupation.size() <= 50
+        && request.resource.data.registeredAt is timestamp
+        && request.resource.data.registeredAt >= request.time - duration.value(10, 'm')
+        && request.resource.data.registeredAt <= request.time + duration.value(10, 'm')
+        && request.resource.data.status == 'active';
+    }
     match /betaTesters/{id} {
-      allow get, list: if isAdmin();
-      allow create: if validBetaSignup(id);
+      // Existing anonymous beta records remain private and immutable.
+      allow get: if isAdmin() || (request.auth != null
+        && request.auth.uid == id
+        && request.auth.token.firebase.sign_in_provider == 'phone');
+      allow list: if isAdmin();
+      allow create: if validBetaSignup(id) || validVerifiedPhoneSignup(id);
       allow update, delete: if false;
     }
     match /usageEvents/{id} {
