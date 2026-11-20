@@ -31,34 +31,14 @@ service cloud.firestore {
         && request.resource.data.registeredAt <= request.time + duration.value(10, 'm')
         && request.resource.data.status == 'active';
     }
-    function validVerifiedPhoneSignup(id) {
-      return request.auth != null
-        && request.auth.uid == id
-        && request.auth.token.firebase.sign_in_provider == 'phone'
-        && request.auth.token.phone_number is string
-        && request.resource.data.keys().hasOnly(['uid', 'name', 'phone', 'occupation', 'registeredAt', 'status', 'verifiedPhone'])
-        && request.resource.data.keys().hasAll(['uid', 'name', 'phone', 'occupation', 'registeredAt', 'status', 'verifiedPhone'])
-        && request.resource.data.uid == id
-        && request.resource.data.verifiedPhone == request.auth.token.phone_number
-        && request.resource.data.phone is string
-        && request.resource.data.phone.matches('^010[0-9]{8}$')
-        && request.resource.data.name is string
-        && request.resource.data.name.size() > 0
-        && request.resource.data.name.size() <= 40
-        && request.resource.data.occupation is string
-        && request.resource.data.occupation.size() > 0
-        && request.resource.data.occupation.size() <= 50
-        && request.resource.data.registeredAt is timestamp
-        && request.resource.data.registeredAt >= request.time - duration.value(10, 'm')
-        && request.resource.data.registeredAt <= request.time + duration.value(10, 'm')
-        && request.resource.data.status == 'active';
-    }
     match /betaTesters/{id} {
+      // Anonymous users may create and read only their own registration.
+      // Admins can list and read registrations. Phone is contact data, not an auth provider.
       allow get: if isAdmin() || (request.auth != null
         && request.auth.uid == id
-        && request.auth.token.firebase.sign_in_provider == 'phone');
+        && request.auth.token.firebase.sign_in_provider == 'anonymous');
       allow list: if isAdmin();
-      allow create: if validBetaSignup(id) || validVerifiedPhoneSignup(id);
+      allow create: if validBetaSignup(id);
       allow update, delete: if false;
     }
     match /usageEvents/{id} {
