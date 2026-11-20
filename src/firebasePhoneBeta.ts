@@ -23,9 +23,17 @@ function authError(error: unknown): Error {
   return new Error('휴대전화 인증에 실패했습니다. ' + code);
 }
 
+export function resetBetaPhoneVerification(): void {
+  confirmation = undefined;
+  if (verifier) {
+    try { verifier.clear(); } catch { /* recaptcha element may already be unmounted */ }
+    verifier = undefined;
+  }
+}
+
 export async function sendBetaVerification(phone: string): Promise<void> {
   const { e164 } = normalizeKoreanMobile(phone);
-  confirmation = undefined;
+  resetBetaPhoneVerification();
   try {
     if (!verifier) verifier = new RecaptchaVerifier(auth, 'bramer-phone-recaptcha', { size: 'invisible' });
     await verifier.render();
