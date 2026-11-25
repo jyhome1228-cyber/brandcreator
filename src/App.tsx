@@ -185,6 +185,24 @@ export default function App() {
   const currentSnapshot = (): SavedBramerProject => ({
     id: projectId, updatedAt: Date.now(), project, industry, selectedCategories, enabled, step: setupStep,
   });
+  const backupProject = () => {
+    let url: string | undefined;
+    try {
+      const snapshot = currentSnapshot();
+      const payload = { version: 1, ...snapshot };
+      url = URL.createObjectURL(new Blob([JSON.stringify(payload, null, 2)], { type: 'application/json;charset=utf-8' }));
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = (project.englishName || project.name || 'bramer').replace(/[^a-zA-Z0-9가-힣_-]+/g, '-') + '-project.json';
+      document.body.appendChild(anchor);
+      try { anchor.click(); } finally { anchor.remove(); }
+    } catch (cause) {
+      console.error('BRAMER backup error', cause);
+      window.alert('프로젝트 백업 파일을 만들지 못했습니다. 다시 시도해 주세요.');
+    } finally {
+      if (url) { const objectUrl = url; window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30000); }
+    }
+  };
   const hasDraftContent = () => Boolean(
     project.name.trim() || project.englishName.trim() || project.description.trim() ||
     project.slogan.trim() || project.logo || setupStep > 1 ||
@@ -513,7 +531,8 @@ export default function App() {
       setProject({ ...saved, logo: safeLogo });
       setEnabled(Object.fromEntries(Object.entries(snapshot.enabled ?? {}).filter(([, value]) => typeof value === 'boolean')));
       setCurrentId('01-cover');
-      setSetupStep(1);
+      const importedStep = (data as { step?: unknown }).step;
+      setSetupStep(typeof importedStep === 'number' && Number.isInteger(importedStep) && importedStep >= 1 && importedStep <= 5 ? importedStep as 1|2|3|4|5 : 1);
       setMode('setup');
       window.location.hash = '/create';
       setError('');
@@ -588,6 +607,7 @@ export default function App() {
           <span className="bramer-dash-product">브랜드 가이드라인 제작 <span className="bramer-save-state">{saveStatus === 'saving' ? '· 저장 중' : saveStatus === 'saved' ? '· 브라우저에 저장됨' : saveStatus === 'error' ? '· 저장 실패' : ''}</span></span>
           <div className="bramer-create-header-actions">
             <label className="bramer-create-import">프로젝트 불러오기<input type="file" accept=".json,application/json" onChange={event => void restoreProject(event)} /></label>
+            <button type="button" className="button secondary" onClick={backupProject}>JSON 백업</button>
             <button type="button" className="bramer-dash-header-start" onClick={() => void saveToBrowser()}>브라우저 저장</button>
           </div>
         </header>
@@ -1128,6 +1148,7 @@ export default function App() {
       <p>현재 작업을 유지한 채 브랜드 설정을 다시 확인할 수 있습니다.</p>
       <button className="button primary" onClick={() => { setMode('setup'); window.location.hash = '/create'; }}>브랜드 설정으로 돌아가기</button>
       <button className="button secondary" onClick={() => void saveToBrowser()}>현재 작업 저장</button>
+      <button className="button secondary" onClick={backupProject}>JSON 백업</button>
       <p role="status">{saveStatus === 'saved' ? '저장 완료' : saveStatus === 'error' ? '저장 실패. 다시 시도해 주세요.' : saveStatus === 'saving' ? '저장 중' : ''}</p>
     </main>
   );
@@ -1144,6 +1165,7 @@ export default function App() {
           </div>
           <div className="header-actions"><label className="bramer-doc-language">결과물 언어 <select value={documentLanguage} onChange={event => selectDocumentLanguage(event.target.value as DocumentLanguage)} aria-label="가이드라인 출력 언어"><option value="ko">한국어 KO</option><option value="en">English EN</option></select></label><button className="button ghost" onClick={() => navigateWorkspace('dashboard')}>대시보드</button><span className="bramer-editor-industry">{industryLabel} · {selectedCount} MODULES</span>
             <button className="button ghost" onClick={() => void saveToBrowser()}>브라우저 저장</button>
+            <button className="button ghost" onClick={backupProject}>JSON 백업</button>
             <button className="button ghost" onClick={() => void openProjectLibrary()}>내 프로젝트</button>
             <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); window.location.hash = '/create'; }}>구성 변경</button>
             <button className="button secondary" disabled={exportBusy !== null || !enabledPages.length} onClick={() => void exportDocument('zip')}>{exportBusy === 'zip' ? 'SVG 준비 중…' : '전체 SVG'}</button>
