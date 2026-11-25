@@ -37,6 +37,9 @@ jobs:
         with:
           python-version: '3.12'
 
+      - name: Guideline engine regression and SVG XML checks
+        run: npm run qa:guidelines
+
       - name: Generate BRAMER social preview PNG
         run: |
           sudo apt-get update -qq
