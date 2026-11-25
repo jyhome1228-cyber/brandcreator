@@ -356,7 +356,17 @@ export default function App() {
 
   const [documentLanguage, setDocumentLanguage] = useState<DocumentLanguage>(() => { try { return localStorage.getItem('bramer-document-language') === 'en' ? 'en' : 'ko'; } catch { return 'ko'; } });
   const selectDocumentLanguage = (value: DocumentLanguage) => { setDocumentLanguage(value); try { localStorage.setItem('bramer-document-language',value); } catch { /* Optional preference */ } };
-  const pages = useMemo(() => localizeGuidelinePages(generateV2Pages(project), documentLanguage), [project, documentLanguage]);
+  const generation = useMemo((): { pages: GuidelinePage[]; failed: boolean } => {
+    try {
+      const result = localizeGuidelinePages(generateV2Pages(project), documentLanguage);
+      if (!result.length) throw new Error('No guideline pages generated');
+      return { pages: result, failed: false };
+    } catch (cause) {
+      console.error('BRAMER guideline generation error', cause);
+      return { pages: [], failed: true };
+    }
+  }, [project, documentLanguage]);
+  const pages = generation.pages;
   const changeIndustry = (value: IndustryId) => {
     setIndustry(value);
     setSelectedCategories(getDefaultSelection(value));
@@ -429,6 +439,8 @@ export default function App() {
       });
     } catch (caught) {
       setError(caught instanceof Error ? caught.message : 'SVG 파일을 불러오지 못했습니다.');
+    } finally {
+      event.target.value = '';
     }
   };
 
@@ -501,6 +513,10 @@ export default function App() {
     }
     if (!project.logo) {
       setError('SVG 형식의 로고 파일을 업로드해 주세요. AI 파일은 Illustrator에서 SVG로 저장하면 됩니다.');
+      return;
+    }
+    if (generation.failed || !pages.length) {
+      setError('가이드라인을 생성하지 못했습니다. 로고와 브랜드 설정을 확인한 후 다시 시도해 주세요.');
       return;
     }
     setError('');
@@ -1083,6 +1099,15 @@ export default function App() {
     );
   }
 
+  if (!currentPage || generation.failed) return (
+    <main role="alert" style={{ maxWidth: 560, margin: '15vh auto', padding: 24 }}>
+      <h1>가이드라인을 표시하지 못했습니다.</h1>
+      <p>현재 작업을 유지한 채 브랜드 설정을 다시 확인할 수 있습니다.</p>
+      <button className="button primary" onClick={() => { setMode('setup'); window.location.hash = '/create'; }}>브랜드 설정으로 돌아가기</button>
+      <button className="button secondary" onClick={() => void saveToBrowser()}>현재 작업 저장</button>
+      <p role="status">{saveStatus === 'saved' ? '저장 완료' : saveStatus === 'error' ? '저장 실패. 다시 시도해 주세요.' : saveStatus === 'saving' ? '저장 중' : ''}</p>
+    </main>
+  );
   return (
     <div className="app-shell editor-mode">
       <header className="topbar editor-topbar">
