@@ -122,25 +122,14 @@ export default function App() {
     }
     goToDashboard();
   };
-  const openCreate = (nextIndustry?: IndustryId) => {
-    if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
-    if (nextIndustry) {
-      setIndustry(nextIndustry);
-      setSelectedCategories(getDefaultSelection(nextIndustry));
-      setSetupStep(2);
-    } else setSetupStep(1);
-    window.location.hash = '/create';
-    setMode('setup');
-    window.scrollTo({ top: 0, behavior: 'instant' });
-  };
   const navigateWorkspace = (view: 'dashboard' | 'guide') => {
     if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     if (view === 'guide') {
       window.location.hash = '/guide';
       setMode('guide');
     } else {
-      window.location.hash = '/create';
-      setMode('setup');
+      window.location.hash = '/dashboard';
+      setMode('dashboard');
     }
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
@@ -303,7 +292,7 @@ export default function App() {
     setMode('projects');
     window.scrollTo({ top: 0, behavior: 'instant' });
   };
-  const createNewProject = async () => {
+  const createNewProject = async (nextIndustry?: IndustryId) => {
     if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
     if (hasDraftContent() && !(await saveToBrowser())) {
@@ -313,7 +302,7 @@ export default function App() {
     const nextId=newProjectId();
     try { localStorage.setItem('bramer-active-project-v1',nextId); } catch { /* unavailable */ }
     setProject({ ...initialProject, year: String(new Date().getFullYear()), contact:{...initialProject.contact!}, colors:{...initialProject.colors}, typography:{...initialProject.typography}, rules:{...initialProject.rules} });
-    setProjectId(nextId); setIndustry('service'); setSelectedCategories(getDefaultSelection('service'));
+    setProjectId(nextId); setIndustry(nextIndustry ?? 'service'); setSelectedCategories(getDefaultSelection(nextIndustry ?? 'service'));
     setEnabled({}); setCurrentId('01-cover'); setSetupStep(1); setError(''); setSaveStatus('idle');
     window.location.hash='/create'; setMode('setup');
     window.scrollTo({ top:0, behavior:'instant' });
@@ -570,9 +559,9 @@ export default function App() {
   if (mode === 'manifesto') return <TechnicalManifesto onHome={goHome} onBeta={enterBetaFromManifesto}/>;
   if (mode === 'projects') return <ProjectLibrary projects={savedProjects}
     onOpen={id=>void resumeSavedProject(id)} onRemove={id=>void removeSavedProject(id)}
-    onNew={()=>void createNewProject()} onBack={goHome} onGuide={openGuide} onHelp={openHelp}
+    onNew={()=>void createNewProject()} onBack={goToDashboard} onGuide={openGuide} onHelp={openHelp}
     error={libraryError}/>;
-  if (mode === 'help') return <HelpView onHome={goHome} onProjects={()=>void openProjectLibrary()}
+  if (mode === 'help') return <HelpView onHome={goToDashboard} onProjects={()=>void openProjectLibrary()}
     onGuide={openGuide} onNew={()=>void createNewProject()} onHelp={openHelp}/>;
   if (mode === 'landing') return <Landing onStart={enterWorkspace} onManifesto={openManifesto} />;
   if (mode === 'welcome') return <WelcomeExperience onFinish={finishWelcome} english={welcomeLanguage==='en'}/>;
@@ -582,7 +571,7 @@ export default function App() {
     onHome={goHome}
     onProjects={()=>{if(!hasBetaSession()){enterBetaFromManifesto();return;}void openProjectLibrary();}}
     onHelp={openHelp}
-    onCreate={(nextIndustry) => { if(!hasBetaSession()) {enterBetaFromManifesto();return;} openCreate(nextIndustry); }}
+    onCreate={(nextIndustry) => { if(!hasBetaSession()) {enterBetaFromManifesto();return;} void createNewProject(nextIndustry); }}
     onContinue={() => { window.location.hash = '/create'; setMode('setup'); }}
     onImport={event => void restoreProject(event)}
     currentProject={project.name.trim() || undefined}
@@ -604,7 +593,7 @@ export default function App() {
         </header>
         <div className="bramer-dash-layout">
           <aside className="bramer-dash-sidebar" aria-label="서비스 메뉴">
-            <WorkspaceNav active="create" onHome={goHome} onProjects={()=>void openProjectLibrary()} onGuide={openGuide} onHelp={openHelp} onNew={()=>void createNewProject()}/>
+            <WorkspaceNav active="create" onHome={goToDashboard} onProjects={()=>void openProjectLibrary()} onGuide={openGuide} onHelp={openHelp} onNew={()=>void createNewProject()}/>
             <div className="bramer-dash-sidebar-bottom">
               <p>브랜드 정보와 로고를 등록하고, 필요한 규칙을 선택하여 가이드라인을 만들어보세요.</p>
               <button type="button" onClick={openHelp}>사용 방법 보기</button>
@@ -1010,13 +999,13 @@ export default function App() {
                       <strong>응용 디자인 SVG 원본</strong>
                       <p className="module-description">명함 90×50mm, 스티커 50mm, A4 레터헤드, 소·대봉투 SVG를 개별 다운로드할 수 있습니다. 인쇄 전 도련·폰트·재단·봉투 전개도 등 실측 규격을 반드시 확인하세요.</p>
                       {project.logo && <div className="bramer-v2-export-buttons">
-                        <button type="button" onClick={()=>exportSingle(()=>{id:'business-card-front',section:'application',title:'Business Card Front',subtitle:'',svg:generateBusinessCardSvg(project)})}>명함 앞면 SVG</button>
-                        <button type="button" onClick={()=>exportSingle(()=>{id:'business-card-back',section:'application',title:'Business Card Back',subtitle:'',svg:generateBusinessCardSvg(project,true)})}>명함 뒷면 SVG</button>
-                        <button type="button" onClick={()=>exportSingle(()=>{id:'sticker-round',section:'application',title:'Round Sticker',subtitle:'',svg:generateStickerSvg(project,'circle')})}>원형 스티커 SVG</button>
-                        <button type="button" onClick={()=>exportSingle(()=>{id:'sticker-square',section:'application',title:'Square Sticker',subtitle:'',svg:generateStickerSvg(project,'square')})}>사각 스티커 SVG</button>
-                        <button type="button" onClick={()=>exportSingle(()=>{id:'letterhead-a4',section:'application',title:'A4 Letterhead',subtitle:'',svg:generateLetterheadSvg(project)})}>A4 레터헤드 SVG</button>
-                        <button type="button" onClick={()=>exportSingle(()=>{id:'envelope-small',section:'application',title:'Small Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'small')})}>소봉투 SVG</button>
-                        <button type="button" onClick={()=>exportSingle(()=>{id:'envelope-large',section:'application',title:'Large Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'large')})}>대봉투 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>({id:'business-card-front',section:'application',title:'Business Card Front',subtitle:'',svg:generateBusinessCardSvg(project)}))}>명함 앞면 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>({id:'business-card-back',section:'application',title:'Business Card Back',subtitle:'',svg:generateBusinessCardSvg(project,true)}))}>명함 뒷면 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>({id:'sticker-round',section:'application',title:'Round Sticker',subtitle:'',svg:generateStickerSvg(project,'circle')}))}>원형 스티커 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>({id:'sticker-square',section:'application',title:'Square Sticker',subtitle:'',svg:generateStickerSvg(project,'square')}))}>사각 스티커 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>({id:'letterhead-a4',section:'application',title:'A4 Letterhead',subtitle:'',svg:generateLetterheadSvg(project)}))}>A4 레터헤드 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>({id:'envelope-small',section:'application',title:'Small Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'small')}))}>소봉투 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>({id:'envelope-large',section:'application',title:'Large Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'large')}))}>대봉투 SVG</button>
                       </div>}
                     </div>
                   </div>
@@ -1171,7 +1160,7 @@ export default function App() {
       <main className="editor-layout">
         <aside className="page-sidebar" aria-label="가이드라인 목차">
           <div className="bramer-editor-global-menu">
-            <WorkspaceNav active="create" onHome={goHome} onProjects={()=>void openProjectLibrary()} onGuide={openGuide} onHelp={openHelp} onNew={()=>void createNewProject()}/>
+            <WorkspaceNav active="create" onHome={goToDashboard} onProjects={()=>void openProjectLibrary()} onGuide={openGuide} onHelp={openHelp} onNew={()=>void createNewProject()}/>
           </div>
           <div className="sidebar-heading">
             <strong>CONTENTS</strong>
