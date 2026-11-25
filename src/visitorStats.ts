@@ -14,6 +14,8 @@ const attemptPrefix='bramer-visit-attempt-';
 type CachedAuth={refreshToken:string;idToken:string;expiresAt:number};
 let pendingAuth:Promise<string>|null=null;
 let pendingTrack:Promise<void>|null=null;
+let memoryAuth:CachedAuth|null=null;
+const recordedDays=new Set<string>();
 function dayId(date=new Date()):string{
   const parts=new Intl.DateTimeFormat('en-CA',{
     timeZone:'Asia/Seoul',year:'numeric',month:'2-digit',day:'2-digit',
@@ -26,8 +28,8 @@ export function latestDays(count=7):string[]{
   return Array.from({length:count},(_,i)=>dayId(new Date(now.getTime()-(count-1-i)*86400000)));
 }
 function readAuth():CachedAuth|null{
-  try{const raw=localStorage.getItem(tokenStorage);return raw?JSON.parse(raw) as CachedAuth:null;}
-  catch{return null;}
+  try{const raw=localStorage.getItem(tokenStorage);return raw?JSON.parse(raw) as CachedAuth:memoryAuth;}
+  catch{return memoryAuth;}
 }
 export async function visitorToken():Promise<string>{
   if(pendingAuth)return pendingAuth;
@@ -44,6 +46,11 @@ export async function visitorToken():Promise<string>{
         const refreshed=await response.json() as {id_token:string;refresh_token:string;expires_in:string};
         payload={idToken:refreshed.id_token,refreshToken:refreshed.refresh_token,expiresIn:refreshed.expires_in};
       }else{
+        const failure=await response.json().catch(()=>({})) as {error?:{message?:string}};
+        const reason=(failure.error?.message||'').toUpperCase();
+        if(!/^(TOKEN_EXPIRED|INVALID_REFRESH_TOKEN|USER_NOT_FOUND)$/.test(reason))
+          throw new Error('Firebase 인증을 갱신하지 못했습니다. 기존 계정을 유지한 채 다시 시도해 주세요.');
+        memoryAuth=null;
         try{localStorage.removeItem(tokenStorage);}catch{}
         payload={};
       }
@@ -58,10 +65,10 @@ export async function visitorToken():Promise<string>{
     }
     const token=String(payload.idToken||'');
     if(!token)throw new Error('익명 Firebase 인증 결과가 없습니다.');
-    try{localStorage.setItem(tokenStorage,JSON.stringify({
-      idToken:token,refreshToken:String(payload.refreshToken||''),
-      expiresAt:Date.now()+Math.max(60,Number(payload.expiresIn)||3600)*1000,
-    } satisfies CachedAuth));}catch{}
+    memoryAuth={
+      idToken:token,refreshToken:String(payload.refreshToken||''),expiresAt:Date.now()+Math.max(60,Number(payload.expiresIn)||3600)*1000,
+    };
+    try{localStorage.setItem(tokenStorage,JSON.stringify(memoryAuth));}catch{}
     return token;
   })();
   try{return await pendingAuth;}finally{pendingAuth=null;}
@@ -162,7 +169,7 @@ async function increaseDay(day:string, isUnique:boolean):Promise<void>{
       body:JSON.stringify(body),
     });
     if(response.ok)return;
-    if(response.status===409||response.status===412)continue;
+    if(response.status===409||response.status===412){await new Promise<void>(resolve=>setTimeout(resolve,80*(attempt+1)));continue;}
     const detail=await response.text().catch(()=>'');
     throw firestoreResponseError(response.status,'write',detail);
   }
@@ -188,6 +195,7 @@ export async function recordVisit():Promise<void>{
   const day=dayId();
   const sessionKey=attemptPrefix+'session-'+day;
   const uniqueKey=attemptPrefix+'unique-'+day;
+  if(recordedDays.has(day))return;
   try{if(sessionStorage.getItem(sessionKey)==='ok')return;}catch{}
   if(pendingTrack)return pendingTrack;
   pendingTrack=(async()=>{
@@ -195,6 +203,7 @@ export async function recordVisit():Promise<void>{
     try{isUnique=localStorage.getItem(uniqueKey)!=='ok';}catch{}
     try{
       await increaseDay(day,isUnique);
+      recordedDays.add(day);
       try{sessionStorage.setItem(sessionKey,'ok');}catch{}
       if(isUnique)try{localStorage.setItem(uniqueKey,'ok');}catch{}
       reportVisitHealth(day,true,'방문 횟수가 Firestore에 저장됐습니다.');
