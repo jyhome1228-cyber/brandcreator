@@ -11,7 +11,10 @@ const ignoredColors = new Set(['none', 'transparent', 'currentcolor', 'inherit']
 
 function parseLength(value: string | null): number | null {
   if (!value) return null;
-  const parsed = Number.parseFloat(value);
+  const match = value.trim().match(/^([+]?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?)\s*(px|pt|pc|mm|cm|in|q)?$/i);
+  if (!match) return null;
+  const factors: Record<string, number> = { px: 1, pt: 96/72, pc: 16, mm: 96/25.4, cm: 96/2.54, in: 96, q: 96/101.6 };
+  const parsed = Number(match[1]) * (factors[(match[2] || 'px').toLowerCase()] ?? 1);
   return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
 }
 
@@ -46,8 +49,9 @@ function resolveViewBox(svg: SVGSVGElement): SvgViewBox {
     }
   }
 
-  const width = parseLength(svg.getAttribute('width')) ?? 1000;
-  const height = parseLength(svg.getAttribute('height')) ?? 1000;
+  const width = parseLength(svg.getAttribute('width'));
+  const height = parseLength(svg.getAttribute('height'));
+  if (width === null || height === null) throw new Error('SVG의 크기 정보를 확인할 수 없습니다. Illustrator에서 아트보드 크기와 viewBox를 포함해 SVG로 다시 저장해 주세요.');
   return { x: 0, y: 0, width, height };
 }
 
@@ -240,6 +244,8 @@ function measureVisualGeometry(
       bounds,
       smallDetailRatio: areas.length ? smallDetails / areas.length : 0,
     };
+  } catch {
+    return { bounds: viewBox, smallDetailRatio: 0 };
   } finally {
     host.remove();
   }
@@ -362,6 +368,8 @@ function analyzeSvg(svg: SVGSVGElement, serializedSvg: string, viewBox: SvgViewB
 }
 
 export function parseLogoSvg(raw: string, fileName = 'logo.svg'): LogoAsset {
+  if (!raw.trim()) throw new Error('빈 SVG 파일입니다. 로고 파일을 다시 선택해 주세요.');
+  if (raw.length > 10 * 1024 * 1024) throw new Error('SVG 파일이 너무 큽니다. 10MB 이하로 최적화해 주세요.');
   const parser = new DOMParser();
   const document = parser.parseFromString(raw, 'image/svg+xml');
   if (document.querySelector('parsererror')) throw new Error('SVG 코드를 읽을 수 없습니다. 올바른 SVG 파일인지 확인해주세요.');
@@ -372,6 +380,9 @@ export function parseLogoSvg(raw: string, fileName = 'logo.svg'): LogoAsset {
   const svg = root as unknown as SVGSVGElement;
   sanitize(svg);
   const viewBox = resolveViewBox(svg);
+  if (!Number.isFinite(viewBox.width / viewBox.height) || !Number.isFinite(viewBox.width * viewBox.height) || viewBox.width / viewBox.height <= 0) throw new Error('SVG의 가로세로 비율이 올바르지 않습니다.');
+  svg.setAttribute('viewBox', [viewBox.x, viewBox.y, viewBox.width, viewBox.height].join(' '));
+  if (!svg.querySelector('path,rect,circle,ellipse,line,polyline,polygon,text,use,image')) throw new Error('SVG에 표시할 로고 요소가 없습니다.');
   const serializer = new XMLSerializer();
   const inner = [...svg.childNodes].map((node) => serializer.serializeToString(node)).join('');
   const serializedSvg = serializer.serializeToString(svg);
