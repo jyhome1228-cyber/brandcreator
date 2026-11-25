@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState, type FormEvent } from 'react';
+import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import BramerLogo from './components/BramerLogo';
 import { firebaseProjectId, signInAdmin, loadAdminData, type AdminSession, type BetaTester, type UsageEvent } from './firebaseAdmin';
 import { fetchDailyVisits, latestDays, checkVisitConnectivity, lastVisitRecordStatus, type DailyVisits } from './visitorStats';
@@ -26,7 +26,11 @@ function readableDate(value:string, withTime = false) {
     {year:'numeric',month:'2-digit',day:'2-digit'}).format(date);
 }
 function downloadCsv(rows:string[][], filename:string) {
-  const csv='\uFEFF'+rows.map(row=>row.map(cell=>'"'+String(cell??'').replace(/"/g,'""')+'"').join(',')).join('\r\n');
+  const csv='\uFEFF'+rows.map(row=>row.map(cell=>{
+    const value=String(cell??'');
+    const safe=/^\s*[=+\-@]|^[\t\r\n]/.test(value)?"'"+value:value;
+    return '"'+safe.replace(/"/g,'""')+'"';
+  }).join(',')).join('\r\n');
   const href=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8'}));
   const anchor=document.createElement('a');
   anchor.href=href;anchor.download=filename;document.body.appendChild(anchor);anchor.click();anchor.remove();
@@ -53,15 +57,30 @@ export default function AdminDashboard({onHome}:Props) {
   const [adminPassword,setAdminPassword]=useState('');
   const [adminPending,setAdminPending]=useState(false);
   const [adminError,setAdminError]=useState('');
+  const [privateLoading,setPrivateLoading]=useState(false);
+  const privateRevision=useRef(0);
+  const sessionRef=useRef<AdminSession|null>(null);
+  function disconnectAdmin(){
+    ++privateRevision.current;
+    sessionRef.current=null;
+    setAdminSession(null);setTesters([]);setEvents([]);setPrivateLoading(false);setAdminError('');
+  }
   async function loadPrivateData(current:AdminSession){
+    const revision=++privateRevision.current;
+    setPrivateLoading(true);
     try {
       const records=await loadAdminData(current);
+      if(revision!==privateRevision.current || sessionRef.current!==current)return;
       setTesters(records.testers);
       setEvents(records.events);
       setAdminError('');
     }catch(e){
-      setAdminError(e instanceof Error?e.message:'Firebase 관리자 데이터를 읽지 못했습니다.');
-    }
+      if(revision!==privateRevision.current || sessionRef.current!==current)return;
+      const message=e instanceof Error?e.message:'Firebase 관리자 데이터를 읽지 못했습니다.';
+      setTesters([]);setEvents([]);
+      if(/만료|권한이 거부/.test(message))disconnectAdmin();
+      setAdminError(message);
+    }finally{if(revision===privateRevision.current)setPrivateLoading(false);}
   }
   async function adminLogin(event:FormEvent<HTMLFormElement>){
     event.preventDefault();
@@ -69,6 +88,7 @@ export default function AdminDashboard({onHome}:Props) {
     setAdminPending(true);setAdminError('');
     try{
       const current=await signInAdmin(adminEmail.trim(),adminPassword);
+      sessionRef.current=current;
       setAdminSession(current);
       setAdminPassword('');
       await loadPrivateData(current);
@@ -116,11 +136,11 @@ export default function AdminDashboard({onHome}:Props) {
   function logout() {
     try {sessionStorage.removeItem('bramer-admin-preview-v1');} catch { /* optional */ }
     setUnlocked(false);setPassword('');
-    setAdminSession(null);setAdminEmail('');setAdminPassword('');setAdminError('');
+    disconnectAdmin();setAdminEmail('');setAdminPassword('');
     setTesters([]);setEvents([]);setVisits([]);setVisitReady(false);setVisitError('');setError('');
     setSection('overview');setSearch('');setOccupation('all');
   }
-  const available = unlocked;
+  const available = visitReady;
   const activeTesters=useMemo(()=>{
     const normalized=search.trim().toLocaleLowerCase('ko-KR');
     return testers.filter(tester=>
@@ -143,7 +163,7 @@ export default function AdminDashboard({onHome}:Props) {
   const latestWeek=events.filter(item=>new Date(item.createdAt).getTime()>Date.now()-7*86400000).length;
   const produced=events.filter(item=>item.event==='guideline_generated').length;
   const exported=events.filter(item=>item.event==='guideline_exported'||item.event==='export_pdf'||item.event==='export_svg').length;
-  const validData=Boolean(adminSession); // Firebase authorization, not the preview PIN.
+  const validData=Boolean(adminSession) && !privateLoading; // Firebase authorization, not the preview PIN.
   const visitorTotal=visits.reduce((total,row)=>total+row.visits,0);
   const todayRecord=visits.find(row=>row.day===latestDays(1)[0]);
   const sevenKeys=new Set(latestDays(7));
@@ -225,8 +245,8 @@ export default function AdminDashboard({onHome}:Props) {
           <div className="bramer-admin-title-actions">
             <button type="button" className="bramer-admin-mobile-nav" aria-expanded={menuOpen}
               onClick={()=>setMenuOpen(open=>!open)}>메뉴</button>
-            <button type="button" onClick={()=>void refreshVisits()} disabled={visitLoading}>
-              {visitLoading?'조회 중':'새로고침'}
+            <button type="button" onClick={()=>{void refreshVisits();if(sessionRef.current)void loadPrivateData(sessionRef.current);}} disabled={visitLoading||privateLoading}>
+              {visitLoading||privateLoading?'조회 중':'새로고침'}
             </button>
           </div>
         </div>
@@ -253,7 +273,7 @@ export default function AdminDashboard({onHome}:Props) {
           </div><span>{visitLoading?'조회 중':visitReady?'집계 연결':'설정 확인'}</span>
         </section>
         {error?<div className="bramer-admin-error" role="alert">{error}</div>:null}
-        {(section==='testers'||section==='events')&&!adminSession?
+        {!adminSession?
           <section className="bramer-admin-signin bramer-admin-private-login">
             <div className="bramer-admin-signin-top">
               <small>FIREBASE AUTHENTICATION</small><h2>등록자 정보 보호</h2>
@@ -269,8 +289,8 @@ export default function AdminDashboard({onHome}:Props) {
             {adminError?<p role="alert" className="bramer-admin-error">{adminError}</p>:null}
           </section>:null}
         {adminSession?<div className="bramer-admin-verified"><span>Firebase 관리자 인증됨</span>
-          <button type="button" onClick={()=>{setAdminSession(null);setTesters([]);setEvents([]);}}>관리자 연결 해제</button>
-          <button type="button" onClick={()=>void loadPrivateData(adminSession)}>데이터 새로고침</button>
+          <button type="button" onClick={disconnectAdmin}>관리자 연결 해제</button>
+          <button type="button" onClick={()=>void loadPrivateData(adminSession)} disabled={privateLoading}>{privateLoading?'조회 중':'데이터 새로고침'}</button>
         </div>:null}
         <div className="bramer-admin-preview-data">
           {section==='overview'?<>
@@ -325,7 +345,7 @@ export default function AdminDashboard({onHome}:Props) {
             <section className="bramer-admin-panel bramer-admin-table-panel">
               <div className="bramer-admin-list-head"><div><h2>베타테스터 목록</h2>
                 <p>검색 결과 {validData?activeTesters.length:0}명</p></div>
-                <button type="button" onClick={exportTesters} disabled={!adminSession}>CSV 내보내기</button>
+                <button type="button" onClick={exportTesters} disabled={!validData}>CSV 내보내기</button>
               </div>
               <div className="bramer-admin-filters">
                 <input value={search} onChange={event=>setSearch(event.target.value)}
@@ -352,7 +372,7 @@ export default function AdminDashboard({onHome}:Props) {
         </div>
         <footer className="bramer-admin-footer">
           <span>© 2026 NINEWORKS · BRAMER ADMIN</span>
-          <span>Firebase {firebaseProjectId} · 기록 조회 미연결</span>
+          <span>Firebase {firebaseProjectId} · {visitReady?'방문 기록 연결':'방문 기록 미연결'} · {adminSession?'관리자 인증됨':'관리자 미인증'}</span>
         </footer>
       </main>
     </div>
