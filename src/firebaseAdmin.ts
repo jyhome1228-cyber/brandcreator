@@ -60,20 +60,23 @@ function messageFromError(raw: string, status: number): string {
     return 'Firebase Authentication 설정을 찾을 수 없습니다. 프로젝트와 로그인 방법 설정을 확인해 주세요.';
   if (message.includes('PERMISSION_DENIED') || status === 403)
     return 'Firestore 관리자 권한이 거부되었습니다. 최신 보안 규칙과 admins/{UID} 문서의 active=true를 확인해 주세요.';
+  if (status === 401) return '관리자 인증이 만료되었습니다. 다시 로그인해 주세요.';
   if (status === 404) return '필요한 Firestore 문서를 찾지 못했습니다. admins/{UID} 관리자 문서가 생성되었는지 확인해 주세요.';
   if (status === 429) return 'Firebase 요청 횟수 제한에 걸렸습니다. 잠시 후 다시 시도해 주세요.';
   return `Firebase 요청에 실패했습니다 (HTTP ${status}). Authentication 로그인 설정과 관리자 권한을 확인해 주세요.`;
 }
 async function jsonRequest<T>(url: string, init: RequestInit): Promise<T> {
-  let response: Response;
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 15000);
   try {
-    response = await fetch(url, init);
-  } catch {
-    throw new Error('Firebase 연결에 실패했습니다. 인터넷 연결과 브라우저의 요청 차단 설정을 확인해 주세요.');
-  }
-  const payload = await response.json().catch(() => ({})) as T & { error?: { message?: string; status?: string } };
-  if (!response.ok) throw new Error(messageFromError(payload.error?.message || payload.error?.status || 'UNKNOWN', response.status));
-  return payload;
+    let response: Response;
+    try { response = await fetch(url, { ...init, signal: controller.signal, cache: 'no-store' }); }
+    catch { throw new Error(controller.signal.aborted ? 'Firebase 응답 시간이 초과되었습니다. 다시 시도해 주세요.' : 'Firebase 연결에 실패했습니다. 인터넷 연결과 브라우저의 요청 차단 설정을 확인해 주세요.'); }
+    const payload = await response.json().catch(() => null) as (T & { error?: { message?: string; status?: string } }) | null;
+    if (!response.ok) throw new Error(messageFromError(payload?.error?.message || payload?.error?.status || 'UNKNOWN', response.status));
+    if (!payload || typeof payload !== 'object') throw new Error('Firebase 응답을 읽을 수 없습니다. 다시 시도해 주세요.');
+    return payload;
+  } finally { clearTimeout(timer); }
 }
 function value(field?: FirestoreValue): string | number | boolean {
   if (!field) return '';
@@ -137,6 +140,7 @@ async function getCollection(collection: string, token: string): Promise<Firesto
     pageToken = data.nextPageToken || '';
     if (!pageToken) break;
   }
+  if (pageToken) throw new Error('조회 가능한 데이터 범위를 초과했습니다. 전체 데이터를 표시할 수 없습니다.');
   return result;
 }
 export async function loadAdminData(session: AdminSession): Promise<{testers:BetaTester[];events:UsageEvent[]}> {
