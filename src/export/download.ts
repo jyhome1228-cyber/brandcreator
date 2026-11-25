@@ -30,7 +30,7 @@ export function validateExportPage(page: GuidelinePage): void {
   if (doc.querySelector('parsererror') || doc.documentElement.localName !== 'svg') {
     throw new Error('SVG 형식이 올바르지 않습니다.');
   }
-  const values = (doc.documentElement.getAttribute('viewBox') ?? '').trim().split(/[\\s,]+/).map(Number);
+  const values = (doc.documentElement.getAttribute('viewBox') ?? '').trim().split(/[\s,]+/).map(Number);
   if (values.length !== 4 || !values.every(Number.isFinite) || values[2] <= 0 || values[3] <= 0) {
     throw new Error('SVG 출력 크기가 올바르지 않습니다.');
   }
