@@ -55,6 +55,7 @@ export default function BramerSelect({ value, options, onChange, ariaLabel, plac
   };
 
   const onTriggerKeyDown = (event: KeyboardEvent<HTMLButtonElement>) => {
+    if (!options.length) return;
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
       setActive(event.key === 'ArrowDown' ? currentIndex : Math.max(0, currentIndex - 1));
@@ -63,6 +64,7 @@ export default function BramerSelect({ value, options, onChange, ariaLabel, plac
   };
 
   const onListKeyDown = (event: KeyboardEvent<HTMLDivElement>) => {
+    if (!options.length) { setOpen(false); return; }
     if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
       event.preventDefault();
       setActive(previous => (previous + (event.key === 'ArrowDown' ? 1 : -1) + options.length) % options.length);
@@ -83,6 +85,7 @@ export default function BramerSelect({ value, options, onChange, ariaLabel, plac
       type="button"
       className="bramer-select-trigger"
       aria-label={ariaLabel}
+      disabled={!options.length}
       aria-haspopup="listbox"
       aria-expanded={open}
       aria-controls={open ? id : undefined}
@@ -92,7 +95,7 @@ export default function BramerSelect({ value, options, onChange, ariaLabel, plac
       <span>{selected?.label ?? placeholder}</span>
       <svg aria-hidden="true" viewBox="0 0 20 20" width="17" height="17" fill="none"><path d="m5 7 5 5 5-5" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"/></svg>
     </button>
-    {open ? <div
+    {open && options.length > 0 ? <div
       id={id}
       ref={listRef}
       role="listbox"
