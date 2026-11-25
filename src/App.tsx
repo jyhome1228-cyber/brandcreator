@@ -188,6 +188,7 @@ export default function App() {
   const [savedProjects, setSavedProjects] = useState<SavedBramerProject[]>([]);
   const [saveStatus, setSaveStatus] = useState<'idle' | 'saving' | 'saved' | 'error'>('idle');
   const [libraryError, setLibraryError] = useState('');
+  const saveRevision = useRef(0);
   const autosaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
   const currentSnapshot = (): SavedBramerProject => ({
     id: projectId, updatedAt: Date.now(), project, industry, selectedCategories, enabled, step: setupStep,
@@ -206,14 +207,17 @@ export default function App() {
   };
   const saveToBrowser = async (): Promise<boolean> => {
     if (!hasDraftContent()) return false;
+    const revision = ++saveRevision.current;
     setSaveStatus('saving');
     try {
       await saveLocalProject(currentSnapshot());
+      if (revision !== saveRevision.current) return true;
       try { localStorage.setItem('bramer-active-project-v1',projectId); } catch { /* browser may block storage */ }
       setSaveStatus('saved');
       await refreshProjects();
       return true;
     } catch (e) {
+      if (revision !== saveRevision.current) return false;
       setSaveStatus('error');
       setLibraryError(e instanceof Error ? e.message : '브라우저 저장에 실패했습니다. JSON 파일로 백업해 주세요.');
       return false;
@@ -249,6 +253,7 @@ export default function App() {
   }, []);
   useEffect(() => {
     if (!hydrated || !hasDraftContent()) return;
+    ++saveRevision.current;
     setSaveStatus('saving');
     autosaveTimer.current = setTimeout(() => { void saveToBrowser(); }, 550);
     return () => { if (autosaveTimer.current) clearTimeout(autosaveTimer.current); };
@@ -265,6 +270,12 @@ export default function App() {
     document.addEventListener('visibilitychange',flush);
     return () => document.removeEventListener('visibilitychange',flush);
   },[hydrated,project,projectId,industry,selectedCategories,enabled,setupStep]);
+  useEffect(() => {
+    if (saveStatus !== 'saving' && saveStatus !== 'error') return;
+    const warn = (event: BeforeUnloadEvent) => { event.preventDefault(); event.returnValue = ''; };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [saveStatus]);
   const openHelp = () => {
     if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     window.location.hash = '/help';
@@ -280,7 +291,10 @@ export default function App() {
   const openProjectLibrary = async () => {
     if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-    if (hasDraftContent()) await saveToBrowser();
+    if (hasDraftContent() && !(await saveToBrowser())) {
+      window.alert('현재 프로젝트를 저장하지 못했습니다. 작업 화면에서 다시 저장해 주세요.');
+      return;
+    }
     await refreshProjects();
     window.location.hash = '/projects';
     setMode('projects');
@@ -302,6 +316,8 @@ export default function App() {
     window.scrollTo({ top:0, behavior:'instant' });
   };
   const resumeSavedProject = async (id: string) => {
+    if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    if (hasDraftContent() && !(await saveToBrowser())) { window.alert('현재 프로젝트를 먼저 저장해 주세요.'); return; }
     try {
       const entries = await listSavedProjects();
       const item = entries.find(entry => entry.id === id);
@@ -322,7 +338,19 @@ export default function App() {
   };
   const removeSavedProject = async (id: string) => {
     if (!window.confirm('이 프로젝트를 브라우저에서 삭제할까요? 복구할 수 없습니다.')) return;
-    try { await deleteLocalProject(id); await refreshProjects(); }
+    if (id === projectId && autosaveTimer.current) clearTimeout(autosaveTimer.current);
+    try {
+      await deleteLocalProject(id);
+      if (id === projectId) {
+        ++saveRevision.current;
+        setProjectId(newProjectId());
+        setProject(initialProject);
+        setIndustry('service'); setSelectedCategories(getDefaultSelection('service'));
+        setEnabled({}); setSetupStep(1); setCurrentId('01-cover'); setSaveStatus('idle');
+        try { localStorage.removeItem('bramer-active-project-v1'); } catch { /* optional pointer */ }
+      }
+      await refreshProjects();
+    }
     catch(e) {setLibraryError(e instanceof Error ? e.message : '프로젝트를 삭제하지 못했습니다.');}
   };
 
@@ -435,16 +463,21 @@ export default function App() {
         ? CATEGORIES.filter(item => snapshot.selectedCategories!.includes(item.id)).map(item => item.id)
         : getDefaultSelection(restoredIndustry);
       const saved = snapshot.project;
+      if ([saved.description, saved.slogan, saved.year, saved.typography.title, saved.typography.body].some(value => typeof value !== 'string') || ![saved.colors.primary, saved.colors.secondary, saved.colors.accent].every(value => typeof value === 'string' && isHex(value)) || ![saved.rules.clearSpace, saved.rules.minimumPrintMm, saved.rules.minimumDigitalPx].every(value => typeof value === 'number' && Number.isFinite(value) && value > 0)) {
+        throw new Error('프로젝트 파일의 색상, 서체 또는 규정 정보가 올바르지 않습니다.');
+      }
       const safeLogo = saved.logo && typeof saved.logo.raw === 'string' && typeof saved.logo.fileName === 'string'
         ? parseLogoSvg(saved.logo.raw, saved.logo.fileName)
         : null;
+      if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
+      if (hasDraftContent() && !(await saveToBrowser())) throw new Error('현재 프로젝트를 저장하지 못했습니다. 기존 작업을 보호하기 위해 불러오기를 중단했습니다.');
       setIndustry(restoredIndustry);
       setSelectedCategories(restoredModules);
       const importedId=newProjectId();
       setProjectId(importedId);
       try { localStorage.setItem('bramer-active-project-v1',importedId); } catch { /* unavailable */ }
       setProject({ ...saved, logo: safeLogo });
-      setEnabled(snapshot.enabled || {});
+      setEnabled(Object.fromEntries(Object.entries(snapshot.enabled ?? {}).filter(([, value]) => typeof value === 'boolean')));
       setCurrentId('01-cover');
       setSetupStep(1);
       setMode('setup');
