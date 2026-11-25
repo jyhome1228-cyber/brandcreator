@@ -306,3 +306,49 @@
    flex:none!important;
  }
 }
+
+
+/* Workspace QA: screen-only rules; keep exported A4 artboards untouched. */
+@media screen {
+  .editor-mode .editor-header-inner { box-sizing:border-box; min-width:0; height:auto!important; min-height:66px; gap:12px; padding-block:10px; }
+  .editor-mode .editor-topbar { height:auto!important; min-height:66px; }
+  .editor-mode .header-actions { min-width:0; justify-content:flex-end; flex-wrap:wrap; }
+  .editor-mode .editor-product-brand { min-width:0; flex-shrink:1; }
+  .editor-mode .project-name { display:block; max-width:240px; overflow-wrap:anywhere; }
+  .editor-mode .editor-layout > *, .editor-mode .page-stage, .editor-mode .preview-title-block { box-sizing:border-box; min-width:0; }
+  .editor-mode .creator-preview-toolbar { flex-wrap:wrap; gap:10px; min-width:0; }
+  .editor-mode .preview-toolbar-meta { display:flex; flex-wrap:wrap; min-width:0; }
+  .editor-mode .svg-page { max-width:100%; height:auto; aspect-ratio:297/210; }
+  .editor-mode .svg-page > svg { width:100%; height:100%; display:block; }
+  .editor-mode .settings-heading h2, .bramer-editor-overview h1, .editor-mode .page-select span:last-child { overflow-wrap:anywhere; }
+  .bramer-create-shell .bramer-create-header-actions { display:flex; flex-wrap:wrap; align-items:center; gap:8px; min-width:0; }
+  .bramer-create-shell .bramer-dash-header { height:auto!important; min-height:66px; padding-block:10px; }
+  .bramer-create-shell .setup-module :is(input:not([type=checkbox]):not([type=radio]),textarea,select), .editor-mode .settings-panel :is(input:not([type=checkbox]):not([type=radio]),textarea,select) { box-sizing:border-box; min-width:0; max-width:100%; }
+  .bramer-dash :is(button,a,input,select,textarea):focus-visible, .editor-mode :is(button,a,input,select,textarea):focus-visible { outline:2px solid #222; outline-offset:3px; }
+  .editor-mode .bramer-export-error { box-sizing:border-box; width:min(1440px,calc(100% - 48px)); margin:12px auto; border:1px solid #ddd; background:#fff; font-size:13px; line-height:1.65; overflow-wrap:anywhere; }
+}
+@media screen and (max-width:1100px) {
+  .editor-mode .editor-header-inner { flex-wrap:wrap; }
+  .editor-mode .header-actions { flex:1 1 100%; justify-content:flex-start; }
+  .editor-mode .editor-topbar { position:relative!important; top:auto!important; }
+}
+@media screen and (max-width:760px) {
+  .bramer-create-shell .bramer-dash-header { flex-wrap:wrap; gap:8px 12px; }
+  .bramer-create-shell .bramer-create-header-actions { flex:1 1 100%; justify-content:flex-end; }
+  .bramer-create-shell .bramer-create-header-actions > * { min-height:40px; }
+  .bramer-dash .bramer-dash-nav { max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; }
+  .bramer-dash .bramer-dash-nav button { flex:0 0 auto; white-space:nowrap; min-height:44px; }
+  .bramer-create-shell .step-nav-list { max-width:100%; overscroll-behavior-x:contain; }
+  .bramer-create-shell .step-actions { flex-wrap:wrap; gap:12px; }
+  .bramer-create-shell .step-actions > * { min-width:0; max-width:100%; }
+  .editor-mode .editor-layout { display:flex!important; flex-direction:column; width:100%!important; max-width:100%; }
+  .editor-mode .page-sidebar, .editor-mode .preview-area, .editor-mode .settings-panel { position:static!important; width:100%!important; max-width:100%; height:auto!important; min-height:0!important; }
+  .editor-mode .page-list { display:flex!important; max-width:100%; overflow-x:auto; overscroll-behavior-x:contain; }
+  .editor-mode .page-group { flex:0 0 180px; min-width:0; }
+  .editor-mode .header-actions .button { min-height:40px; }
+  .editor-mode .creator-preview-toolbar { align-items:flex-start; }
+  .editor-mode .preview-toolbar-meta { justify-content:flex-start; }
+  .editor-mode .bramer-export-error { width:calc(100% - 24px); }
+  .bramer-project-card .bramer-project-controls { flex-wrap:wrap; min-width:0; }
+  .bramer-landing .bramer-beta-dialog.bramer-beta-refined { box-sizing:border-box; max-height:calc(100vh - 28px); max-height:calc(100dvh - 28px); }
+}
