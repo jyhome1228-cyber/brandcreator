@@ -50,9 +50,9 @@ const fittedText = (value:string,x:number,y:number,maxWidth:number,fontSize:numb
   return `<text x="${x}" y="${y}" font-family="Pretendard,Arial,sans-serif" font-size="${size}" font-weight="${weight}" fill="${fill}">${esc(v)}</text>`;
 };
 const wrapCopy = (value:string,maxUnits:number,maxLines:number):string[] => {
-  const content=String(value||'').trim().replace(/\\s+/g,' ');
+  const content=String(value||'').trim().replace(/\s+/g,' ');
   if(!content)return [];
-  const units=(str:string)=>[...str].reduce((sum,ch)=>sum+(/[가-힣\\u3040-\\u30ff\\u4e00-\\u9fff]/u.test(ch)?2:1),0);
+  const units=(str:string)=>[...str].reduce((sum,ch)=>sum+(/[가-힣\u3040-\u30ff\u4e00-\u9fff]/u.test(ch)?2:1),0);
   const result:string[]=[];
   let current='';
   const push=()=>{if(current.trim())result.push(current.trim());current='';};
