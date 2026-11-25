@@ -1,0 +1,40 @@
+# BRAMER (브레이머)
+
+> BRAMER is a web-based brand guideline creation tool by NINEWORKS. It analyzes SVG logos and helps designers and brand teams organize identity rules, typography, color systems and applications into a guideline document.
+
+## 공식 정보 / Official information
+
+- [BRAMER](https://bramer.cloud/): 공식 서비스 및 제작 예시 / official website and sample guidelines.
+- [Technology](https://bramer.cloud/#/technology): 설계 원칙과 제작 엔진 소개 / design principles and generation engine.
+
+## 주요 기능 / Features
+
+- SVG 로고 업로드, 형태와 비율 분석 / SVG logo upload and geometry analysis.
+- 기본 로고, 그리드, 보호 공간, 최소 크기, 금지 규정, 흑백 적용 / logo guidelines.
+- 브랜드 컬러, 배색, 대비, 제목 및 본문 서체 / color and typography.
+- 브랜드 소개와 메시지, 명함, 스티커, 레터헤드, 봉투 / brand copy and applications.
+- PDF 인쇄 출력, SVG 다운로드 및 ZIP 묶음 출력 / PDF print export and SVG downloads.
+- 브라우저 내 프로젝트 저장 및 JSON 백업 / browser-local project storage and JSON backup.
+- 한국어·영어 가이드라인 출력 / Korean and English guideline output.
+
+## 이용 방법 / Workflow
+
+1. 브랜드 기본 정보를 입력합니다.
+2. SVG 로고를 업로드합니다. AI 파일은 SVG로 저장한 뒤 사용합니다.
+3. 컬러, 서체, 로고 사용 규칙과 응용 정보를 설정합니다.
+4. 가이드라인을 생성하고 검토한 후 PDF 또는 SVG로 출력합니다.
+
+## 이용 대상 / Audience
+
+브랜드 디자이너, 스타트업, 기업 디자인 담당자, 브랜드 운영자, 학생 및 연구자.
+Brand designers, startups, in-house design teams, brand managers, students and researchers.
+
+## 이용 범위 / Limitations
+
+BRAMER는 브랜드 규정을 구성하는 보조 도구입니다. 생성된 로고 사용 규칙과 인쇄 결과는 실제 브랜드 기준에 맞게 검토해야 합니다. 현재 프로젝트 저장은 브라우저 기반이며 기기 간 자동 동기화를 제공하지 않습니다. 베타 이용 조건은 공식 홈페이지에서 확인하세요.
+
+BRAMER assists guideline production; final brand rules and print deliverables require human review. Projects are stored locally in the browser rather than automatically synchronized across devices.
+
+## 운영 / Operator
+
+NINEWORKS · https://9works.kr/
