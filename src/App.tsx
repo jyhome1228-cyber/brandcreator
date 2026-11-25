@@ -14,7 +14,7 @@ import WorkspaceNav from './components/WorkspaceNav';
 import { deleteLocalProject, listSavedProjects, newProjectId, saveLocalProject, type SavedBramerProject } from './engines/projectLibrary';
 import BramerSelect from './components/BramerSelect';
 import { INDUSTRY_RATIONALE } from './engines/industryRationale';
-import { downloadAllSvg, downloadSvg } from './export/download';
+import { downloadAllSvg, downloadSvg, validateExportPage } from './export/download';
 import { CORE_ITEMS, generateV2Pages, generateBusinessCardSvg, generateStickerSvg, generateLetterheadSvg, generateEnvelopeSvg } from './guideline-system/v2Pages';
 import { localizeGuidelinePages, type DocumentLanguage } from './guideline-system/localizeGuideline';
 import { CATEGORIES, INDUSTRIES, INDUSTRY_GUIDANCE, getDefaultSelection, type GuidelineCategory, type IndustryId } from './engines/industryRecommendations';
@@ -181,6 +181,9 @@ export default function App() {
   const [currentId, setCurrentId] = useState('01-cover');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
+  const [exportBusy, setExportBusy] = useState<'zip' | 'pdf' | null>(null);
+  const exportLock = useRef(false);
+  const [exportError, setExportError] = useState('');
   const [industry, setIndustry] = useState<IndustryId>('service');
   const [selectedCategories, setSelectedCategories] = useState<GuidelineCategory[]>(getDefaultSelection('service'));
   const [projectId, setProjectId] = useState(() => newProjectId());
@@ -375,6 +378,36 @@ export default function App() {
   const currentPage = pages.find((page) => page.id === currentId) ?? pages[0];
   const currentPageNumber = Math.max(1, pages.findIndex(page => page.id === currentPage?.id) + 1);
   const enabledPages = pages.filter((page) => enabled[page.id] !== false);
+  const exportSingle = (makePage: () => GuidelinePage) => {
+    if (exportLock.current) return;
+    setExportError('');
+    try { downloadSvg(makePage(), project.englishName || project.name); }
+    catch (cause) { console.error('BRAMER SVG export error', cause); setExportError('SVG 파일을 내보내지 못했습니다. 로고와 출력 설정을 확인해 주세요.'); }
+  };
+  const exportDocument = async (kind: 'zip' | 'pdf') => {
+    if (exportLock.current) return;
+    setExportError('');
+    if (!enabledPages.length) { setExportError('출력할 페이지를 선택해 주세요.'); return; }
+    exportLock.current = true;
+    setExportBusy(kind);
+    try {
+      if (kind === 'zip') {
+        await downloadAllSvg(enabledPages, project.englishName || project.name);
+      } else {
+        enabledPages.forEach(validateExportPage);
+        // Give web fonts a chance to load without blocking the user indefinitely.
+        if (document.fonts) {
+          let timer: ReturnType<typeof setTimeout> | undefined;
+          try { await Promise.race([document.fonts.ready, new Promise<void>(resolve => { timer = setTimeout(resolve, 4000); })]); }
+          finally { if (timer !== undefined) clearTimeout(timer); }
+        }
+        window.print();
+      }
+    } catch (cause) {
+      console.error('BRAMER export error', cause);
+      setExportError(kind === 'pdf' ? 'PDF 출력 창을 열지 못했습니다. 다시 시도해 주세요.' : 'SVG 압축 파일을 만들지 못했습니다. 다시 시도해 주세요.');
+    } finally { exportLock.current = false; setExportBusy(null); }
+  };
   const industryLabel = INDUSTRIES.find(item => item.id === industry)?.label ?? '브랜드';
   const selectedCount = CORE_ITEMS.length;
   const setupChecks = [
@@ -977,13 +1010,13 @@ export default function App() {
                       <strong>응용 디자인 SVG 원본</strong>
                       <p className="module-description">명함 90×50mm, 스티커 50mm, A4 레터헤드, 소·대봉투 SVG를 개별 다운로드할 수 있습니다. 인쇄 전 도련·폰트·재단·봉투 전개도 등 실측 규격을 반드시 확인하세요.</p>
                       {project.logo && <div className="bramer-v2-export-buttons">
-                        <button type="button" onClick={()=>downloadSvg({id:'business-card-front',section:'application',title:'Business Card Front',subtitle:'',svg:generateBusinessCardSvg(project)},project.englishName||project.name)}>명함 앞면 SVG</button>
-                        <button type="button" onClick={()=>downloadSvg({id:'business-card-back',section:'application',title:'Business Card Back',subtitle:'',svg:generateBusinessCardSvg(project,true)},project.englishName||project.name)}>명함 뒷면 SVG</button>
-                        <button type="button" onClick={()=>downloadSvg({id:'sticker-round',section:'application',title:'Round Sticker',subtitle:'',svg:generateStickerSvg(project,'circle')},project.englishName||project.name)}>원형 스티커 SVG</button>
-                        <button type="button" onClick={()=>downloadSvg({id:'sticker-square',section:'application',title:'Square Sticker',subtitle:'',svg:generateStickerSvg(project,'square')},project.englishName||project.name)}>사각 스티커 SVG</button>
-                        <button type="button" onClick={()=>downloadSvg({id:'letterhead-a4',section:'application',title:'A4 Letterhead',subtitle:'',svg:generateLetterheadSvg(project)},project.englishName||project.name)}>A4 레터헤드 SVG</button>
-                        <button type="button" onClick={()=>downloadSvg({id:'envelope-small',section:'application',title:'Small Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'small')},project.englishName||project.name)}>소봉투 SVG</button>
-                        <button type="button" onClick={()=>downloadSvg({id:'envelope-large',section:'application',title:'Large Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'large')},project.englishName||project.name)}>대봉투 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>{id:'business-card-front',section:'application',title:'Business Card Front',subtitle:'',svg:generateBusinessCardSvg(project)})}>명함 앞면 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>{id:'business-card-back',section:'application',title:'Business Card Back',subtitle:'',svg:generateBusinessCardSvg(project,true)})}>명함 뒷면 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>{id:'sticker-round',section:'application',title:'Round Sticker',subtitle:'',svg:generateStickerSvg(project,'circle')})}>원형 스티커 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>{id:'sticker-square',section:'application',title:'Square Sticker',subtitle:'',svg:generateStickerSvg(project,'square')})}>사각 스티커 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>{id:'letterhead-a4',section:'application',title:'A4 Letterhead',subtitle:'',svg:generateLetterheadSvg(project)})}>A4 레터헤드 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>{id:'envelope-small',section:'application',title:'Small Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'small')})}>소봉투 SVG</button>
+                        <button type="button" onClick={()=>exportSingle(()=>{id:'envelope-large',section:'application',title:'Large Envelope',subtitle:'',svg:generateEnvelopeSvg(project,'large')})}>대봉투 SVG</button>
                       </div>}
                     </div>
                   </div>
@@ -992,6 +1025,7 @@ export default function App() {
             </div>
 
             {error ? <p className="error-message setup-error" role="alert">{error}</p> : null}
+            {exportError && <p className="setup-error" role="alert">{exportError}</p>}
 
             <div className="setup-actions creator-actions step-actions">
               <div className="action-copy">
@@ -1123,12 +1157,13 @@ export default function App() {
             <button className="button ghost" onClick={() => void saveToBrowser()}>브라우저 저장</button>
             <button className="button ghost" onClick={() => void openProjectLibrary()}>내 프로젝트</button>
             <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); window.location.hash = '/create'; }}>구성 변경</button>
-            <button className="button secondary" onClick={() => { if (!enabledPages.length) { window.alert('출력할 페이지를 선택해 주세요.'); return; } void downloadAllSvg(enabledPages, project.englishName || project.name).catch((cause: unknown) => { console.error('BRAMER SVG export error', cause); window.alert('SVG 파일을 내보내지 못했습니다. 프로젝트를 저장한 후 다시 시도해 주세요.'); }); }}>전체 SVG</button>
-            <button className="button primary" onClick={() => { if (!enabledPages.length) { window.alert('출력할 페이지를 선택해 주세요.'); return; } try { window.print(); } catch (cause) { console.error('BRAMER print error', cause); window.alert('PDF 출력 창을 열지 못했습니다. 다시 시도해 주세요.'); } }}>PDF로 내보내기</button>
+            <button className="button secondary" disabled={exportBusy !== null || !enabledPages.length} onClick={() => void exportDocument('zip')}>{exportBusy === 'zip' ? 'SVG 준비 중…' : '전체 SVG'}</button>
+            <button className="button primary" disabled={exportBusy !== null || !enabledPages.length} onClick={() => void exportDocument('pdf')}>{exportBusy === 'pdf' ? 'PDF 준비 중…' : 'PDF로 내보내기'}</button>
           </div>
         </div>
       </header>
 
+      {exportError && <p className="bramer-export-error" role="alert" style={{ padding: "12px 24px" }}>{exportError}</p>}
       <div className="bramer-editor-overview">
         <div><span>가이드라인 편집</span><h1>{project.englishName || project.name}</h1></div>
         <div><strong>{enabledPages.length}개 페이지</strong><small>{industryLabel} · A4 Landscape</small></div>
@@ -1185,7 +1220,7 @@ export default function App() {
               <span>{String(currentPageNumber).padStart(2, '0')} / {String(pages.length).padStart(2, '0')}</span>
               <span>A4 가로형</span>
               <span>벡터 문서</span>
-              <button className="button tertiary small" onClick={() => downloadSvg(currentPage, project.englishName || project.name)}>SVG 다운로드</button>
+              <button className="button tertiary small" disabled={exportBusy !== null} onClick={() => exportSingle(() => currentPage)}>SVG 다운로드</button>
             </div>
           </div>
           <div className="page-stage">
