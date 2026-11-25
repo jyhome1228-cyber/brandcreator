@@ -260,7 +260,7 @@ export default function App() {
     const flush = () => {
       if(document.visibilityState !== 'hidden' || !hasDraftContent()) return;
       if(autosaveTimer.current) clearTimeout(autosaveTimer.current);
-      void saveLocalProject(currentSnapshot()).catch(() => {});
+      void saveToBrowser();
     };
     document.addEventListener('visibilitychange',flush);
     return () => document.removeEventListener('visibilitychange',flush);
@@ -289,7 +289,10 @@ export default function App() {
   const createNewProject = async () => {
     if (!hasBetaSession()) { enterBetaFromManifesto(); return; }
     if (autosaveTimer.current) clearTimeout(autosaveTimer.current);
-    if (hasDraftContent()) await saveToBrowser();
+    if (hasDraftContent() && !(await saveToBrowser())) {
+      window.alert('현재 프로젝트를 저장하지 못했습니다. 작업을 보호하기 위해 새 프로젝트 생성을 중단합니다. JSON 백업 후 다시 시도해 주세요.');
+      return;
+    }
     const nextId=newProjectId();
     try { localStorage.setItem('bramer-active-project-v1',nextId); } catch { /* unavailable */ }
     setProject({ ...initialProject, year: String(new Date().getFullYear()), contact:{...initialProject.contact!}, colors:{...initialProject.colors}, typography:{...initialProject.typography}, rules:{...initialProject.rules} });
@@ -1062,8 +1065,8 @@ export default function App() {
             <button className="button ghost" onClick={() => void saveToBrowser()}>브라우저 저장</button>
             <button className="button ghost" onClick={() => void openProjectLibrary()}>내 프로젝트</button>
             <button className="button ghost" onClick={() => { setSetupStep(1); setMode('setup'); window.location.hash = '/create'; }}>구성 변경</button>
-            <button className="button secondary" onClick={() => void downloadAllSvg(enabledPages, project.englishName || project.name)}>전체 SVG</button>
-            <button className="button primary" onClick={() => window.print()}>PDF로 내보내기</button>
+            <button className="button secondary" onClick={() => { if (!enabledPages.length) { window.alert('출력할 페이지를 선택해 주세요.'); return; } void downloadAllSvg(enabledPages, project.englishName || project.name).catch((cause: unknown) => { console.error('BRAMER SVG export error', cause); window.alert('SVG 파일을 내보내지 못했습니다. 프로젝트를 저장한 후 다시 시도해 주세요.'); }); }}>전체 SVG</button>
+            <button className="button primary" onClick={() => { if (!enabledPages.length) { window.alert('출력할 페이지를 선택해 주세요.'); return; } try { window.print(); } catch (cause) { console.error('BRAMER print error', cause); window.alert('PDF 출력 창을 열지 못했습니다. 다시 시도해 주세요.'); } }}>PDF로 내보내기</button>
           </div>
         </div>
       </header>
