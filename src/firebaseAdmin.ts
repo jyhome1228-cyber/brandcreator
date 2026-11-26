@@ -24,8 +24,12 @@ export type UsageEvent = {
   projectName: string;
   detail: string;
 };
-export type AdminSession = { email: string; uid: string; token: string };
-type AuthResponse = { idToken?: string; localId?: string; email?: string; error?: { message?: string } };
+export type AdminSession = { email: string; uid: string; token: string; refreshToken?: string; expiresAt?: number };
+const ADMIN_SESSION_KEY = 'bramer-firebase-admin-session-v2';
+export function clearAdminSession(): void { try { localStorage.removeItem(ADMIN_SESSION_KEY); } catch {} }
+function rememberAdminSession(session: AdminSession): void { try { localStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session)); } catch {} }
+export function hasRememberedAdminSession(): boolean { try { return Boolean(localStorage.getItem(ADMIN_SESSION_KEY)); } catch { return false; } }
+type AuthResponse = { idToken?: string; localId?: string; email?: string; refreshToken?: string; expiresIn?: string; error?: { message?: string } };
 type FirestoreValue = {
   stringValue?: string;
   integerValue?: string;
@@ -123,8 +127,29 @@ export async function signInAdmin(email: string, password: string): Promise<Admi
     }
     throw new Error('Firebase 로그인은 성공했지만 관리자 정보를 확인할 수 없습니다. Firestore 설정과 네트워크를 확인해 주세요.');
   }
-  return { email: response.email, uid: response.localId, token: response.idToken };
+  const session: AdminSession = { email: response.email, uid: response.localId, token: response.idToken, refreshToken: response.refreshToken, expiresAt: Date.now() + Number(response.expiresIn || 3600) * 1000 };
+  rememberAdminSession(session);
+  return session;
 }
+
+export async function restoreAdminSession(): Promise<AdminSession | null> {
+  let raw: string | null = null;
+  try { raw = localStorage.getItem(ADMIN_SESSION_KEY); } catch { return null; }
+  if (!raw) return null;
+  let session: AdminSession;
+  try { session = JSON.parse(raw) as AdminSession; } catch { clearAdminSession(); return null; }
+  if (!session.uid || !session.email || !session.token) { clearAdminSession(); return null; }
+  if (!session.expiresAt || session.expiresAt < Date.now() + 120000) {
+    if (!session.refreshToken) { clearAdminSession(); return null; }
+    const refreshed = await jsonRequest<{id_token:string;refresh_token:string;expires_in:string;user_id:string}>(`https://securetoken.googleapis.com/v1/token?key=${encodeURIComponent(firebaseApiKey)}`, {method:'POST',headers:{'Content-Type':'application/x-www-form-urlencoded'},body:new URLSearchParams({grant_type:'refresh_token',refresh_token:session.refreshToken})});
+    if (!refreshed.id_token || refreshed.user_id !== session.uid) { clearAdminSession(); return null; }
+    session = {...session,token:refreshed.id_token,refreshToken:refreshed.refresh_token,expiresAt:Date.now()+Number(refreshed.expires_in||3600)*1000};
+  }
+  const profile = await authGET(`${firestoreRoot()}/admins/${encodeURIComponent(session.uid)}`,session.token);
+  if (value(profile.fields?.active) !== true) { clearAdminSession(); throw new Error('관리자 권한이 활성화되어 있지 않습니다.'); }
+  return session;
+}
+export function persistAdminSession(session:AdminSession):void { rememberAdminSession(session); }
 
 async function getCollection(collection: string, token: string): Promise<FirestoreDocument[]> {
   let pageToken = '';
