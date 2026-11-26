@@ -191,6 +191,8 @@ export function generateApplicationPages(project:BrandProject):GuidelinePage[] {
  appPage('v2-14-business-card','Business Card','90 × 50 mm · front and back',project,
   `${embedApplication(front,185,485,1195,664)}
    ${embedApplication(back,1530,485,1195,664)}
+   <rect x="185" y="485" width="1195" height="664" fill="none" stroke="#D0D0D0" stroke-width="2.5"/>
+   <rect x="1530" y="485" width="1195" height="664" fill="none" stroke="#D0D0D0" stroke-width="2.5"/>
    ${dimensionH(185,1188,1195,'90 mm')}
    ${dimensionV(1415,485,664,'50 mm')}
    ${dimensionH(1530,1188,1195,'90 mm')}
