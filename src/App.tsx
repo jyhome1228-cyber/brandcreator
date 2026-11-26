@@ -4,6 +4,7 @@ import { parseLogoSvg } from './engines/svgParser';
 import Landing from './Landing';
 import AdminDashboard from './AdminDashboard';
 import { recordVisit } from './visitorStats';
+import { recordBetaUsage } from './firebaseBetaRegistration';
 import TechnicalManifesto from './TechnicalManifesto';
 import WelcomeExperience from './WelcomeExperience';
 import { hasLocalBetaRegistration } from './betaLocalAccess';
@@ -389,7 +390,7 @@ export default function App() {
   const exportSingle = (makePage: () => GuidelinePage) => {
     if (exportLock.current) return;
     setExportError('');
-    try { downloadSvg(makePage(), project.englishName || project.name); }
+    try { downloadSvg(makePage(), project.englishName || project.name); void recordBetaUsage('export_svg').catch(()=>{}); }
     catch (cause) { console.error('BRAMER SVG export error', cause); setExportError('SVG 파일을 내보내지 못했습니다. 로고와 출력 설정을 확인해 주세요.'); }
   };
   const exportDocument = async (kind: 'zip' | 'pdf') => {
@@ -401,6 +402,7 @@ export default function App() {
     try {
       if (kind === 'zip') {
         await downloadAllSvg(enabledPages, project.englishName || project.name);
+        void recordBetaUsage('export_svg').catch(()=>{});
       } else {
         enabledPages.forEach(validateExportPage);
         // Give web fonts a chance to load without blocking the user indefinitely.
@@ -410,6 +412,7 @@ export default function App() {
           finally { if (timer !== undefined) clearTimeout(timer); }
         }
         window.print();
+        void recordBetaUsage('pdf_print_requested').catch(()=>{});
       }
     } catch (cause) {
       console.error('BRAMER export error', cause);
@@ -565,6 +568,7 @@ export default function App() {
     setEnabled(previous=>Object.fromEntries(pages.map(page=>[page.id,previous[page.id]!==false])));
     setCurrentId(pages[0].id);
     setPageView('overview');
+    void recordBetaUsage('guideline_generated').catch(()=>{});
     setMode('editor');
     window.location.hash = '/editor';
     window.scrollTo({ top: 0, behavior: 'instant' });
