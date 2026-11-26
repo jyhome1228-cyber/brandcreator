@@ -133,12 +133,11 @@ export async function checkVisitConnectivity():Promise<VisitConnectionState> {
 }
 export async function fetchDailyVisits():Promise<DailyVisits[]>{
   const rows:DailyVisits[]=[];
-  const auth=await visitorToken();
   let token='';
   for(let page=0;page<15;page++){
     const qs=new URLSearchParams({pageSize:'100'});
     if(token)qs.set('pageToken',token);
-    const response=await fetch(`${root}/visitDaily?${qs.toString()}`,{cache:'no-store',headers:{Authorization:`Bearer ${auth}`}});
+    const response=await fetch(`${root}/visitDaily?${qs.toString()}`,{cache:'no-store'});
     if(!response.ok){
       throw firestoreResponseError(response.status,'read',await response.text().catch(()=>''));
     }
