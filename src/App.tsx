@@ -168,6 +168,7 @@ export default function App() {
   }, [mode]);
   const [setupStep, setSetupStep] = useState<1 | 2 | 3 | 4 | 5>(1);
   const [currentId, setCurrentId] = useState('01-cover');
+  const [pageView, setPageView] = useState<'overview' | 'single'>('overview');
   const [enabled, setEnabled] = useState<Record<string, boolean>>({});
   const [error, setError] = useState('');
   const [exportBusy, setExportBusy] = useState<'zip' | 'pdf' | null>(null);
@@ -563,6 +564,7 @@ export default function App() {
     setError('');
     setEnabled(previous=>Object.fromEntries(pages.map(page=>[page.id,previous[page.id]!==false])));
     setCurrentId(pages[0].id);
+    setPageView('overview');
     setMode('editor');
     window.location.hash = '/editor';
     window.scrollTo({ top: 0, behavior: 'instant' });
@@ -1202,7 +1204,7 @@ export default function App() {
                     const index = pages.findIndex((item) => item.id === page.id);
                     return (
                       <div className={`page-row ${page.id === currentPage.id ? 'selected' : ''}`} key={page.id}>
-                        <button className="page-select" onClick={() => setCurrentId(page.id)}>
+                        <button className="page-select" onClick={() => { setCurrentId(page.id); setPageView('single'); }}>
                           <span>{String(index + 1).padStart(2, '0')}</span>
                           <span>{page.subtitle || page.title}</span>
                         </button>
@@ -1222,6 +1224,11 @@ export default function App() {
         </aside>
 
         <section className="preview-area">
+          <div className="bramer-page-view-switch" role="group" aria-label="페이지 보기 방식">
+            <button type="button" aria-pressed={pageView === 'overview'} onClick={() => setPageView('overview')}>전체 페이지 ({pages.length})</button>
+            <button type="button" aria-pressed={pageView === 'single'} onClick={() => setPageView('single')}>현재 페이지</button>
+          </div>
+          <div hidden={pageView === 'overview'}>
           <div className="preview-toolbar creator-preview-toolbar">
             <div className="preview-title-block">
               <span className="metadata-label">{currentPage.title}</span>
@@ -1237,6 +1244,27 @@ export default function App() {
           <div className="page-stage">
             <div className="svg-page" dangerouslySetInnerHTML={{ __html: currentPage.svg }} />
           </div>
+          </div>
+          <section className={`bramer-page-gallery ${pageView === 'overview' ? 'is-overview' : ''}`} aria-label="전체 가이드라인 미리보기">
+            <div className="bramer-page-gallery-head">
+              <h2>전체 페이지 미리보기</h2>
+              <span>{pages.length}개 생성 · {enabledPages.length}개 출력 선택</span>
+            </div>
+            <div className="bramer-page-gallery-grid">
+              {pages.map((page, index) => (
+                <button type="button" className="bramer-page-thumb" key={page.id}
+                  aria-current={currentPage.id === page.id ? 'page' : undefined}
+                  data-excluded={enabled[page.id] === false}
+                  aria-label={`${index + 1}. ${page.subtitle || page.title}${enabled[page.id] === false ? ' (출력 제외)' : ''}`}
+                  onClick={() => { setCurrentId(page.id); setPageView('single'); }}>
+                  <span className="bramer-page-thumb-paper">
+                    <img loading="lazy" decoding="async" alt="" src={`data:image/svg+xml;charset=utf-8,${encodeURIComponent(page.svg)}`} />
+                  </span>
+                  <span className="bramer-page-thumb-meta"><strong>{String(index + 1).padStart(2, '0')}</strong><span>{page.subtitle || page.title}{enabled[page.id] === false ? ' · 출력 제외' : ''}</span></span>
+                </button>
+              ))}
+            </div>
+          </section>
         </section>
 
         <aside className="settings-panel">
