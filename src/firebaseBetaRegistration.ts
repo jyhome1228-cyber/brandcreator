@@ -58,3 +58,11 @@ export async function verifyOwnFirebaseBetaTester(name:string,phone:string):Prom
     ||data.status?.stringValue!=='active')return null;
   return {name:registeredName,phone:registeredPhone,occupation:data.occupation?.stringValue||''};
 }
+
+/** Minimal usage telemetry; no project names or personal contact details. */
+export async function recordBetaUsage(event:'guideline_generated'|'export_svg'|'pdf_print_requested'):Promise<void>{
+  const {uid,token}=await getAnonymousFirebaseIdentity();
+  const url=`https://firestore.googleapis.com/v1/projects/${firebaseWebConfig.projectId}/databases/(default)/documents/usageEvents`;
+  const response=await fetch(url,{method:'POST',headers:{'Content-Type':'application/json',Authorization:`Bearer ${token}`},body:JSON.stringify({fields:{userId:{stringValue:uid},event:{stringValue:event},createdAt:{timestampValue:new Date().toISOString()}}})});
+  if(!response.ok)throw new Error('Usage recording failed: '+response.status);
+}
