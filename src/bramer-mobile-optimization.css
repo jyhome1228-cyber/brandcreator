@@ -352,3 +352,31 @@
   .bramer-project-card .bramer-project-controls { flex-wrap:wrap; min-width:0; }
   .bramer-landing .bramer-beta-dialog.bramer-beta-refined { box-sizing:border-box; max-height:calc(100vh - 28px); max-height:calc(100dvh - 28px); }
 }
+
+/* Generated document overview: screen only, never print the thumbnails. */
+@media screen {
+ .editor-mode .bramer-page-view-switch {display:inline-flex;gap:3px;padding:3px;border:1px solid #dedede;background:#fff;border-radius:6px;flex-shrink:0}
+ .editor-mode .bramer-page-view-switch button {border:0;background:transparent;color:#555;font:inherit;font-size:12px;font-weight:600;padding:8px 12px;border-radius:4px;cursor:pointer;white-space:nowrap}
+ .editor-mode .bramer-page-view-switch button[aria-pressed="true"] {background:#222;color:#fff}
+ .editor-mode .bramer-page-gallery {width:100%;max-width:1440px;margin:22px auto 0;min-width:0}
+ .editor-mode .bramer-page-gallery-head {display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:8px;margin-bottom:15px}
+ .editor-mode .bramer-page-gallery-head h2 {font-size:16px;font-weight:650;margin:0;color:#222}
+ .editor-mode .bramer-page-gallery-head span {font-size:12px;color:#555}
+ .editor-mode .bramer-page-gallery-grid {display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:18px 14px;align-items:start}
+ .editor-mode .bramer-page-thumb {display:block;text-align:left;width:100%;min-width:0;border:0;background:transparent;padding:0;color:#222;cursor:pointer;font:inherit}
+ .editor-mode .bramer-page-thumb-paper {display:block;aspect-ratio:297/210;background:#fff;border:1px solid #d6d6d6;box-sizing:border-box;overflow:hidden;border-radius:3px}
+ .editor-mode .bramer-page-thumb-paper img {width:100%;height:100%;display:block;object-fit:contain}
+ .editor-mode .bramer-page-thumb:hover .bramer-page-thumb-paper {border-color:#777}
+ .editor-mode .bramer-page-thumb[aria-current="page"] .bramer-page-thumb-paper {outline:2px solid #2450e8;outline-offset:2px}
+ .editor-mode .bramer-page-thumb-meta {display:flex;gap:6px;align-items:baseline;margin-top:8px;font-size:12px;line-height:1.45}
+ .editor-mode .bramer-page-thumb-meta strong {font-size:11px;font-variant-numeric:tabular-nums;flex-shrink:0}
+ .editor-mode .bramer-page-thumb-meta span {overflow-wrap:anywhere;min-width:0}
+ .editor-mode .bramer-page-thumb[data-excluded="true"] .bramer-page-thumb-paper {opacity:.48}
+ .editor-mode .bramer-page-thumb[data-excluded="true"] .bramer-page-thumb-meta {color:#777}
+ .editor-mode .bramer-page-gallery.is-overview {margin-top:12px}
+}
+@media screen and (max-width:760px) {
+ .editor-mode .bramer-page-gallery-grid {grid-template-columns:repeat(2,minmax(0,1fr));gap:15px 10px}
+ .editor-mode .bramer-page-view-switch {max-width:100%}
+ .editor-mode .bramer-page-view-switch button {min-height:40px;padding-inline:10px}
+}
