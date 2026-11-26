@@ -224,35 +224,6 @@
 }
 
 
-/* Mobile only: replace tiny document thumbnails with the approved BRAMER logo. */
-.bramer-landing .bramer-mobile-logo-preview{display:none}
-@media(max-width:760px){
- .bramer-landing .bramer-home-preview-section{
-   background:#fff!important;padding:57px 16px 72px!important;
- }
- .bramer-landing .bramer-home-preview-section .bramer-home-section-heading{
-   max-width:440px!important;margin-bottom:27px!important;
- }
- .bramer-landing .bramer-mobile-logo-preview{
-   display:flex!important;align-items:center;justify-content:center;
-   width:100%;max-width:560px;margin:0 auto;
-   aspect-ratio:1.54;min-height:220px;max-height:370px;
-   padding:35px;background:#080808;border:0;border-radius:0;
-   overflow:hidden;
- }
- .bramer-landing .bramer-mobile-logo-preview .bramer-logo{
-   display:block!important;width:min(48%,220px)!important;
-   height:auto!important;max-width:220px!important;max-height:52px!important;
-   object-fit:contain;object-position:center;filter:brightness(0) invert(1)!important;
- }
-}
-@media(max-width:380px){
- .bramer-landing .bramer-mobile-logo-preview{
-   min-height:210px;padding:25px;
- }
-}
-
-
 /* iPhone/Safari refinement: all three HOW IT WORKS illustrations share one center axis. */
 @media(max-width:760px){
  .bramer-landing .bramer-home-steps-section .bramer-home-process{
@@ -380,3 +351,31 @@
  .editor-mode .bramer-page-view-switch {max-width:100%}
  .editor-mode .bramer-page-view-switch button {min-height:40px;padding-inline:10px}
 }
+
+/* Compact mobile guideline carousel and editorial footer. */
+@media screen and (max-width:760px){
+ .bramer-landing .bramer-home-preview-section{padding:54px 16px 58px!important;background:#fff!important}
+ .bramer-landing .bramer-home-preview-section .bramer-home-section-heading{margin-bottom:24px!important}
+ .bramer-landing .bramer-mobile-guideline-carousel{width:100%;max-width:560px;margin:auto;min-width:0}
+ .bramer-landing .bramer-mobile-guideline-paper{aspect-ratio:297/210;overflow:hidden;background:#fff;border:1px solid #dedede;touch-action:pan-y;box-sizing:border-box}
+ .bramer-landing .bramer-mobile-guideline-paper img{display:block;width:100%;height:100%;object-fit:contain;animation:bramer-mobile-page-in .24s ease-out}
+ .bramer-landing .bramer-mobile-guideline-controls{display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:10px;align-items:center;margin-top:14px}
+ .bramer-landing .bramer-mobile-guideline-controls button{width:44px;height:44px;border:1px solid #ddd;border-radius:50%;background:#fff;color:#171717;font-size:28px;line-height:1;cursor:pointer}
+ .bramer-landing .bramer-mobile-guideline-controls>div{display:flex;flex-direction:column;align-items:center;gap:5px;text-align:center;min-width:0}
+ .bramer-landing .bramer-mobile-guideline-controls strong{font-size:13px;color:#222;overflow-wrap:anywhere}
+ .bramer-landing .bramer-mobile-guideline-controls span{font-size:11px;color:#666;font-variant-numeric:tabular-nums}
+ .bramer-landing .bramer-mobile-guideline-progress{height:2px;background:#e5e5e5;margin-top:14px}
+ .bramer-landing .bramer-mobile-guideline-progress i{display:block;height:100%;background:#222;transition:width .2s ease}
+ .bramer-landing .bramer-home-footer{padding:30px 20px 24px!important;background:#111!important}
+ .bramer-landing .bramer-footer-inner{width:100%!important;max-width:560px!important;margin:0 auto!important;padding:0!important}
+ .bramer-landing .bramer-footer-columns.bramer-footer-curated{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:23px 18px!important;padding:0 0 24px!important;margin:0!important}
+ .bramer-landing .bramer-footer-col{display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:4px!important;margin:0!important;padding:0!important}
+ .bramer-landing .bramer-footer-col h3{font-size:13px!important;line-height:1.5!important;color:#fff!important;margin:0 0 6px!important}
+ .bramer-landing .bramer-footer-col a,.bramer-landing .bramer-footer-link-button,.bramer-landing .bramer-footer-company{font-size:12px!important;line-height:1.6!important;min-height:32px!important;padding:5px 0!important;margin:0!important;color:#bbb!important}
+ .bramer-landing .bramer-footer-bottom{border-top:1px solid #333!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;gap:14px!important;padding:22px 0 0!important;margin:0!important}
+ .bramer-landing .bramer-footer-bottom>div{display:flex!important;flex-direction:column!important;gap:8px!important;align-items:flex-start!important}
+ .bramer-landing .bramer-footer-bottom .bramer-logo{width:112px!important;height:auto!important;max-width:112px!important}
+ .bramer-landing .bramer-footer-bottom span,.bramer-landing .bramer-footer-bottom small{font-size:11px!important;color:#aaa!important;line-height:1.6!important;margin:0!important}
+}
+@keyframes bramer-mobile-page-in{from{opacity:.65}to{opacity:1}}
+@media(prefers-reduced-motion:reduce){.bramer-landing .bramer-mobile-guideline-paper img{animation:none}.bramer-landing .bramer-mobile-guideline-progress i{transition:none}}
