@@ -76,11 +76,6 @@ function GuidelinePreview({ english }: { english: boolean }) {
     if (leaveTimer.current) clearTimeout(leaveTimer.current);
   }, []);
   useEffect(() => {
-    if (mobilePreview) {
-      setSampleProject(null);
-      setSampleError(false);
-      return;
-    }
     let cancelled = false;
     const source = window.location.pathname.startsWith("/brandcreator/") ? "/brandcreator/bramer-sample-logo.svg" : "/bramer-sample-logo.svg";
     fetch(source)
@@ -102,7 +97,7 @@ function GuidelinePreview({ english }: { english: boolean }) {
       })
       .catch(() => { if (!cancelled) setSampleError(true); });
     return () => { cancelled = true; };
-  }, [mobilePreview]);
+  }, []);
   const pages = useMemo(() => {
     if (!sampleProject) return [];
     const generated = localizeGuidelinePages(generateV2Pages(sampleProject), english ? 'en' : 'ko');
@@ -145,8 +140,18 @@ function GuidelinePreview({ english }: { english: boolean }) {
   return (
     <div className="bramer-preview bramer-engine-preview" data-reveal>
       {mobilePreview ? (
-        <div className="bramer-mobile-logo-preview" role="img" aria-label={english ? 'BRAMER logo on a black background' : '검은 배경에 배치한 BRAMER 로고'}>
-          <BramerLogo light className="bramer-mobile-preview-logo" />
+        <div className="bramer-mobile-guideline-carousel" role="region" aria-label={english ? 'Guideline samples' : '가이드라인 예시'}>
+          {pages.length ? <>
+            <div className="bramer-mobile-guideline-paper" onTouchStart={onSwipeStart} onTouchEnd={onSwipeEnd} onKeyDown={onPreviewKey} tabIndex={0}>
+              <img key={current.id} src={selectedImage} alt={current.title + ' — ' + current.subtitle} draggable={false} />
+            </div>
+            <div className="bramer-mobile-guideline-controls">
+              <button type="button" onClick={()=>changePage(index-1,pages.length)} aria-label={english?'Previous page':'이전 페이지'}>‹</button>
+              <div aria-live="polite"><strong>{current.title}</strong><span>{String(index+1).padStart(2,'0')} / {pages.length}</span></div>
+              <button type="button" onClick={()=>changePage(index+1,pages.length)} aria-label={english?'Next page':'다음 페이지'}>›</button>
+            </div>
+            <div className="bramer-mobile-guideline-progress"><i style={{width:((index+1)/pages.length*100)+'%'}}/></div>
+          </> : <p role="status">{sampleError ? (english?'Preview unavailable':'미리보기를 불러올 수 없습니다.') : (english?'Preparing preview…':'가이드라인을 준비하고 있습니다…')}</p>}
         </div>
       ) : (
       <>
@@ -504,7 +509,7 @@ export default function Landing({ onStart, onManifesto }: LandingProps) {
             <span className="bramer-footer-company">NINEWORKS · 박재영</span>
           </div>
         </div>
-        <div className="bramer-footer-bottom"><div><BramerLogo light /><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>{tr('현재 제공되는 기능을 기준으로 안내합니다.','Features described reflect the current beta version.')}</small></div>
+        <div className="bramer-footer-bottom"><div><BramerLogo light /><span>{tr('브랜드 가이드라인 제작 서비스','Brand guideline creation service')}</span></div><small>© 2026 NINEWORKS</small></div>
       </div>
     </footer>
     {betaOpen ? <div className="bramer-beta-overlay" onMouseDown={event => {if(event.target===event.currentTarget)closeBeta();}}>
