@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react';
 import BramerLogo from './components/BramerLogo';
-import { firebaseProjectId, signInAdmin, loadAdminData, type AdminSession, type BetaTester, type UsageEvent } from './firebaseAdmin';
+import { firebaseProjectId, signInAdmin, loadAdminData, restoreAdminSession, persistAdminSession, clearAdminSession, hasRememberedAdminSession, type AdminSession, type BetaTester, type UsageEvent } from './firebaseAdmin';
 import { fetchDailyVisits, latestDays, checkVisitConnectivity, lastVisitRecordStatus, type DailyVisits } from './visitorStats';
 
 type AdminSection = 'overview' | 'visitors' | 'testers' | 'events';
@@ -56,6 +56,7 @@ export default function AdminDashboard({onHome}:Props) {
   const [adminEmail,setAdminEmail]=useState('');
   const [adminPassword,setAdminPassword]=useState('');
   const [adminPending,setAdminPending]=useState(false);
+  const [restoringAdmin,setRestoringAdmin]=useState(() => hasRememberedAdminSession());
   const [adminError,setAdminError]=useState('');
   const [privateLoading,setPrivateLoading]=useState(false);
   const privateRevision=useRef(0);
@@ -63,19 +64,29 @@ export default function AdminDashboard({onHome}:Props) {
   function disconnectAdmin(){
     ++privateRevision.current;
     sessionRef.current=null;
+    clearAdminSession();
+    setRestoringAdmin(false);
     setAdminSession(null);setTesters([]);setEvents([]);setPrivateLoading(false);setAdminError('');
   }
   async function loadPrivateData(current:AdminSession){
     const revision=++privateRevision.current;
     setPrivateLoading(true);
     try {
-      const records=await loadAdminData(current);
-      if(revision!==privateRevision.current || sessionRef.current!==current)return;
+      let active=current;
+      if(current.expiresAt && current.expiresAt < Date.now()+120000){
+        const renewed=await restoreAdminSession();
+        if(!renewed)throw new Error('관리자 인증이 만료되었습니다. 다시 로그인해 주세요.');
+        if(revision!==privateRevision.current || sessionRef.current!==current)return;
+        persistAdminSession(renewed);
+        active=renewed;sessionRef.current=active;setAdminSession(active);
+      }
+      const records=await loadAdminData(active);
+      if(revision!==privateRevision.current || sessionRef.current!==active)return;
       setTesters(records.testers);
       setEvents(records.events);
       setAdminError('');
     }catch(e){
-      if(revision!==privateRevision.current || sessionRef.current!==current)return;
+      if(revision!==privateRevision.current)return;
       const message=e instanceof Error?e.message:'Firebase 관리자 데이터를 읽지 못했습니다.';
       setTesters([]);setEvents([]);
       if(/만료|권한이 거부/.test(message))disconnectAdmin();
@@ -96,6 +107,26 @@ export default function AdminDashboard({onHome}:Props) {
       setAdminError(e instanceof Error?e.message:'관리자 인증에 실패했습니다.');
     }finally{setAdminPending(false);}
   }
+  useEffect(()=>{
+    if(!unlocked)return;
+    let cancelled=false;
+    if(!hasRememberedAdminSession()){setRestoringAdmin(false);return;}
+    setRestoringAdmin(true);
+    void restoreAdminSession().then(current=>{
+      if(cancelled)return;
+      if(current){
+        persistAdminSession(current);
+        sessionRef.current=current;
+        setAdminSession(current);
+        void loadPrivateData(current);
+      }
+    }).catch(e=>{
+      if(cancelled)return;
+      clearAdminSession();
+      setAdminError(e instanceof Error?e.message:'관리자 인증을 복원하지 못했습니다.');
+    }).finally(()=>{if(!cancelled)setRestoringAdmin(false);});
+    return()=>{cancelled=true;++privateRevision.current;};
+  },[unlocked]);
   const [visits,setVisits]=useState<DailyVisits[]>([]);
   const [visitLoading,setVisitLoading]=useState(false);
   const [visitReady,setVisitReady]=useState(false);
@@ -274,11 +305,12 @@ export default function AdminDashboard({onHome}:Props) {
           </div><span>{visitLoading?'조회 중':visitReady?'집계 연결':'설정 확인'}</span>
         </section> : null}
         {error?<div className="bramer-admin-error" role="alert">{error}</div>:null}
-        {privateSection && !adminSession?
+        {privateSection && restoringAdmin?<div className="bramer-admin-panel" role="status">저장된 관리자 인증을 확인하는 중입니다.</div>:null}
+        {privateSection && !adminSession && !restoringAdmin?
           <section className="bramer-admin-signin bramer-admin-private-login">
             <div className="bramer-admin-signin-top">
-              <small>FIREBASE AUTHENTICATION</small><h2>등록자 정보 보호</h2>
-              <p>등록자 정보는 Firebase 관리자에게만 표시됩니다. Authentication의 이메일/비밀번호 로그인 활성화, 관리자 계정 생성, Firestore admins/{'{UID}'} 문서의 active=true 설정이 필요합니다.</p>
+              <small>BRAMER ADMIN</small><h2>관리자 연결</h2>
+              <p>처음 한 번만 관리자 계정으로 연결하면 이 브라우저에서 인증을 유지하고 등록자 정보를 자동으로 불러옵니다. 공용 기기에서는 이용 후 관리자 연결을 해제해 주세요.</p>
             </div>
             <form onSubmit={event=>void adminLogin(event)}>
               <label><span>관리자 이메일</span><input type="email" autoComplete="username" required
@@ -361,7 +393,7 @@ export default function AdminDashboard({onHome}:Props) {
           </section></>:section==='testers'?<>
             <section className="bramer-admin-panel bramer-admin-table-panel">
               <div className="bramer-admin-list-head"><div><h2>베타테스터 목록</h2>
-                <p>검색 결과 {validData?activeTesters.length:0}명</p></div>
+                <p>{validData?`검색 결과 ${activeTesters.length}명`:restoringAdmin||privateLoading?'조회 중':'관리자 연결 필요'}</p></div>
                 <button type="button" onClick={exportTesters} disabled={!validData}>CSV 내보내기</button>
               </div>
               <div className="bramer-admin-filters">
@@ -373,7 +405,7 @@ export default function AdminDashboard({onHome}:Props) {
                   {occupations.map(value=><option key={value} value={value}>{value}</option>)}
                 </select>
               </div>
-              {adminSession?<TesterTable testers={activeTesters}/>:<div className="bramer-admin-empty">Firebase 관리자 인증 후 베타테스터 정보를 확인할 수 있습니다.</div>}
+              {adminSession?<TesterTable testers={activeTesters}/>:<div className="bramer-admin-empty">{restoringAdmin?'등록자 정보를 불러오는 중입니다.':'최초 관리자 연결 후 등록자 정보를 확인할 수 있습니다.'}</div>}
             </section>
           </>:<section className="bramer-admin-panel bramer-admin-table-panel">
             <div className="bramer-admin-list-head"><div><h2>이용 기록</h2>
