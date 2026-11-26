@@ -15,6 +15,7 @@ const eventNames: Record<string,string> = {
   guideline_generated:'가이드라인 제작',
   guideline_exported:'파일 내보내기',
   export_pdf:'PDF 내보내기',
+  pdf_print_requested:'PDF 출력 요청',
   export_svg:'SVG 내보내기',
 };
 function readableDate(value:string, withTime = false) {
@@ -195,7 +196,28 @@ export default function AdminDashboard({onHome}:Props) {
   const latestWeek=events.filter(item=>new Date(item.createdAt).getTime()>Date.now()-7*86400000).length;
   const produced=events.filter(item=>item.event==='guideline_generated').length;
   const exported=events.filter(item=>item.event==='guideline_exported'||item.event==='export_pdf'||item.event==='export_svg').length;
-  const validData=Boolean(adminSession) && !privateLoading; // Firebase authorization, not the preview PIN.
+  const validData=Boolean(adminSession) && !privateLoading && !adminError; // Firebase authorization, not the preview PIN.
+  const registeredIds=new Set(testers.map(t=>t.id));
+  const usageRecords=events.filter(e=>registeredIds.has(e.userId)&&['guideline_generated','guideline_exported','export_pdf','export_svg','pdf_print_requested'].includes(e.event));
+  const distinct=(records:UsageEvent[])=>new Set(records.map(e=>e.userId)).size;
+  const usedCount=distinct(usageRecords);
+  const makers=distinct(usageRecords.filter(e=>e.event==='guideline_generated'));
+  const weeklyUsers=distinct(usageRecords.filter(e=>new Date(e.createdAt).getTime()>=Date.now()-7*86400000));
+  const exportUsers=distinct(usageRecords.filter(e=>e.event!=='guideline_generated'));
+  const usageMetrics=[
+    {label:'누적 베타 등록 계정',value:testers.length,caption:'등록 문서 기준'},
+    {label:'실제 활용 계정',value:usedCount,caption:'제작 또는 출력 기록 · 중복 제외'},
+    {label:'가이드라인 제작 계정',value:makers,caption:'제작 기록 · 중복 제외'},
+    {label:'최근 7일 활용 계정',value:weeklyUsers,caption:'최근 7일간 제작 또는 출력'},
+    {label:'출력 이용 계정',value:exportUsers,caption:'SVG 다운로드 또는 PDF 출력 요청'},
+    {label:'등록 대비 활용률',value:testers.length?Math.round(usedCount/testers.length*100):0,caption:'기록이 확보된 계정 기준',suffix:'%'},
+  ];
+  const renderUsageMetrics=()=> <section className="bramer-admin-panel" style={{marginBottom:20}}>
+    <div className="bramer-admin-panel-head"><div><h2>베타 서비스 활용 현황</h2><p>등록과 실제 제작·출력 이용을 구분합니다. 이용 기록 수집 시작 이후 기준이며 계정 수는 실제 인원과 다를 수 있습니다.</p></div>
+    {!adminSession && <button type="button" onClick={()=>selectSection('testers')}>관리자 연결</button>}</div>
+    <div className="bramer-admin-metrics">{usageMetrics.map(item=><article key={item.label}><span>{item.label}</span><strong>{validData?item.value.toLocaleString('ko-KR')+(item.suffix||''):'—'}</strong><small>{item.caption}</small></article>)}</div>
+    <p>{validData?(usageRecords.length?'제작·출력 기록에 근거한 집계입니다. PDF는 저장 완료가 아닌 출력 요청 기준입니다.':'아직 수집된 제작·출력 기록이 없습니다. Firestore 최신 규칙 게시 후 발생한 활동부터 집계됩니다.'):'관리자 연결 후 실제 등록 및 활용 수치를 확인할 수 있습니다.'}</p>
+  </section>;
   const visitorTotal=visits.reduce((total,row)=>total+row.visits,0);
   const todayRecord=visits.find(row=>row.day===latestDays(1)[0]);
   const sevenKeys=new Set(latestDays(7));
@@ -327,6 +349,7 @@ export default function AdminDashboard({onHome}:Props) {
         </div>:null}
         <div className="bramer-admin-preview-data">
           {section==='overview'?<>
+            {renderUsageMetrics()}
             <div className="bramer-admin-metrics">
               {[{label:'누적 방문',value:visitorTotal,caption:'집계 시작 이후 전체 방문',ready:visitReady},
                 {label:'오늘 방문',value:todayRecord?.visits||0,caption:'오늘 발생한 방문',ready:visitReady},
@@ -391,6 +414,7 @@ export default function AdminDashboard({onHome}:Props) {
               </td></tr>}</tbody>
             </table></div>
           </section></>:section==='testers'?<>
+            {renderUsageMetrics()}
             <section className="bramer-admin-panel bramer-admin-table-panel">
               <div className="bramer-admin-list-head"><div><h2>베타테스터 목록</h2>
                 <p>{validData?`검색 결과 ${activeTesters.length}명`:restoringAdmin||privateLoading?'조회 중':'관리자 연결 필요'}</p></div>
