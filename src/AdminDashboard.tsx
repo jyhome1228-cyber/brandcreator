@@ -140,6 +140,7 @@ export default function AdminDashboard({onHome}:Props) {
     setTesters([]);setEvents([]);setVisits([]);setVisitReady(false);setVisitError('');setError('');
     setSection('overview');setSearch('');setOccupation('all');
   }
+  const privateSection = section === 'testers' || section === 'events';
   const available = visitReady;
   const activeTesters=useMemo(()=>{
     const normalized=search.trim().toLocaleLowerCase('ko-KR');
@@ -254,7 +255,7 @@ export default function AdminDashboard({onHome}:Props) {
           {(['overview','visitors','testers','events'] as AdminSection[]).map(value=><button key={value} type="button"
             onClick={()=>selectSection(value)}>{sectionNames[value]}</button>)}</nav>:null}
 
-        <section className="bramer-admin-setup-banner">
+        {(section === 'overview' || section === 'visitors') && (!visitReady || visitError) ? <section className="bramer-admin-setup-banner">
           <div><small>BRAMER VISITOR ANALYTICS</small>
             <h2>{visitReady?'방문 기록 집계 중':'Firebase 방문 기록 설정 필요'}</h2>
             <p>{visitReady?'방문자 통계가 Firestore에 날짜별로 기록됩니다. 집계를 활성화한 시점부터의 방문만 표시합니다.':
@@ -271,9 +272,9 @@ export default function AdminDashboard({onHome}:Props) {
               </p>:<p>이 브라우저의 방문 기록 시도가 아직 없습니다. 홈페이지를 방문한 뒤 다시 진단해 주세요.</p>}
             </div>
           </div><span>{visitLoading?'조회 중':visitReady?'집계 연결':'설정 확인'}</span>
-        </section>
+        </section> : null}
         {error?<div className="bramer-admin-error" role="alert">{error}</div>:null}
-        {!adminSession?
+        {privateSection && !adminSession?
           <section className="bramer-admin-signin bramer-admin-private-login">
             <div className="bramer-admin-signin-top">
               <small>FIREBASE AUTHENTICATION</small><h2>등록자 정보 보호</h2>
@@ -288,7 +289,7 @@ export default function AdminDashboard({onHome}:Props) {
             </form>
             {adminError?<p role="alert" className="bramer-admin-error">{adminError}</p>:null}
           </section>:null}
-        {adminSession?<div className="bramer-admin-verified"><span>Firebase 관리자 인증됨</span>
+        {privateSection && adminSession?<div className="bramer-admin-verified"><span>Firebase 관리자 인증됨</span>
           <button type="button" onClick={disconnectAdmin}>관리자 연결 해제</button>
           <button type="button" onClick={()=>void loadPrivateData(adminSession)} disabled={privateLoading}>{privateLoading?'조회 중':'데이터 새로고침'}</button>
         </div>:null}
@@ -327,7 +328,23 @@ export default function AdminDashboard({onHome}:Props) {
                 <button type="button" onClick={()=>selectSection('testers')}>등록자 관리</button></div>
               {adminSession?<TesterTable testers={testers.slice().sort((a,b)=>b.registeredAt.localeCompare(a.registeredAt)).slice(0,6)}/>:<div className="bramer-admin-empty">Firebase 관리자 인증 후 최근 등록자가 표시됩니다.</div>}
             </section>
-          </>:section==='visitors'?<section className="bramer-admin-panel bramer-admin-table-panel">
+          </>:section==='visitors'?<>
+            <div className="bramer-admin-metrics">
+              {[{label:'누적 방문',value:visitorTotal,caption:'집계 시작 이후 전체 방문'},
+                {label:'오늘 방문',value:todayRecord?.visits||0,caption:'한국시간 기준 오늘'},
+                {label:'최근 7일 방문',value:sevenDayTotal,caption:'최근 일주일 방문 합계'},
+                {label:'오늘 방문 브라우저',value:todayRecord?.unique||0,caption:'오늘 첫 방문한 브라우저'}].map(item=>
+                  <article key={item.label}><span>{item.label}</span><strong>{visitReady?item.value.toLocaleString('ko-KR'):'—'}</strong><small>{item.caption}</small></article>)}
+            </div>
+            <section className="bramer-admin-panel">
+              <div className="bramer-admin-panel-head"><div><h2>최근 7일 방문 추이</h2><p>일별 방문 횟수</p></div><span>7 DAYS</span></div>
+              <div className="bramer-admin-chart" role="img" aria-label="최근 7일 방문 횟수 막대 차트">
+                {chartDays.map(day=><div key={day.label} className="bramer-admin-chart-day">
+                  <div className="bramer-admin-chart-track"><div style={{height:visitReady?`${Math.max(day.count/chartMax*100,day.count?3:0)}%`:'0%'}} title={visitReady?String(day.count):'미연결'}/></div>
+                  <span>{day.label}</span></div>)}
+              </div>
+            </section>
+            <section className="bramer-admin-panel bramer-admin-table-panel">
             <div className="bramer-admin-list-head"><div><h2>날짜별 방문 기록</h2>
               <p>{visitReady?`총 ${orderedVisits.length}일 · 누적 ${visitorTotal.toLocaleString('ko-KR')}회`:'Firebase 방문 기록 연결 필요'}</p></div>
               <button type="button" onClick={exportVisits} disabled={!visitReady}>CSV 내보내기</button>
@@ -341,7 +358,7 @@ export default function AdminDashboard({onHome}:Props) {
                 {visitReady?'아직 집계된 방문 기록이 없습니다.':'방문 통계 연결이 필요합니다.'}
               </td></tr>}</tbody>
             </table></div>
-          </section>:section==='testers'?<>
+          </section></>:section==='testers'?<>
             <section className="bramer-admin-panel bramer-admin-table-panel">
               <div className="bramer-admin-list-head"><div><h2>베타테스터 목록</h2>
                 <p>검색 결과 {validData?activeTesters.length:0}명</p></div>
